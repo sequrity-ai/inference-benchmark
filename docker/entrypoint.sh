@@ -22,9 +22,8 @@ echo "[entrypoint] Branch: $BENCH_BRANCH"
 if [[ -d "$BENCH_DIR/.git" ]]; then
     echo "[entrypoint] Updating existing clone..."
     cd "$BENCH_DIR"
-    git fetch origin
-    git checkout "$BENCH_BRANCH"
-    git pull origin "$BENCH_BRANCH"
+    git fetch --all
+    git checkout -B "$BENCH_BRANCH" "origin/$BENCH_BRANCH"
 else
     echo "[entrypoint] Cloning $BENCH_REPO..."
     git clone -b "$BENCH_BRANCH" "$BENCH_REPO" "$BENCH_DIR"
