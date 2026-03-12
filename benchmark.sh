@@ -13,15 +13,17 @@
 # =============================================================================
 set -euo pipefail
 
-PYTHON=/home/khl22/.conda/envs/huggingface/bin/python
+PYTHON="${PYTHON:-/home/khl22/.conda/envs/huggingface/bin/python}"
+# On RunPod: PYTHON=python3 ./benchmark.sh chatbot
+command -v "$PYTHON" &>/dev/null || PYTHON=python3
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$REPO_ROOT"
 
 # =============================================================================
 # CONFIG — edit these for your server
 # =============================================================================
-URL="http://38.80.152.148:30158/v1/chat/completions"   # RunPod 2x H100 70B FP8
-MODEL="neuralmagic/Meta-Llama-3.1-70B-Instruct-FP8"
+URL="${BENCH_URL:-http://localhost:8000/v1/chat/completions}"
+MODEL="${BENCH_MODEL:-neuralmagic/Meta-Llama-3.1-8B-Instruct-FP8}"
 BACKEND="vllm"          # vllm | sglang | openai | trtllm
 API_KEY="test"
 WARMUP=5                # warmup requests (excluded from timing)
