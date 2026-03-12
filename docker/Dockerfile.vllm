@@ -18,7 +18,8 @@ FROM vllm/vllm-openai:latest
 
 # Install git + minimal system utils (not present in vllm base image)
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    git curl vim \
+    git curl vim openssh-server \
+    && mkdir -p /run/sshd \
     && rm -rf /var/lib/apt/lists/*
 
 # Pre-install benchmark Python deps (speeds up first startup)

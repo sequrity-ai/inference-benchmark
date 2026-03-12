@@ -34,6 +34,18 @@ fi
 mkdir -p "$BENCH_DIR/results"
 cd "$BENCH_DIR"
 
+# SSH setup — RunPod injects public key via $PUBLIC_KEY env var
+if command -v sshd &>/dev/null; then
+    mkdir -p /root/.ssh /run/sshd
+    chmod 700 /root/.ssh
+    if [[ -n "${PUBLIC_KEY:-}" ]]; then
+        echo "$PUBLIC_KEY" >> /root/.ssh/authorized_keys
+        chmod 600 /root/.ssh/authorized_keys
+    fi
+    service ssh start 2>/dev/null || /usr/sbin/sshd
+    echo "[entrypoint] sshd started"
+fi
+
 # If a command was passed, run it. Otherwise sleep forever (keeps container alive for SSH).
 if [[ $# -gt 0 ]]; then
     exec "$@"
