@@ -5,11 +5,21 @@ Usage:
     python -m src.benchmark.runner \
         --url http://localhost:8000/v1/chat/completions \
         --model meta-llama/Llama-3.1-8B-Instruct \
+        --backend vllm \
         --profile output-short \
         --concurrency 10 \
         --num-requests 100 \
         --api-key test \
         --output results/run_001.json
+
+    # TRT-LLM (point URL at /generate_stream):
+    python -m src.benchmark.runner \
+        --url http://localhost:8000/generate_stream \
+        --model meta-llama/Llama-3.1-8B-Instruct \
+        --backend trtllm \
+        --profile output-short \
+        --concurrency 10 \
+        --num-requests 100
 """
 
 import asyncio
@@ -21,11 +31,11 @@ from pathlib import Path
 
 import aiohttp
 
-from .client import send_chat_request, run_warmup, RequestResult
 from .metrics import aggregate, print_summary
 from ..workloads.profiles import get_profile
 from ..workloads.dataset import make_dataset
 from ..workloads.arrival import make_arrival_times
+from ..engines import get_backend, SUPPORTED_BACKENDS
 
 
 async def run_benchmark(
@@ -34,16 +44,19 @@ async def run_benchmark(
     profile_name: str,
     concurrency: int,
     num_requests: int,
+    backend_name: str = "vllm",
     api_key: str = "test",
     arrival_pattern: str = "steady",
     target_rate: float = 10.0,
     warmup_requests: int = 3,
     seed: int = 42,
     timeout: int = 120,
-) -> list[RequestResult]:
+    ignore_eos: bool = False,
+):
     """
-    Run a benchmark and return per-request results.
+    Run a benchmark and return (results, duration).
     """
+    backend = get_backend(backend_name)
     profile = get_profile(profile_name)
     dataset = make_dataset(profile)
     arrival_times = make_arrival_times(
@@ -61,30 +74,30 @@ async def run_benchmark(
         # Warmup
         if warmup_requests > 0:
             print(f"Warming up with {warmup_requests} requests...")
-            await run_warmup(url, model, api_key, warmup_requests, timeout)
+            await backend.run_warmup(url, model, api_key, warmup_requests, timeout)
             print("Warmup done.")
 
-        # Schedule requests according to arrival pattern
+        # Schedule requests
         semaphore = asyncio.Semaphore(concurrency)
-        results: list[RequestResult] = [None] * num_requests
+        results = [None] * num_requests
         benchmark_start = time.perf_counter()
 
         async def dispatch(i: int, dispatch_time: float):
-            # Wait until scheduled dispatch time
             now = time.perf_counter() - benchmark_start
             delay = dispatch_time - now
             if delay > 0:
                 await asyncio.sleep(delay)
 
-            messages = dataset.get_next_messages()
+            request = dataset.get_next_request()
             async with semaphore:
-                result = await send_chat_request(
+                result = await backend.send_request(
                     session=session,
                     url=url,
                     model=model,
-                    messages=messages,
-                    max_tokens=profile.osl_tokens,
+                    messages=request.messages,
+                    max_tokens=request.max_tokens,
                     api_key=api_key,
+                    ignore_eos=ignore_eos,
                 )
             results[i] = result
 
@@ -95,7 +108,7 @@ async def run_benchmark(
     return results, benchmark_duration
 
 
-def save_results(summary, results: list[RequestResult], output_path: str, config: dict):
+def save_results(summary, results, output_path: str, config: dict):
     """Save summary + per-request data to JSON."""
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
     output = {
@@ -121,8 +134,10 @@ def save_results(summary, results: list[RequestResult], output_path: str, config
 
 def get_args():
     parser = argparse.ArgumentParser(description="inference-benchmark runner")
-    parser.add_argument("--url", required=True, help="OpenAI-compatible chat completions URL")
+    parser.add_argument("--url", required=True, help="Server endpoint URL")
     parser.add_argument("--model", required=True)
+    parser.add_argument("--backend", default="vllm", choices=SUPPORTED_BACKENDS,
+                        help="Backend type (vllm/sglang/openai → /v1/chat/completions, trtllm → /generate_stream)")
     parser.add_argument("--profile", default="output-short", help="Workload profile name")
     parser.add_argument("--concurrency", type=int, default=10)
     parser.add_argument("--num-requests", type=int, default=100)
@@ -133,13 +148,32 @@ def get_args():
     parser.add_argument("--seed", type=int, default=42)
     parser.add_argument("--timeout", type=int, default=120)
     parser.add_argument("--output", default="results/latest.json")
+    parser.add_argument("--ignore-eos", action="store_true",
+                        help="Pass ignore_eos=true to vLLM (needed for FP8 models with random token workloads)")
+    parser.add_argument("--mode", choices=["stress-test", "single-turn", "multi-turn"],
+                        help="Benchmark mode (sets profile defaults and required flags). "
+                             "Use --profile for a specific profile within a mode.")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = get_args()
 
-    config = vars(args)
+    if args.mode:
+        if args.mode == "multi-turn":
+            print("ERROR: multi-turn mode not yet implemented. See src/modes/multi_turn.py.")
+            import sys; sys.exit(1)
+        if args.mode == "stress-test":
+            if not args.ignore_eos:
+                print("NOTE: stress-test mode auto-enables --ignore-eos (required for FP8 models)")
+                args.ignore_eos = True
+            if args.profile == "output-short":  # default — override for stress-test
+                args.profile = "random-inferencex"
+        if args.mode == "single-turn":
+            print("NOTE: single-turn mode requires server launched with --enable-prefix-caching (vLLM)")
+            print("      or radix cache (SGLang default). See scripts/launch_server.sh")
+
+    config = {**vars(args), "mode": args.mode}
 
     results, duration = asyncio.run(run_benchmark(
         url=args.url,
@@ -147,12 +181,14 @@ if __name__ == "__main__":
         profile_name=args.profile,
         concurrency=args.concurrency,
         num_requests=args.num_requests,
+        backend_name=args.backend,
         api_key=args.api_key,
         arrival_pattern=args.arrival,
         target_rate=args.target_rate,
         warmup_requests=args.warmup,
         seed=args.seed,
         timeout=args.timeout,
+        ignore_eos=args.ignore_eos,
     ))
 
     summary = aggregate(

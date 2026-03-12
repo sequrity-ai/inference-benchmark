@@ -14,6 +14,25 @@ import time
 
 
 @dataclass
+class RequestResult:
+    """Per-request benchmark result. Shared across all backends."""
+    success: bool
+    ttft: Optional[float] = None          # seconds to first token
+    itl: list = field(default_factory=list)  # inter-token latencies (seconds)
+    e2el: Optional[float] = None          # end-to-end latency (seconds)
+    input_tokens: int = 0
+    output_tokens: int = 0
+    error: Optional[str] = None
+
+    @property
+    def tpot(self) -> Optional[float]:
+        """Time per output token (mean ITL), excluding first token."""
+        if not self.itl:
+            return None
+        return sum(self.itl) / len(self.itl)
+
+
+@dataclass
 class BenchmarkSummary:
     """Aggregated metrics for a benchmark run."""
 
