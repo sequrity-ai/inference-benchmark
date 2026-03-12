@@ -152,6 +152,8 @@ Still scaling at conc=120. TPOT jumps to 34.1ms at conc=120 — decode saturatio
 
 ### chatbot-multi-turn
 
+> Note: this is **single-turn mode** with larger ISL/OSL bounds (max 4000/1000 vs 2000/500 for chatbot-short) to simulate heavier conversation history. True multi-turn (growing KV cache across turns) is Phase 2.
+
 | Conc | Req/s | Out tok/s | Total tok/s | TTFT p50 | TTFT p99 | TPOT p50 | E2EL p50 |
 |------|-------|-----------|-------------|----------|----------|----------|----------|
 | 1    | 0.79  | 236       | 403         | 22.8ms   | 82.2ms   | 4.1ms    | 1,149ms  |
@@ -586,4 +588,4 @@ Random 1024-token output batches are significantly heavier than natural ShareGPT
 - `docker/Dockerfile.sglang` — FROM lmsysorg/sglang:latest, same pattern
 - `docker/Dockerfile.trtllm` — FROM nvcr.io/nvidia/tritonserver:24.12-trtllm-python-py3, same pattern
 - Model weights NOT baked in — mount as network volume. Always pulls latest benchmark code via BENCH_BRANCH env var.
-- **Status**: ✅ DONE — push repo to GitHub first (entrypoint.sh git clones sequrity-ai/inference-benchmark), then `docker build -f docker/Dockerfile.vllm -t sequrity/bench-vllm:latest .`
+- **Status**: ✅ DONE — image `boothalgo01/bench-vllm:latest` pushed to Docker Hub. entrypoint.sh git clones sequrity-ai/inference-benchmark at container start, writes $PUBLIC_KEY to authorized_keys, starts sshd.
