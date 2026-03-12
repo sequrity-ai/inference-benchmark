@@ -35,10 +35,10 @@ fi
 mkdir -p "$BENCH_DIR/results"
 cd "$BENCH_DIR"
 
-# If a command was passed, run it. Otherwise drop to bash.
+# If a command was passed, run it. Otherwise sleep forever (keeps container alive for SSH).
 if [[ $# -gt 0 ]]; then
     exec "$@"
 else
     echo "[entrypoint] Ready. Working dir: $BENCH_DIR"
-    exec bash
+    exec sleep infinity
 fi
