@@ -20,6 +20,12 @@ export function useData() {
       })
       .then((data: BenchmarkResult[]) => {
         setAllData(data);
+        // Default to first hardware config to avoid chart clutter
+        const hwSet = new Set(data.map((r) => r.hardware));
+        const firstHw = Array.from(hwSet).sort()[0];
+        if (firstHw) {
+          setFilters((prev) => ({ ...prev, hardware: [firstHw] }));
+        }
         setLoading(false);
       })
       .catch((err) => {
