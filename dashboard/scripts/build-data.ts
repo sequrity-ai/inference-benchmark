@@ -1,0 +1,232 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+interface RawResult {
+  config: {
+    model: string;
+    backend: string;
+    profile: string;
+    concurrency: number;
+    [key: string]: unknown;
+  };
+  summary: Record<string, unknown>;
+}
+
+interface EnrichedResult {
+  config: RawResult['config'];
+  summary: RawResult['summary'];
+  hardware: string;
+  quant: string;
+  modelShort: string;
+  seriesKey: string;
+  filename: string;
+}
+
+const RESULTS_DIR = path.resolve(__dirname, '../../results');
+const OUTPUT_FILE = path.resolve(__dirname, '../public/data.json');
+
+// Files to skip — test files, debug files, symlinks
+const SKIP_PATTERNS = [
+  /^smoke_test/,
+  /^test_/,
+  /^rng_/,
+  /^doublewrap/,
+  /^latest\.json$/,
+  /^output_short_conc/,  // ambiguous naming, no hardware prefix
+];
+
+function detectHardware(filename: string, dirPath: string): string {
+  const fp = filename.toLowerCase();
+  const dir = dirPath.toLowerCase();
+
+  if (fp.includes('h100x2') || dir.includes('h100x2')) return 'H100x2';
+  if (fp.includes('h100_tcp') || dir.includes('h100_tcp')) return 'H100-TCP';
+  if (fp.includes('h100') || dir.includes('h100')) return 'H100';
+  if (fp.includes('a6000') || dir.includes('a6000')) return 'A6000';
+
+  // Infer from directory name
+  if (dir.includes('h100_70b_fp8')) return 'H100';
+
+  return 'Unknown';
+}
+
+function detectQuant(filename: string, model: string, dirPath: string): string {
+  const combined = `${filename} ${model} ${dirPath}`.toLowerCase();
+  if (combined.includes('fp8')) return 'FP8';
+  if (combined.includes('bf16') || combined.includes('bfloat16')) return 'BF16';
+  // Default: 8B models without FP8 marker are BF16
+  if (combined.includes('8b') && !combined.includes('fp8')) return 'BF16';
+  return 'FP8'; // 70B models default to FP8
+}
+
+function shortenModel(model: string): string {
+  let short = model;
+  // Remove common prefixes
+  short = short.replace(/^meta-llama\/Meta-/i, '');
+  short = short.replace(/^meta-llama\//i, '');
+  short = short.replace(/^neuralmagic\/(Meta-)?/i, '');
+  // Remove -Instruct suffix
+  short = short.replace(/-Instruct$/i, '');
+  // Remove -FP8 suffix (captured separately in quant)
+  short = short.replace(/-FP8$/i, '');
+  return short;
+}
+
+function normalizeProfile(profile: string): string {
+  // Normalize underscores to hyphens for consistency
+  return profile.replace(/_/g, '-');
+}
+
+function detectBackendFromFilename(filename: string, configBackend: string): string {
+  const fn = filename.toLowerCase();
+  if (fn.startsWith('sglang_') || fn.includes('_sglang_')) return 'sglang';
+  if (fn.startsWith('vllm_') || fn.includes('_vllm_')) return 'vllm';
+  return configBackend || 'vllm';
+}
+
+function collectJsonFiles(dir: string, relDir: string = ''): Array<{ fullPath: string; filename: string; relDir: string }> {
+  const entries = fs.readdirSync(dir, { withFileTypes: true });
+  const files: Array<{ fullPath: string; filename: string; relDir: string }> = [];
+
+  for (const entry of entries) {
+    const fullPath = path.join(dir, entry.name);
+    if (entry.isDirectory()) {
+      // Recurse into subdirectories
+      files.push(...collectJsonFiles(fullPath, path.join(relDir, entry.name)));
+    } else if (entry.isFile() && entry.name.endsWith('.json')) {
+      files.push({ fullPath, filename: entry.name, relDir });
+    }
+  }
+
+  return files;
+}
+
+function shouldSkip(filename: string, relDir: string): boolean {
+  // Skip crossval and inferencex subdirectories
+  if (relDir.includes('crossval') || relDir.includes('inferencex')) return true;
+
+  for (const pattern of SKIP_PATTERNS) {
+    if (pattern.test(filename)) return true;
+  }
+
+  return false;
+}
+
+function main() {
+  console.log(`Reading results from: ${RESULTS_DIR}`);
+
+  const jsonFiles = collectJsonFiles(RESULTS_DIR);
+  console.log(`Found ${jsonFiles.length} JSON files total`);
+
+  const results: EnrichedResult[] = [];
+  let skipped = 0;
+  let errors = 0;
+
+  for (const { fullPath, filename, relDir } of jsonFiles) {
+    if (shouldSkip(filename, relDir)) {
+      skipped++;
+      continue;
+    }
+
+    try {
+      const raw = JSON.parse(fs.readFileSync(fullPath, 'utf-8')) as RawResult;
+
+      // Validate required fields
+      if (!raw.config || !raw.summary || !raw.config.model || !raw.summary.median_ttft_ms === undefined) {
+        skipped++;
+        continue;
+      }
+
+      // Must have concurrency
+      const concurrency = raw.config.concurrency ?? raw.summary.concurrency;
+      if (!concurrency) {
+        skipped++;
+        continue;
+      }
+
+      const hardware = detectHardware(filename, relDir);
+      const quant = detectQuant(filename, raw.config.model, relDir);
+      const modelShort = shortenModel(raw.config.model);
+      const backend = detectBackendFromFilename(filename, raw.config.backend);
+      const profile = normalizeProfile(raw.config.profile || (raw.summary as Record<string, string>).profile || 'unknown');
+
+      // Skip unknown hardware or unknown profiles
+      if (hardware === 'Unknown') {
+        skipped++;
+        continue;
+      }
+
+      const seriesKey = `${hardware} / ${modelShort} ${quant} / ${backend} / ${profile}`;
+
+      results.push({
+        config: { ...raw.config, backend, profile, concurrency },
+        summary: raw.summary,
+        hardware,
+        quant,
+        modelShort,
+        seriesKey,
+        filename: path.join(relDir, filename),
+      });
+    } catch (e) {
+      errors++;
+      console.error(`  Error parsing ${fullPath}: ${(e as Error).message}`);
+    }
+  }
+
+  // Deduplicate: if same series+concurrency appears multiple times, keep the one
+  // from the deeper directory (h100_70b_fp8/ subdir files are duplicates of root)
+  const seen = new Map<string, EnrichedResult>();
+  for (const r of results) {
+    const dedupeKey = `${r.seriesKey}::${r.config.concurrency}`;
+    const existing = seen.get(dedupeKey);
+    if (!existing) {
+      seen.set(dedupeKey, r);
+    } else {
+      // Prefer the file NOT in the subdirectory (root-level is canonical)
+      // Unless root has no relDir and subdir does, keep whichever has more specific path
+      if (r.filename.includes('/') && !existing.filename.includes('/')) {
+        // existing is root-level, keep it
+      } else if (!r.filename.includes('/') && existing.filename.includes('/')) {
+        seen.set(dedupeKey, r); // r is root-level, prefer it
+      }
+      // Otherwise keep first seen
+    }
+  }
+
+  const dedupedResults = Array.from(seen.values());
+
+  // Sort by hardware, model, backend, profile, concurrency
+  dedupedResults.sort((a, b) => {
+    if (a.hardware !== b.hardware) return a.hardware.localeCompare(b.hardware);
+    if (a.modelShort !== b.modelShort) return a.modelShort.localeCompare(b.modelShort);
+    if (a.config.backend !== b.config.backend) return a.config.backend.localeCompare(b.config.backend);
+    if (a.config.profile !== b.config.profile) return a.config.profile.localeCompare(b.config.profile);
+    return a.config.concurrency - b.config.concurrency;
+  });
+
+  // Ensure output directory exists
+  fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
+  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(dedupedResults, null, 2));
+
+  console.log(`\nResults:`);
+  console.log(`  Included: ${dedupedResults.length}`);
+  console.log(`  Skipped:  ${skipped}`);
+  console.log(`  Errors:   ${errors}`);
+  console.log(`  Output:   ${OUTPUT_FILE}`);
+
+  // Print series summary
+  const seriesMap = new Map<string, number>();
+  for (const r of dedupedResults) {
+    seriesMap.set(r.seriesKey, (seriesMap.get(r.seriesKey) || 0) + 1);
+  }
+  console.log(`\nSeries (${seriesMap.size}):`);
+  for (const [key, count] of seriesMap) {
+    console.log(`  ${key} (${count} points)`);
+  }
+}
+
+main();
