@@ -90,15 +90,31 @@ function buildChartData(
   });
 }
 
-function shortenSeriesKey(key: string): string {
-  // "H100 / Llama-3.1-70B FP8 / vllm / output-short" -> "H100 70B vllm output-short"
+function shortenSeriesKey(key: string, allKeys: string[]): string {
   const parts = key.split(' / ');
   if (parts.length < 4) return key;
-  const hw = parts[0];
-  const modelQuant = parts[1].replace('Llama-3.1-', '').replace('Llama-3.1-', '');
-  const backend = parts[2];
-  const profile = parts[3];
-  return `${hw} ${modelQuant} ${backend} ${profile}`;
+
+  // Collect unique values per part across all visible series
+  const partSets = [new Set<string>(), new Set<string>(), new Set<string>(), new Set<string>()];
+  for (const k of allKeys) {
+    const p = k.split(' / ');
+    p.forEach((v, i) => partSets[i]?.add(v));
+  }
+
+  // Only include parts that vary across series
+  const labels: string[] = [];
+  const partNames = parts.map((p, i) => {
+    if (i === 1) return p.replace('Llama-3.1-', '');
+    return p;
+  });
+
+  for (let i = 0; i < 4; i++) {
+    if (partSets[i].size > 1) {
+      labels.push(partNames[i]);
+    }
+  }
+
+  return labels.length > 0 ? labels.join(' · ') : partNames[3];
 }
 
 export function LatencyChart({ seriesData }: LatencyChartProps) {
@@ -157,12 +173,12 @@ export function LatencyChart({ seriesData }: LatencyChartProps) {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(value: any, name: any) => [
                     `${Number(value).toFixed(2)} ms`,
-                    shortenSeriesKey(String(name)),
+                    shortenSeriesKey(String(name), seriesNames),
                   ]}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-                  formatter={(value: string) => shortenSeriesKey(value)}
+                  formatter={(value: string) => shortenSeriesKey(value, seriesNames)}
                 />
                 {seriesNames.map((name, i) => (
                   <Line

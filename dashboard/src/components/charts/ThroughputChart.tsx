@@ -63,14 +63,24 @@ function buildChartData(
   });
 }
 
-function shortenSeriesKey(key: string): string {
+function shortenSeriesKey(key: string, allKeys: string[]): string {
   const parts = key.split(' / ');
   if (parts.length < 4) return key;
-  const hw = parts[0];
-  const modelQuant = parts[1].replace('Llama-3.1-', '');
-  const backend = parts[2];
-  const profile = parts[3];
-  return `${hw} ${modelQuant} ${backend} ${profile}`;
+
+  const partSets = [new Set<string>(), new Set<string>(), new Set<string>(), new Set<string>()];
+  for (const k of allKeys) {
+    const p = k.split(' / ');
+    p.forEach((v, i) => partSets[i]?.add(v));
+  }
+
+  const labels: string[] = [];
+  const partNames = parts.map((p, i) => (i === 1 ? p.replace('Llama-3.1-', '') : p));
+
+  for (let i = 0; i < 4; i++) {
+    if (partSets[i].size > 1) labels.push(partNames[i]);
+  }
+
+  return labels.length > 0 ? labels.join(' · ') : partNames[3];
 }
 
 export function ThroughputChart({ seriesData }: ThroughputChartProps) {
@@ -129,12 +139,12 @@ export function ThroughputChart({ seriesData }: ThroughputChartProps) {
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(value: any, name: any) => [
                     `${Number(value).toFixed(2)} ${metric.unit}`,
-                    shortenSeriesKey(String(name)),
+                    shortenSeriesKey(String(name), seriesNames),
                   ]}
                 />
                 <Legend
                   wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-                  formatter={(value: string) => shortenSeriesKey(value)}
+                  formatter={(value: string) => shortenSeriesKey(value, seriesNames)}
                 />
                 {seriesNames.map((name, i) => (
                   <Area
