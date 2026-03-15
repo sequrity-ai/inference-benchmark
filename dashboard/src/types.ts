@@ -45,6 +45,22 @@ export interface BenchmarkSummary {
   errors: unknown[];
 }
 
+export interface PerTurnEntry {
+  turn_index: number;
+  num_requests: number;
+  successful: number;
+  mean_ttft_ms: number;
+  median_ttft_ms: number;
+  p90_ttft_ms: number;
+  p99_ttft_ms: number;
+  mean_tpot_ms: number;
+  median_tpot_ms: number;
+  mean_e2el_ms: number;
+  median_e2el_ms: number;
+  avg_input_tokens: number;
+  avg_output_tokens: number;
+}
+
 export interface BenchmarkResult {
   config: BenchmarkConfig;
   summary: BenchmarkSummary;
@@ -54,6 +70,7 @@ export interface BenchmarkResult {
   modelShort: string;
   seriesKey: string;
   filename: string;
+  perTurn?: PerTurnEntry[];
 }
 
 export interface FilterState {
@@ -63,7 +80,7 @@ export interface FilterState {
   profile: string[];
 }
 
-export type TabId = 'latency' | 'throughput' | 'comparison' | 'raw';
+export type TabId = 'latency' | 'throughput' | 'comparison' | 'multi-turn' | 'raw';
 
 export interface FilterOptions {
   hardware: string[];

@@ -9,6 +9,7 @@ const TABS: Array<{ id: TabId; label: string }> = [
   { id: 'latency', label: 'Latency' },
   { id: 'throughput', label: 'Throughput' },
   { id: 'comparison', label: 'Comparison' },
+  { id: 'multi-turn', label: 'Multi-Turn' },
   { id: 'raw', label: 'Raw Data' },
 ];
 

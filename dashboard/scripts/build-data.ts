@@ -16,6 +16,22 @@ interface RawResult {
   summary: Record<string, unknown>;
 }
 
+interface PerTurnEntry {
+  turn_index: number;
+  num_requests: number;
+  successful: number;
+  mean_ttft_ms: number;
+  median_ttft_ms: number;
+  p90_ttft_ms: number;
+  p99_ttft_ms: number;
+  mean_tpot_ms: number;
+  median_tpot_ms: number;
+  mean_e2el_ms: number;
+  median_e2el_ms: number;
+  avg_input_tokens: number;
+  avg_output_tokens: number;
+}
+
 interface EnrichedResult {
   config: RawResult['config'];
   summary: RawResult['summary'];
@@ -24,6 +40,7 @@ interface EnrichedResult {
   modelShort: string;
   seriesKey: string;
   filename: string;
+  perTurn?: PerTurnEntry[];
 }
 
 const RESULTS_DIR = path.resolve(__dirname, '../../results');
@@ -162,6 +179,20 @@ function main() {
 
       const seriesKey = `${hardware} / ${modelShort} ${quant} / ${backend} / ${profile}`;
 
+      // Check for matching _per_turn.json file
+      let perTurn: PerTurnEntry[] | undefined;
+      const perTurnPath = fullPath.replace(/\.json$/, '_per_turn.json');
+      if (fs.existsSync(perTurnPath)) {
+        try {
+          const ptRaw = JSON.parse(fs.readFileSync(perTurnPath, 'utf-8'));
+          if (ptRaw.per_turn && Array.isArray(ptRaw.per_turn)) {
+            perTurn = ptRaw.per_turn as PerTurnEntry[];
+          }
+        } catch {
+          // Skip if per-turn file is malformed
+        }
+      }
+
       results.push({
         config: { ...raw.config, backend, profile, concurrency },
         summary: raw.summary,
@@ -170,6 +201,7 @@ function main() {
         modelShort,
         seriesKey,
         filename: path.join(relDir, filename),
+        ...(perTurn ? { perTurn } : {}),
       });
     } catch (e) {
       errors++;

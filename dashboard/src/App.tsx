@@ -7,6 +7,7 @@ import { Tabs } from './components/Tabs';
 import { LatencyChart } from './components/charts/LatencyChart';
 import { ThroughputChart } from './components/charts/ThroughputChart';
 import { ComparisonChart } from './components/charts/ComparisonChart';
+import { PerTurnChart } from './components/charts/PerTurnChart';
 import { DataTable } from './components/DataTable';
 import type { TabId } from './types';
 import './index.css';
@@ -62,6 +63,7 @@ function App() {
           {activeTab === 'latency' && <LatencyChart seriesData={seriesData} />}
           {activeTab === 'throughput' && <ThroughputChart seriesData={seriesData} />}
           {activeTab === 'comparison' && <ComparisonChart seriesData={seriesData} />}
+          {activeTab === 'multi-turn' && <PerTurnChart data={data} />}
           {activeTab === 'raw' && <DataTable data={data} />}
         </>
       )}
