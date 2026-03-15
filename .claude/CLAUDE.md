@@ -30,7 +30,7 @@ inference-benchmark/
 │       ├── profiles.py       # WorkloadProfile dataclasses, PROFILES dict
 │       ├── dataset.py        # ShareGPT + FileDataset + random token generation
 │       └── arrival.py        # steady, Poisson, ramp arrival patterns
-├── markdown/
+├── .claude/docs/
 │   ├── results.md            # All benchmark results with flag annotations
 │   └── notes.md              # Architecture notes and lit review
 └── results/                  # JSON output from benchmark runs
