@@ -437,6 +437,163 @@ class RandomTokenDatasetDoubleWrap(RandomTokenDataset):
         )
 
 
+@dataclass
+class MultiTurnSession:
+    """A single multi-turn conversation: list of requests with growing history."""
+    session_id: int
+    turns: list[BenchmarkRequest]  # turn[0] = 1 msg, turn[1] = 3 msgs, turn[2] = 5 msgs, ...
+
+
+class ShareGPTMultiTurnDataset(BaseDataset):
+    """
+    Loads multi-turn conversations from ShareGPT for multi-turn benchmarking.
+
+    Instead of extracting only the first human+GPT pair, extracts full conversations
+    and builds growing-history request sequences:
+      Turn 1: [system, human1]                                        → max_tokens=osl1
+      Turn 2: [system, human1, assistant1, human2]                    → max_tokens=osl2
+      Turn 3: [system, human1, assistant1, human2, assistant2, human3] → max_tokens=osl3
+
+    Assistant replies come from ShareGPT's pre-recorded GPT responses (Option B design),
+    making requests deterministic and reproducible. The growing context tests prefix cache
+    reuse — the server should recognize the shared prefix from earlier turns.
+
+    Sessions are served round-robin for interleaved scheduling in the runner.
+    """
+
+    def __init__(
+        self,
+        min_turns: int = 3,
+        max_turns: int = 10,
+        num_sessions: int = 200,
+        random_seed: int = 42,
+        system_prompt: str = "You are a helpful assistant.",
+        max_isl_tokens: int = 8192,   # max total context per turn (growing)
+        max_osl_tokens: int = 2048,   # max assistant reply length per turn
+        min_osl_tokens: int = 50,
+    ):
+        self.min_turns = min_turns
+        self.max_turns = max_turns
+        self.num_sessions = num_sessions
+        self.random_seed = random_seed
+        self.system_prompt = system_prompt
+        self.max_isl_tokens = max_isl_tokens
+        self.max_osl_tokens = max_osl_tokens
+        self.min_osl_tokens = min_osl_tokens
+        self._sessions: Optional[list[MultiTurnSession]] = None
+        self._lock = threading.Lock()
+        # For get_next_request() fallback — flattened round-robin iterator
+        self._flat_requests: Optional[list[BenchmarkRequest]] = None
+        self._flat_available: Optional[list[BenchmarkRequest]] = None
+        self._rng = random.Random(random_seed)
+
+    def _load(self):
+        if self._sessions is not None:
+            return
+        with self._lock:
+            if self._sessions is not None:
+                return
+            import datasets as hf_datasets
+            ds = hf_datasets.load_dataset(
+                "Aeala/ShareGPT_Vicuna_unfiltered",
+                split="train",
+            )
+            sessions = []
+            for item in ds:
+                convs = item["conversations"]
+                if len(convs) < self.min_turns * 2:
+                    continue
+
+                # Extract all human+assistant pairs
+                pairs = []  # list of (human_msg, assistant_msg, osl_est)
+                human_msg = None
+                for turn in convs:
+                    if turn.get("from") == "human":
+                        human_msg = turn.get("value", "")
+                    elif turn.get("from") == "gpt" and human_msg is not None:
+                        assistant_msg = turn.get("value", "")
+                        osl_est = int(len(assistant_msg.split()) * 1.35)
+                        if osl_est > self.max_osl_tokens or osl_est < self.min_osl_tokens:
+                            break  # stop at first bad turn
+                        pairs.append((human_msg, assistant_msg, osl_est))
+                        human_msg = None
+
+                if len(pairs) < self.min_turns:
+                    continue
+
+                # Truncate to max_turns
+                pairs = pairs[:self.max_turns]
+
+                # Build growing-history requests
+                turns = []
+                messages_so_far = []
+                if self.system_prompt:
+                    messages_so_far.append({"role": "system", "content": self.system_prompt})
+
+                total_est_tokens = 0
+                for human_msg, assistant_msg, osl_est in pairs:
+                    messages_so_far.append({"role": "user", "content": human_msg})
+                    total_est_tokens += int(len(human_msg.split()) * 1.35)
+
+                    if total_est_tokens > self.max_isl_tokens:
+                        break  # context too long
+
+                    turns.append(BenchmarkRequest(
+                        messages=list(messages_so_far),  # snapshot
+                        max_tokens=osl_est,
+                    ))
+
+                    # Append assistant reply for next turn's history
+                    messages_so_far.append({"role": "assistant", "content": assistant_msg})
+                    total_est_tokens += osl_est
+
+                if len(turns) < self.min_turns:
+                    continue
+
+                sessions.append(MultiTurnSession(
+                    session_id=len(sessions),
+                    turns=turns,
+                ))
+
+                if len(sessions) >= self.num_sessions * 3:
+                    break
+
+            rng = random.Random(self.random_seed)
+            rng.shuffle(sessions)
+            self._sessions = sessions[:self.num_sessions]
+
+            # Build flattened round-robin for get_next_request() compatibility
+            self._build_flat_requests()
+
+    def _build_flat_requests(self):
+        """Build interleaved round-robin: [A1, B1, C1, A2, B2, C2, ...]"""
+        if not self._sessions:
+            self._flat_requests = []
+            self._flat_available = []
+            return
+        max_num_turns = max(len(s.turns) for s in self._sessions)
+        flat = []
+        for turn_idx in range(max_num_turns):
+            for session in self._sessions:
+                if turn_idx < len(session.turns):
+                    flat.append(session.turns[turn_idx])
+        self._flat_requests = flat
+        self._flat_available = list(flat)
+
+    @property
+    def sessions(self) -> list[MultiTurnSession]:
+        self._load()
+        return self._sessions
+
+    def get_next_request(self) -> BenchmarkRequest:
+        """Fallback for single-request dispatch — serves from flattened round-robin."""
+        self._load()
+        with self._lock:
+            if not self._flat_available:
+                self._flat_available = list(self._flat_requests)
+            return self._flat_available.pop(0)
+
+
 def make_dataset(profile) -> BaseDataset:
     """Factory: create the right dataset for a workload profile."""
     from .profiles import WorkloadProfile
@@ -475,6 +632,15 @@ def make_dataset(profile) -> BaseDataset:
             input_len=profile.isl_tokens,
             output_len=profile.osl_tokens,
             num_prompts=500,
+        )
+    elif profile.dataset == "sharegpt-multi-turn":
+        return ShareGPTMultiTurnDataset(
+            min_turns=profile.min_turns,
+            max_turns=profile.max_turns,
+            num_sessions=profile.num_sessions,
+            system_prompt=profile.system_prompt,
+            max_isl_tokens=profile.isl_tokens,
+            max_osl_tokens=profile.osl_tokens,
         )
     elif profile.dataset == "jsonl":
         return JsonlDataset(

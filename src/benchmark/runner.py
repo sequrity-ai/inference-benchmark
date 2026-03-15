@@ -31,7 +31,7 @@ from pathlib import Path
 
 import aiohttp
 
-from .metrics import aggregate, print_summary
+from .metrics import aggregate, aggregate_per_turn, print_summary, print_multi_turn_summary
 from ..workloads.profiles import get_profile
 from ..workloads.dataset import make_dataset
 from ..workloads.arrival import make_arrival_times
@@ -108,6 +108,99 @@ async def run_benchmark(
     return results, benchmark_duration
 
 
+async def run_multi_turn_benchmark(
+    url: str,
+    model: str,
+    profile_name: str,
+    concurrency: int,
+    backend_name: str = "vllm",
+    api_key: str = "test",
+    warmup_requests: int = 3,
+    timeout: int = 120,
+    ignore_eos: bool = False,
+):
+    """
+    Run a multi-turn benchmark with interleaved round-robin scheduling.
+
+    Scheduling: [A1, B1, C1, A2, B2, C2, ...] where A1 = session A turn 1.
+    This forces KV cache eviction between turns of the same session,
+    testing prefix cache reuse under realistic memory pressure.
+
+    Returns (results_by_turn, duration) where results_by_turn is a dict
+    mapping turn_index → list[RequestResult].
+    """
+    from ..workloads.dataset import ShareGPTMultiTurnDataset
+
+    backend = get_backend(backend_name)
+    profile = get_profile(profile_name)
+    dataset = make_dataset(profile)
+
+    if not isinstance(dataset, ShareGPTMultiTurnDataset):
+        raise ValueError(f"Profile '{profile_name}' does not use sharegpt-multi-turn dataset")
+
+    sessions = dataset.sessions
+    if not sessions:
+        raise ValueError("No multi-turn sessions loaded — check ShareGPT dataset and filter bounds")
+
+    max_turns = max(len(s.turns) for s in sessions)
+    print(f"Loaded {len(sessions)} sessions, max {max_turns} turns per session")
+
+    connector = aiohttp.TCPConnector(limit=concurrency + 10)
+    client_timeout = aiohttp.ClientTimeout(total=timeout)
+
+    async with aiohttp.ClientSession(connector=connector, timeout=client_timeout) as session_http:
+        # Warmup
+        if warmup_requests > 0:
+            print(f"Warming up with {warmup_requests} requests...")
+            await backend.run_warmup(url, model, api_key, warmup_requests, timeout)
+            print("Warmup done.")
+
+        semaphore = asyncio.Semaphore(concurrency)
+        # results_by_turn[turn_idx] = list of RequestResult
+        results_by_turn: dict[int, list] = {i: [] for i in range(max_turns)}
+        benchmark_start = time.perf_counter()
+
+        # Interleaved round-robin: process all sessions' turn N before turn N+1
+        for turn_idx in range(max_turns):
+            turn_requests = []
+            for conv_session in sessions:
+                if turn_idx < len(conv_session.turns):
+                    turn_requests.append((conv_session.session_id, conv_session.turns[turn_idx]))
+
+            if not turn_requests:
+                continue
+
+            print(f"  Turn {turn_idx + 1}/{max_turns}: dispatching {len(turn_requests)} requests...")
+
+            async def dispatch(session_id: int, request, t_idx: int):
+                async with semaphore:
+                    result = await backend.send_request(
+                        session=session_http,
+                        url=url,
+                        model=model,
+                        messages=request.messages,
+                        max_tokens=request.max_tokens,
+                        api_key=api_key,
+                        ignore_eos=ignore_eos,
+                    )
+                return t_idx, result
+
+            tasks = [dispatch(sid, req, turn_idx) for sid, req in turn_requests]
+            completed = await asyncio.gather(*tasks)
+
+            for t_idx, result in completed:
+                results_by_turn[t_idx].append(result)
+
+    benchmark_duration = time.perf_counter() - benchmark_start
+
+    # Also flatten all results for overall summary
+    all_results = []
+    for turn_idx in sorted(results_by_turn.keys()):
+        all_results.extend(results_by_turn[turn_idx])
+
+    return all_results, results_by_turn, benchmark_duration
+
+
 def save_results(summary, results, output_path: str, config: dict):
     """Save summary + per-request data to JSON."""
     Path(output_path).parent.mkdir(parents=True, exist_ok=True)
@@ -161,8 +254,9 @@ if __name__ == "__main__":
 
     if args.mode:
         if args.mode == "multi-turn":
-            print("ERROR: multi-turn mode not yet implemented. See src/modes/multi_turn.py.")
-            import sys; sys.exit(1)
+            print("NOTE: multi-turn mode requires server launched with --enable-prefix-caching (vLLM)")
+            if args.profile == "output-short":  # default — override for multi-turn
+                args.profile = "multi-turn-short"
         if args.mode == "stress-test":
             if not args.ignore_eos:
                 print("NOTE: stress-test mode auto-enables --ignore-eos (required for FP8 models)")
@@ -174,30 +268,69 @@ if __name__ == "__main__":
             print("      or radix cache (SGLang default). See scripts/launch_server.sh")
 
     config = {**vars(args), "mode": args.mode}
+    profile = get_profile(args.profile)
 
-    results, duration = asyncio.run(run_benchmark(
-        url=args.url,
-        model=args.model,
-        profile_name=args.profile,
-        concurrency=args.concurrency,
-        num_requests=args.num_requests,
-        backend_name=args.backend,
-        api_key=args.api_key,
-        arrival_pattern=args.arrival,
-        target_rate=args.target_rate,
-        warmup_requests=args.warmup,
-        seed=args.seed,
-        timeout=args.timeout,
-        ignore_eos=args.ignore_eos,
-    ))
+    if profile.mode == "multi-turn":
+        all_results, results_by_turn, duration = asyncio.run(run_multi_turn_benchmark(
+            url=args.url,
+            model=args.model,
+            profile_name=args.profile,
+            concurrency=args.concurrency,
+            backend_name=args.backend,
+            api_key=args.api_key,
+            warmup_requests=args.warmup,
+            timeout=args.timeout,
+            ignore_eos=args.ignore_eos,
+        ))
 
-    summary = aggregate(
-        results=[r for r in results if r is not None],
-        duration_s=duration,
-        model=args.model,
-        profile=args.profile,
-        concurrency=args.concurrency,
-    )
+        summary = aggregate(
+            results=[r for r in all_results if r is not None],
+            duration_s=duration,
+            model=args.model,
+            profile=args.profile,
+            concurrency=args.concurrency,
+        )
 
-    print_summary(summary)
-    save_results(summary, results, args.output, config)
+        turn_summaries = aggregate_per_turn(results_by_turn)
+        print_multi_turn_summary(turn_summaries, summary)
+        save_results(summary, all_results, args.output, config)
+
+        # Also save per-turn breakdown
+        turn_output = args.output.replace(".json", "_per_turn.json")
+        import json as json_mod
+        from pathlib import Path as PathMod
+        PathMod(turn_output).parent.mkdir(parents=True, exist_ok=True)
+        with open(turn_output, "w") as f:
+            json_mod.dump({
+                "config": config,
+                "per_turn": [ts.to_dict() for ts in turn_summaries],
+            }, f, indent=2)
+        print(f"Per-turn results saved to: {turn_output}")
+
+    else:
+        results, duration = asyncio.run(run_benchmark(
+            url=args.url,
+            model=args.model,
+            profile_name=args.profile,
+            concurrency=args.concurrency,
+            num_requests=args.num_requests,
+            backend_name=args.backend,
+            api_key=args.api_key,
+            arrival_pattern=args.arrival,
+            target_rate=args.target_rate,
+            warmup_requests=args.warmup,
+            seed=args.seed,
+            timeout=args.timeout,
+            ignore_eos=args.ignore_eos,
+        ))
+
+        summary = aggregate(
+            results=[r for r in results if r is not None],
+            duration_s=duration,
+            model=args.model,
+            profile=args.profile,
+            concurrency=args.concurrency,
+        )
+
+        print_summary(summary)
+        save_results(summary, results, args.output, config)

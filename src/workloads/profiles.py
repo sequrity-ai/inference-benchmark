@@ -22,6 +22,9 @@ class WorkloadProfile:
     tokenizer_name: str = "" # used when dataset="random"
     mode: str = "single-turn"           # "stress-test" | "single-turn" | "multi-turn"
     prefix_caching_required: bool = False  # True = server must be launched with --enable-prefix-caching
+    min_turns: int = 1                   # multi-turn: minimum turns per session
+    max_turns: int = 1                   # multi-turn: maximum turns per session
+    num_sessions: int = 200              # multi-turn: number of concurrent sessions
 
 
 PROFILES: dict[str, WorkloadProfile] = {
@@ -195,11 +198,39 @@ PROFILES: dict[str, WorkloadProfile] = {
         mode="stress-test",
         prefix_caching_required=False,
     ),
+    # Multi-turn profiles — growing conversation history with prefix cache reuse
+    "multi-turn-short": WorkloadProfile(
+        name="multi-turn-short",
+        isl_tokens=8192,
+        osl_tokens=1000,
+        isl_stddev=0.0,
+        description="Short multi-turn: 3-5 turns, moderate growing context",
+        dataset="sharegpt-multi-turn",
+        mode="multi-turn",
+        prefix_caching_required=True,
+        min_turns=3,
+        max_turns=5,
+        num_sessions=200,
+    ),
+    "multi-turn-long": WorkloadProfile(
+        name="multi-turn-long",
+        isl_tokens=16384,
+        osl_tokens=1500,
+        isl_stddev=0.0,
+        description="Long multi-turn: 5-10 turns, large growing context for KV cache pressure",
+        dataset="sharegpt-multi-turn",
+        mode="multi-turn",
+        prefix_caching_required=True,
+        min_turns=5,
+        max_turns=10,
+        num_sessions=100,
+    ),
 }
 
 
 STRESS_TEST_PROFILES = {k: v for k, v in PROFILES.items() if v.mode == "stress-test"}
 SINGLE_TURN_PROFILES = {k: v for k, v in PROFILES.items() if v.mode == "single-turn"}
+MULTI_TURN_PROFILES = {k: v for k, v in PROFILES.items() if v.mode == "multi-turn"}
 
 
 def get_profile(name: str) -> WorkloadProfile:

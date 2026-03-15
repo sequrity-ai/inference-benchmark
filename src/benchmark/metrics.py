@@ -170,6 +170,91 @@ def aggregate(results, duration_s: float, model: str = "", profile: str = "", co
     return summary
 
 
+@dataclass
+class TurnSummary:
+    """Per-turn metrics for multi-turn benchmarks."""
+    turn_index: int
+    num_requests: int = 0
+    successful: int = 0
+    mean_ttft_ms: float = 0.0
+    median_ttft_ms: float = 0.0
+    p90_ttft_ms: float = 0.0
+    p99_ttft_ms: float = 0.0
+    mean_tpot_ms: float = 0.0
+    median_tpot_ms: float = 0.0
+    mean_e2el_ms: float = 0.0
+    median_e2el_ms: float = 0.0
+    avg_input_tokens: float = 0.0
+    avg_output_tokens: float = 0.0
+
+    def to_dict(self) -> dict:
+        return self.__dict__.copy()
+
+
+def aggregate_per_turn(results_by_turn: dict[int, list]) -> list[TurnSummary]:
+    """Aggregate metrics per turn for multi-turn benchmarks."""
+    summaries = []
+    for turn_idx in sorted(results_by_turn.keys()):
+        results = results_by_turn[turn_idx]
+        if not results:
+            continue
+
+        ts = TurnSummary(turn_index=turn_idx)
+        ts.num_requests = len(results)
+
+        ttfts = []
+        tpots = []
+        e2els = []
+        input_toks = []
+        output_toks = []
+
+        for r in results:
+            if r.success:
+                ts.successful += 1
+                if r.ttft is not None:
+                    ttfts.append(r.ttft * 1000)
+                if r.tpot is not None:
+                    tpots.append(r.tpot * 1000)
+                if r.e2el is not None:
+                    e2els.append(r.e2el * 1000)
+                input_toks.append(r.input_tokens)
+                output_toks.append(r.output_tokens)
+
+        if ttfts:
+            ts.mean_ttft_ms = statistics.mean(ttfts)
+            ts.median_ttft_ms = statistics.median(ttfts)
+            ts.p90_ttft_ms = _percentile(ttfts, 90)
+            ts.p99_ttft_ms = _percentile(ttfts, 99)
+        if tpots:
+            ts.mean_tpot_ms = statistics.mean(tpots)
+            ts.median_tpot_ms = statistics.median(tpots)
+        if e2els:
+            ts.mean_e2el_ms = statistics.mean(e2els)
+            ts.median_e2el_ms = statistics.median(e2els)
+        if input_toks:
+            ts.avg_input_tokens = statistics.mean(input_toks)
+        if output_toks:
+            ts.avg_output_tokens = statistics.mean(output_toks)
+
+        summaries.append(ts)
+    return summaries
+
+
+def print_multi_turn_summary(turn_summaries: list, overall: BenchmarkSummary) -> None:
+    """Print per-turn metrics table for multi-turn benchmarks."""
+    print_summary(overall)
+    print(f"{'=' * 72}")
+    print(f" Per-Turn Breakdown (prefix cache effect visible in TTFT trend)")
+    print(f"{'=' * 72}")
+    print(f" {'Turn':>4}  {'Reqs':>5}  {'Avg ISL':>8}  {'TTFT p50':>9}  {'TTFT p90':>9}  {'TPOT p50':>9}  {'E2EL p50':>9}")
+    print(f" {'─' * 4}  {'─' * 5}  {'─' * 8}  {'─' * 9}  {'─' * 9}  {'─' * 9}  {'─' * 9}")
+    for ts in turn_summaries:
+        print(f" {ts.turn_index + 1:>4}  {ts.successful:>5}  {ts.avg_input_tokens:>8.0f}  "
+              f"{ts.median_ttft_ms:>8.1f}ms  {ts.p90_ttft_ms:>8.1f}ms  "
+              f"{ts.median_tpot_ms:>8.1f}ms  {ts.median_e2el_ms:>8.1f}ms")
+    print(f"{'=' * 72}\n")
+
+
 def print_summary(s: BenchmarkSummary) -> None:
     """Print a formatted benchmark summary to stdout."""
     print(f"\n{'=' * 52}")

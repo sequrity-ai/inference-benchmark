@@ -1,14 +1,16 @@
 """
 Multi-turn mode — growing conversation history with prefix caching.
 
-NOT YET IMPLEMENTED. Stub only.
+Uses ShareGPT pre-recorded replies to build deterministic growing-history
+request sequences (Option B design — see .claude/docs/multi_turn_design.md).
 
-Planned design:
-  - ConversationSession: maintains per-user history across turns
+Design:
+  - ShareGPTMultiTurnDataset: extracts full conversations, builds per-session
+    request sequences with growing message history
   - Interleaved round-robin scheduling: [A1,B1,C1,A2,B2,C2,...] forces KV
-    cache eviction between turns, testing offloading under memory pressure
-  - Server: prefix caching ON (same as single-turn)
-  - Client: growing message list per session (no truncation — engine handles it)
+    cache eviction between turns, testing prefix cache reuse under memory pressure
+  - Per-turn metrics: TTFT by turn number shows prefix cache effectiveness
+    (turn 2+ should have lower TTFT due to shared prefix)
 
 Server requirements (same as single-turn):
   - vLLM: --enable-prefix-caching
@@ -17,8 +19,13 @@ Server requirements (same as single-turn):
 
 REQUIRED_CLIENT_FLAGS: list[str] = []
 PREFIX_CACHING_REQUIRED = True
-PROFILES: list[str] = []  # no profiles yet
+
+PROFILES = [
+    "multi-turn-short",
+    "multi-turn-long",
+]
 
 SERVER_NOTES = """
-Not implemented. See src/modes/multi_turn.py for planned design.
+vLLM: pass --enable-prefix-caching
+SGLang: radix cache is on by default (no flag needed)
 """
