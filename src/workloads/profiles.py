@@ -105,6 +105,18 @@ PROFILES: dict[str, WorkloadProfile] = {
         mode="single-turn",
         prefix_caching_required=True,
     ),
+    "coding-agent": WorkloadProfile(
+        name="coding-agent",
+        isl_tokens=17000,
+        osl_tokens=800,
+        isl_stddev=0.0,
+        description="Real coding-agent prompts from Sequrity SWEBench runs (PLLM planning calls, ~17K ISL, ~800 OSL)",
+        dataset="jsonl",
+        file_path="data/coding_agent_prompts.jsonl",
+        system_prompt="",  # system prompt is embedded in the JSONL
+        mode="single-turn",
+        prefix_caching_required=True,
+    ),
     # Legacy profiles from llm-bench (for direct comparison)
     "output-short": WorkloadProfile(
         name="output-short",

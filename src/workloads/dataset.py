@@ -81,6 +81,57 @@ class FileDataset(BaseDataset):
         return BenchmarkRequest(messages=messages, max_tokens=self.max_tokens)
 
 
+class JsonlDataset(BaseDataset):
+    """
+    Loads real prompts from a JSONL file.
+
+    Each line: {"system": "...", "user": "...", "osl_tokens": N}
+    Returns per-request max_tokens from osl_tokens field.
+    Used for coding-agent profile with real SWEBench PLLM prompts.
+    """
+
+    def __init__(self, filepath: str, random_seed: int = 42):
+        self.filepath = filepath
+        self.random_seed = random_seed
+        self._samples: Optional[list[tuple]] = None   # list of (messages, osl_tokens)
+        self._available: Optional[list[tuple]] = None
+        self._lock = threading.Lock()
+        self._rng = random.Random(random_seed)
+
+    def _load(self):
+        if self._samples is not None:
+            return
+        with self._lock:
+            if self._samples is not None:
+                return
+            import json
+            samples = []
+            with open(self.filepath, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    entry = json.loads(line)
+                    messages = [
+                        {"role": "system", "content": entry["system"]},
+                        {"role": "user", "content": entry["user"]},
+                    ]
+                    samples.append((messages, entry["osl_tokens"]))
+            rng = random.Random(self.random_seed)
+            rng.shuffle(samples)
+            self._samples = samples
+            self._available = list(self._samples)
+
+    def get_next_request(self) -> BenchmarkRequest:
+        self._load()
+        with self._lock:
+            if not self._available:
+                self._available = list(self._samples)
+                self._rng.shuffle(self._available)
+            messages, osl_tokens = self._available.pop()
+        return BenchmarkRequest(messages=messages, max_tokens=osl_tokens)
+
+
 class ShareGPTDataset(BaseDataset):
     """
     Loads real conversations from ShareGPT dataset.
@@ -424,6 +475,10 @@ def make_dataset(profile) -> BaseDataset:
             input_len=profile.isl_tokens,
             output_len=profile.osl_tokens,
             num_prompts=500,
+        )
+    elif profile.dataset == "jsonl":
+        return JsonlDataset(
+            filepath=profile.file_path,
         )
     else:
         raise ValueError(f"Unknown dataset type: {profile.dataset}")

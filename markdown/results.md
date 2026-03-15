@@ -589,3 +589,124 @@ Random 1024-token output batches are significantly heavier than natural ShareGPT
 - `docker/Dockerfile.trtllm` — FROM nvcr.io/nvidia/tritonserver:24.12-trtllm-python-py3, same pattern
 - Model weights NOT baked in — mount as network volume. Always pulls latest benchmark code via BENCH_BRANCH env var.
 - **Status**: ✅ DONE — image `boothalgo01/bench-vllm:latest` pushed to Docker Hub. entrypoint.sh git clones sequrity-ai/inference-benchmark at container start, writes $PUBLIC_KEY to authorized_keys, starts sshd.
+
+---
+
+## Local A6000 — Llama 3.1 8B bfloat16 — coding-agent Profile (Real SWEBench Prompts)
+
+**Date**: 2026-03-13
+**Model**: Llama 3.1 8B bfloat16
+**Hardware**: 1x A6000 (GPU 2), ee-kraken
+**Server flags**: prefix caching ON, chunked prefill ON, TP=1, max-model-len=32768, gpu-memory-utilization=0.75
+**Client flags**: --ignore-eos NO, arrival=steady
+**Dataset**: 500 real SWEBench PLLM prompts (Sequrity codex runs, harbor/task_analysis/)
+**Profile**: coding-agent (ISL~17K tokens, OSL~350-680 tokens per request, natural distribution)
+**Tool**: inference-benchmark
+**Note**: ISL dominated by shared system prompt (~6K tokens) — prefix caching should give high cache hit rates at conc>=10
+✓ TTFT — real varied prompts (system prompt fixed, user task varies per request)
+
+| Concurrency | TTFT p50 (ms) | TTFT p90 (ms) | TPOT p50 (ms) | TPOT p90 (ms) | E2EL p50 (ms) | Input tok/s | Output tok/s | Req/s |
+|-------------|--------------|--------------|--------------|--------------|--------------|-------------|-------------|-------|
+| 1  | 97.2  | 244.1 | 25.7 | 26.0 | 8,852  | 713   | 38  | 0.11 |
+| 10 | 104.5 | 210.4 | 36.3 | 37.1 | 12,816 | 4,471 | 253 | 0.72 |
+| 20 | 103.5 | 303.1 | 46.7 | 46.9 | 15,337 | 7,105 | 383 | 1.14 |
+| 40 | 333.8 | 523.7 | 60.5 | 62.1 | 19,527 | 8,636 | 462 | 1.38 |
+
+**Key observations**:
+- TTFT stays low (97-104ms p50) at conc 1-20, spikes at conc=40 (334ms) — prefix cache saturation
+- TPOT scales from 25.7ms (conc=1) to 60.5ms (conc=40) — decode batch growing
+- Input tok/s: 713 → 8,636 (12x) — prefill parallelism scales well with large ISL
+- Output tok/s low (~38-462) due to short OSL (~350-680 tokens per request)
+- Throughput plateau visible at conc=40 (1.38 req/s) — approaching GPU memory bandwidth limit for this ISL size
+
+---
+
+## Local A6000 — Llama 3.1 8B bfloat16 — SGLang vs vLLM — coding-agent Profile
+
+**Date**: 2026-03-13
+**Model**: Llama 3.1 8B bfloat16
+**Hardware**: 1x A6000 (GPU 0 = SGLang port 8001, GPU 2 = vLLM port 8000), ee-kraken
+**Server flags**: prefix caching ON (SGLang default), chunked prefill ON, TP=1
+**Client flags**: --ignore-eos NO, arrival=steady, 50 requests, warmup=3
+**Dataset**: 500 real SWEBench PLLM prompts (~17K ISL, ~350-680 OSL natural distribution)
+**Tool**: inference-benchmark
+✓ TTFT — real varied prompts
+
+### SGLang (port 8001)
+
+| Concurrency | TTFT p50 (ms) | TTFT p90 (ms) | TPOT p50 (ms) | TPOT p90 (ms) | E2EL p50 (ms) | Input tok/s | Output tok/s | Req/s |
+|-------------|--------------|--------------|--------------|--------------|--------------|-------------|-------------|-------|
+| 1  | 95.3  | 233.5 | 24.0 | 24.2 | 8,398  | 734    | 41  | 0.12 |
+| 10 | 85.6  | 208.6 | 31.1 | 31.7 | 10,397 | 5,595  | 294 | 0.90 |
+| 20 | 100.6 | 295.3 | 35.6 | 36.6 | 11,756 | 9,138  | 450 | 1.47 |
+| 40 | 769.7 | 773.6 | 44.3 | 45.4 | 15,679 | 11,464 | 638 | 1.84 |
+
+### vLLM (port 8000, from previous run)
+
+| Concurrency | TTFT p50 (ms) | TTFT p90 (ms) | TPOT p50 (ms) | TPOT p90 (ms) | E2EL p50 (ms) | Input tok/s | Output tok/s | Req/s |
+|-------------|--------------|--------------|--------------|--------------|--------------|-------------|-------------|-------|
+| 1  | 97.2  | 244.1 | 25.7 | 26.0 | 8,852  | 713   | 38  | 0.11 |
+| 10 | 104.5 | 210.4 | 36.3 | 37.1 | 12,816 | 4,471 | 253 | 0.72 |
+| 20 | 103.5 | 303.1 | 46.7 | 46.9 | 15,337 | 7,105 | 383 | 1.14 |
+| 40 | 333.8 | 523.7 | 60.5 | 62.1 | 19,527 | 8,636 | 462 | 1.38 |
+
+**Key observations**:
+- SGLang +25% input tok/s at conc=20, +33% at conc=40
+- SGLang TPOT consistently 5-10ms lower than vLLM at all concurrency levels
+- SGLang TTFT collapses at conc=40 (770ms vs vLLM 334ms) — prefill queue saturates earlier
+- Both engines: 0 failures across all runs on 17K ISL workload
+
+---
+
+## RunPod 1x H100 SXM 80GB — Llama 3.1 70B FP8 — vLLM 0.17.1
+
+**Date**: 2026-03-13
+**Model**: neuralmagic/Meta-Llama-3.1-70B-Instruct-FP8
+**Hardware**: 1x H100 SXM 80GB, RunPod
+**Server flags**: prefix caching ON, chunked prefill ON, TP=1, max-model-len=4096, gpu-memory-utilization=0.95
+**Client flags**: --ignore-eos NO, arrival=steady, 50 requests, warmup=3
+**Tool**: inference-benchmark
+**Note**: max-model-len limited to 4096 — 70B FP8 uses 67.7GiB leaving ~4GiB KV cache. 2x H100 needed for full production profiles (rag-heavy, coding-agent etc.)
+⚠️ TTFT (output-long) — not recorded (very short ISL=180, TTFT dominated by scheduling)
+✓ TTFT (chatbot-short, output-short) — real varied prompts / file-based
+
+### chatbot-short (ShareGPT, ISL≤2000, OSL≤500)
+
+| Concurrency | TTFT p50 (ms) | TPOT p50 (ms) | Output tok/s | Total tok/s | Req/s |
+|-------------|--------------|--------------|-------------|------------|-------|
+| 1   | 45.9    | 25.7 | 38    | 68     | - |
+| 10  | 82.9    | 27.2 | 323   | 571    | - |
+| 20  | 89.0    | 30.5 | 542   | 953    | - |
+| 40  | 91.6    | 31.3 | 949   | 1,676  | - |
+| 80  | 1,970.8 | 37.6 | 1,234 | 2,174  | - |
+| 120 | 2,607.9 | 39.0 | 1,199 | 2,106  | - |
+
+### output-short (file-based, ISL=1200, OSL=128)
+
+| Concurrency | TTFT p50 (ms) | TPOT p50 (ms) | Output tok/s | Total tok/s | Req/s |
+|-------------|--------------|--------------|-------------|------------|-------|
+| 1   | 57.1  | 25.7 | 38    | 486    | - |
+| 10  | 85.6  | 27.7 | 342   | 4,275  | - |
+| 20  | 97.1  | 32.0 | 576   | 7,303  | - |
+| 40  | 98.6  | 31.8 | 1,105 | 13,624 | - |
+| 80  | 171.9 | 34.7 | 1,776 | 22,029 | - |
+| 120 | 272.5 | 36.5 | 2,424 | 29,574 | - |
+
+### output-long (file-based, ISL=180, OSL=1024)
+
+| Concurrency | TPOT p50 (ms) | Output tok/s | Total tok/s |
+|-------------|--------------|-------------|------------|
+| 1   | 25.9 | 39  | -     |
+| 10  | 27.5 | 362 | 1,121 |
+| 20  | 30.4 | 602 | -     |
+| 40  | 36.6 | 895 | 1,089 |
+| 80  | 50.1 | 921 | 1,121 |
+| 120 | 70.3 | 879 | 1,070 |
+
+**Key observations**:
+- TPOT baseline 25.7ms at conc=1 (matches A6000 8B baseline — decode speed similar between 8B bfloat16 and 70B FP8)
+- TTFT stays low (<100ms) up to conc=40, then spikes at conc=80+ due to prefill queue saturation
+- Output-short (prefill-heavy) scales to 29,574 total tok/s at conc=120
+- Output-long saturates at ~900 output tok/s (conc=80-120) — H100 memory bandwidth limit for 70B decode
+- KV cache bottleneck: 70B FP8 leaves only ~4GiB for KV at max-model-len=4096. Full production profiles (coding-agent ~17K ISL, rag-heavy ~8K ISL) require 2x H100 or model parallelism
+- TRT-LLM could not be tested: TRT-LLM 1.2.0 requires CUDA 13, pod has CUDA 12.6

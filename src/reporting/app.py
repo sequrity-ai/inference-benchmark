@@ -115,8 +115,13 @@ app.index_string = """
             border-radius: var(--radius-sm) !important;
             color: var(--text-primary) !important;
         }
-        .Select-value-label, .Select-placeholder {
-            color: var(--text-secondary) !important;
+        .Select-value-label {
+            color: var(--text-primary) !important;
+            font-family: var(--font-sans) !important;
+            font-size: 13px !important;
+        }
+        .Select-placeholder {
+            color: var(--text-muted) !important;
             font-family: var(--font-sans) !important;
             font-size: 13px !important;
         }
@@ -135,11 +140,14 @@ app.index_string = """
         }
         .Select-multi-value-wrapper { gap: 4px; }
         .Select-value {
-            background-color: rgba(0,188,212,0.12) !important;
-            border-color: rgba(0,188,212,0.3) !important;
+            background-color: rgba(0,188,212,0.18) !important;
+            border-color: rgba(0,188,212,0.4) !important;
             border-radius: 4px !important;
             color: var(--accent-teal) !important;
             font-size: 12px !important;
+        }
+        .Select-value .Select-value-label {
+            color: var(--accent-teal) !important;
         }
         .Select-value-icon { color: var(--accent-teal) !important; }
         .Select-arrow-zone { color: var(--text-muted) !important; }
@@ -370,13 +378,13 @@ def _empty_fig(msg: str = "No data") -> go.Figure:
 # Layout helpers
 # ---------------------------------------------------------------------------
 
-def _make_dropdown(id_: str, label: str, options: list, multi: bool = True):
+def _make_dropdown(id_: str, label: str, options: list, multi: bool = True, default=None):
     return html.Div(className="filter-item", children=[
         html.Span(label, className="controls-label"),
         dcc.Dropdown(
             id=id_,
             options=[{"label": o, "value": o} for o in options],
-            value=[],
+            value=default if default is not None else [],
             multi=multi,
             placeholder=f"All {label}s",
             clearable=True,
@@ -563,7 +571,8 @@ def build_layout():
                                 className="filter-bar",
                                 children=[
                                     _make_dropdown("filter-hardware", "Hardware",
-                                                   opts.get("hardware", [])),
+                                                   opts.get("hardware", []),
+                                                   default=[opts["hardware"][0]] if opts.get("hardware") else []),
                                     _make_dropdown("filter-model",    "Model",
                                                    opts.get("model_short", [])),
                                     _make_dropdown("filter-backend",  "Backend",

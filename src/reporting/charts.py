@@ -57,6 +57,8 @@ def _base_layout(title: str, xaxis: str, yaxis: str) -> dict:
             linecolor=GRID_COLOR,
             zeroline=False,
             showgrid=True,
+            type="log",
+            dtick="D1",
         ),
         yaxis=dict(
             title=dict(text=yaxis, font=dict(size=12, color=TEXT_MUTED)),
@@ -102,7 +104,7 @@ def latency_vs_concurrency(
     percentiles: subset of ['median', 'p90', 'p99', 'mean'] (default: median, p90, p99)
     """
     if percentiles is None:
-        percentiles = ["median", "p90", "p99"]
+        percentiles = ["median"]
 
     metric_upper = metric.upper()
     fig = go.Figure()
@@ -137,6 +139,8 @@ def latency_vs_concurrency(
                     color=color,
                     dash=dash_map.get(pct, "solid"),
                     width=2.5 if is_primary else 1.5,
+                    shape="spline",
+                    smoothing=0.8,
                 ),
                 marker=dict(
                     symbol=symbol_map.get(pct, "circle"),
@@ -203,7 +207,7 @@ def throughput_vs_concurrency(
             name=series,
             fill="tozeroy",
             fillcolor=f"rgba({_hex_to_rgb(color)},0.08)",
-            line=dict(color=color, width=2.5),
+            line=dict(color=color, width=2.5, shape="spline", smoothing=0.8),
             marker=dict(
                 size=8,
                 color=color,
@@ -259,7 +263,7 @@ def comparison_chart(
             y=sdf[metric],
             mode="lines+markers",
             name=series,
-            line=dict(color=color, width=2.5),
+            line=dict(color=color, width=2.5, shape="spline", smoothing=0.8),
             marker=dict(
                 size=9,
                 color=color,
