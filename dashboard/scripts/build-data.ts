@@ -16,6 +16,12 @@ interface RawResult {
   summary: Record<string, unknown>;
 }
 
+interface ScatterPoint {
+  input_tokens: number;
+  ttft_ms: number;
+  turn_index: number;
+}
+
 interface PerTurnEntry {
   turn_index: number;
   num_requests: number;
@@ -41,6 +47,7 @@ interface EnrichedResult {
   seriesKey: string;
   filename: string;
   perTurn?: PerTurnEntry[];
+  scatterData?: ScatterPoint[];
 }
 
 const RESULTS_DIR = path.resolve(__dirname, '../../results');
@@ -179,6 +186,22 @@ function main() {
 
       const seriesKey = `${hardware} / ${modelShort} ${quant} / ${backend} / ${profile}`;
 
+      // Extract scatter data from per_request (multi-turn results with turn_index)
+      let scatterData: ScatterPoint[] | undefined;
+      if (raw.summary && (raw as Record<string, unknown>).per_request) {
+        const perReq = (raw as Record<string, unknown>).per_request as Array<Record<string, unknown>>;
+        const points = perReq
+          .filter((r) => r.success && r.turn_index !== undefined && r.ttft_ms != null && r.input_tokens != null)
+          .map((r) => ({
+            input_tokens: r.input_tokens as number,
+            ttft_ms: r.ttft_ms as number,
+            turn_index: r.turn_index as number,
+          }));
+        if (points.length > 0) {
+          scatterData = points;
+        }
+      }
+
       // Check for matching _per_turn.json file
       let perTurn: PerTurnEntry[] | undefined;
       const perTurnPath = fullPath.replace(/\.json$/, '_per_turn.json');
@@ -202,6 +225,7 @@ function main() {
         seriesKey,
         filename: path.join(relDir, filename),
         ...(perTurn ? { perTurn } : {}),
+        ...(scatterData ? { scatterData } : {}),
       });
     } catch (e) {
       errors++;

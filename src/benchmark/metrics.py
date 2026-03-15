@@ -23,6 +23,7 @@ class RequestResult:
     input_tokens: int = 0
     output_tokens: int = 0
     error: Optional[str] = None
+    turn_index: Optional[int] = None      # multi-turn: which turn (0-indexed)
 
     @property
     def tpot(self) -> Optional[float]:

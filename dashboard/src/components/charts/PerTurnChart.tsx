@@ -9,6 +9,9 @@ import {
   ResponsiveContainer,
   Bar,
   BarChart,
+  ScatterChart as RechartsScatterChart,
+  Scatter,
+  ZAxis,
 } from 'recharts';
 import type { BenchmarkResult } from '../../types';
 
@@ -254,6 +257,89 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
           </LineChart>
         </ResponsiveContainer>
       </div>
+
+      {/* TTFT vs ISL scatter — per-request level */}
+      {(() => {
+        const allScatter = multiTurnResults.flatMap((r) =>
+          (r.scatterData || []).map((p) => ({ ...p, series: shortenKey(r.seriesKey) }))
+        );
+        if (allScatter.length === 0) return null;
+
+        // Group by turn index for coloring
+        const maxTurnIdx = Math.max(...allScatter.map((p) => p.turn_index));
+        const turnGroups = Array.from({ length: maxTurnIdx + 1 }, (_, i) =>
+          allScatter.filter((p) => p.turn_index === i)
+        );
+
+        // Color scale: gradient from teal to coral across turns
+        const turnColors = Array.from({ length: maxTurnIdx + 1 }, (_, i) => {
+          const t = maxTurnIdx > 0 ? i / maxTurnIdx : 0;
+          // Interpolate from teal (#00bcd4) to coral (#ef5350)
+          const r = Math.round(0x00 + t * (0xef - 0x00));
+          const g = Math.round(0xbc + t * (0x53 - 0xbc));
+          const b = Math.round(0xd4 + t * (0x50 - 0xd4));
+          return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        });
+
+        return (
+          <div className="rounded-lg border border-[#21262d] bg-[#161b22] p-4 lg:col-span-2">
+            <h3 className="mb-1 text-sm font-medium text-[#e6edf3]">
+              TTFT vs Input Length
+              <span className="ml-2 text-xs text-[#8b949e]">per-request, colored by turn number</span>
+            </h3>
+            <p className="mb-3 text-xs text-[#8b949e]">
+              Each dot is one request. Later turns (warmer colors) have longer context but may benefit from prefix cache.
+            </p>
+            <ResponsiveContainer width="100%" height={350}>
+              <RechartsScatterChart margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
+                <CartesianGrid strokeDasharray="3 3" stroke={chartStyle.grid} />
+                <XAxis
+                  dataKey="input_tokens"
+                  type="number"
+                  name="Input Tokens"
+                  tick={{ fill: chartStyle.tick, fontSize: 11 }}
+                  axisLine={{ stroke: chartStyle.grid }}
+                  tickLine={{ stroke: chartStyle.grid }}
+                  label={{ value: 'Input Tokens', position: 'insideBottom', offset: -2, fill: chartStyle.tick, fontSize: 11 }}
+                />
+                <YAxis
+                  dataKey="ttft_ms"
+                  type="number"
+                  name="TTFT"
+                  tick={{ fill: chartStyle.tick, fontSize: 11 }}
+                  axisLine={{ stroke: chartStyle.grid }}
+                  tickLine={{ stroke: chartStyle.grid }}
+                  label={{ value: 'TTFT (ms)', angle: -90, position: 'insideLeft', fill: chartStyle.tick, fontSize: 11 }}
+                />
+                <ZAxis range={[20, 20]} />
+                <Tooltip
+                  contentStyle={tooltipStyle}
+                  formatter={(value: number, name: string) => {
+                    if (name === 'Input Tokens') return [`${value}`, name];
+                    if (name === 'TTFT') return [`${value.toFixed(1)} ms`, name];
+                    return [`${value}`, name];
+                  }}
+                  labelFormatter={() => ''}
+                />
+                <Legend
+                  wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
+                />
+                {turnGroups.map((points, i) =>
+                  points.length > 0 ? (
+                    <Scatter
+                      key={`turn-${i}`}
+                      name={`Turn ${i + 1}`}
+                      data={points}
+                      fill={turnColors[i]}
+                      opacity={0.7}
+                    />
+                  ) : null
+                )}
+              </RechartsScatterChart>
+            </ResponsiveContainer>
+          </div>
+        );
+      })()}
 
       {/* Requests per turn */}
       <div className="rounded-lg border border-[#21262d] bg-[#161b22] p-4 lg:col-span-2">

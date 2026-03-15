@@ -193,10 +193,12 @@ async def run_multi_turn_benchmark(
 
     benchmark_duration = time.perf_counter() - benchmark_start
 
-    # Also flatten all results for overall summary
+    # Flatten results, tagging each with turn_index
     all_results = []
     for turn_idx in sorted(results_by_turn.keys()):
-        all_results.extend(results_by_turn[turn_idx])
+        for r in results_by_turn[turn_idx]:
+            r.turn_index = turn_idx
+            all_results.append(r)
 
     return all_results, results_by_turn, benchmark_duration
 
@@ -216,6 +218,7 @@ def save_results(summary, results, output_path: str, config: dict):
                 "input_tokens": r.input_tokens,
                 "output_tokens": r.output_tokens,
                 "error": r.error,
+                **({"turn_index": r.turn_index} if r.turn_index is not None else {}),
             }
             for r in results if r is not None
         ],

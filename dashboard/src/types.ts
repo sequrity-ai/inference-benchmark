@@ -61,6 +61,12 @@ export interface PerTurnEntry {
   avg_output_tokens: number;
 }
 
+export interface ScatterPoint {
+  input_tokens: number;
+  ttft_ms: number;
+  turn_index: number;
+}
+
 export interface BenchmarkResult {
   config: BenchmarkConfig;
   summary: BenchmarkSummary;
@@ -71,6 +77,7 @@ export interface BenchmarkResult {
   seriesKey: string;
   filename: string;
   perTurn?: PerTurnEntry[];
+  scatterData?: ScatterPoint[];
 }
 
 export interface FilterState {
