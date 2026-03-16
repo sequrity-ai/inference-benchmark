@@ -29,6 +29,11 @@ function shortenKey(key: string): string {
   return parts[parts.length - 1] || key;
 }
 
+// Unique key per result: include concurrency to distinguish runs
+function perTurnKey(r: BenchmarkResult): string {
+  return `${shortenKey(r.seriesKey)} conc=${r.config.concurrency}`;
+}
+
 export function PerTurnChart({ data }: PerTurnChartProps) {
   // Filter to only results with perTurn data
   const multiTurnResults = data.filter((r) => r.perTurn && r.perTurn.length > 0);
@@ -41,15 +46,16 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
     );
   }
 
-  // Build TTFT chart data: x = turn number, one line per series
+  // Build TTFT chart data: x = turn number, one line per unique run
   const maxTurns = Math.max(...multiTurnResults.map((r) => r.perTurn!.length));
   const ttftData = Array.from({ length: maxTurns }, (_, i) => {
     const point: Record<string, number> = { turn: i + 1 };
     for (const r of multiTurnResults) {
+      const key = perTurnKey(r);
       const entry = r.perTurn![i];
       if (entry) {
-        point[`${r.seriesKey}_ttft`] = Math.round(entry.median_ttft_ms * 100) / 100;
-        point[`${r.seriesKey}_isl`] = Math.round(entry.avg_input_tokens);
+        point[`${key}_ttft`] = Math.round(entry.median_ttft_ms * 100) / 100;
+        point[`${key}_isl`] = Math.round(entry.avg_input_tokens);
       }
     }
     return point;
@@ -61,7 +67,7 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
     for (const r of multiTurnResults) {
       const entry = r.perTurn![i];
       if (entry) {
-        point[r.seriesKey] = Math.round(entry.avg_input_tokens);
+        point[perTurnKey(r)] = Math.round(entry.avg_input_tokens);
       }
     }
     return point;
@@ -73,7 +79,7 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
     for (const r of multiTurnResults) {
       const entry = r.perTurn![i];
       if (entry) {
-        point[r.seriesKey] = Math.round(entry.median_tpot_ms * 100) / 100;
+        point[perTurnKey(r)] = Math.round(entry.median_tpot_ms * 100) / 100;
       }
     }
     return point;
@@ -85,13 +91,13 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
     for (const r of multiTurnResults) {
       const entry = r.perTurn![i];
       if (entry) {
-        point[r.seriesKey] = entry.successful;
+        point[perTurnKey(r)] = entry.successful;
       }
     }
     return point;
   });
 
-  const seriesKeys = multiTurnResults.map((r) => r.seriesKey);
+  const seriesKeys = multiTurnResults.map((r) => perTurnKey(r));
 
   const chartStyle = {
     grid: '#21262d',
@@ -143,13 +149,13 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
                 const isl = turnIdx >= 0 ? ttftData[turnIdx][islKey] : undefined;
                 return [
                   `${value.toFixed(1)} ms${isl ? ` (ISL: ~${isl})` : ''}`,
-                  shortenKey(key),
+                  key,
                 ];
-              }}
+              }
             />
             <Legend
               wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-              formatter={(value: string) => shortenKey(value.replace(/_ttft$/, ''))}
+              formatter={(value: string) => value.replace(/_ttft$/, '')}
             />
             {seriesKeys.map((key, i) => (
               <Line
@@ -192,11 +198,11 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
             <Tooltip
               contentStyle={tooltipStyle}
               labelFormatter={(v) => `Turn ${v}`}
-              formatter={(value: number, name: string) => [`${value} tokens`, shortenKey(name)]}
+              formatter={(value: number, name: string) => [`${value} tokens`, name]}
             />
             <Legend
               wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-              formatter={(value: string) => shortenKey(value)}
+              formatter={(value: string) => value}
             />
             {seriesKeys.map((key, i) => (
               <Bar
@@ -236,11 +242,11 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
             <Tooltip
               contentStyle={tooltipStyle}
               labelFormatter={(v) => `Turn ${v}`}
-              formatter={(value: number, name: string) => [`${value.toFixed(1)} ms`, shortenKey(name)]}
+              formatter={(value: number, name: string) => [`${value.toFixed(1)} ms`, name]}
             />
             <Legend
               wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-              formatter={(value: string) => shortenKey(value)}
+              formatter={(value: string) => value}
             />
             {seriesKeys.map((key, i) => (
               <Line
@@ -366,11 +372,11 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
             <Tooltip
               contentStyle={tooltipStyle}
               labelFormatter={(v) => `Turn ${v}`}
-              formatter={(value: number, name: string) => [`${value} sessions`, shortenKey(name)]}
+              formatter={(value: number, name: string) => [`${value} sessions`, name]}
             />
             <Legend
               wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-              formatter={(value: string) => shortenKey(value)}
+              formatter={(value: string) => value}
             />
             {seriesKeys.map((key, i) => (
               <Bar
