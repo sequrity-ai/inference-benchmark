@@ -25,7 +25,7 @@ inference-benchmark/
 │   ├── modes/
 │   │   ├── stress_test.py    # random tokens, --ignore-eos required, prefix cache OFF
 │   │   ├── single_turn.py    # ShareGPT real prompts, prefix cache ON
-│   │   └── multi_turn.py     # stub — ConversationSession planned
+│   │   └── multi_turn.py     # growing conversation history, prefix cache reuse
 │   └── workloads/
 │       ├── profiles.py       # WorkloadProfile dataclasses, PROFILES dict
 │       ├── dataset.py        # ShareGPT + FileDataset + random token generation
@@ -44,7 +44,7 @@ See `src/modes/` for documentation. Always launch server with `scripts/launch_se
 |------|-------------|--------------|----------|
 | stress-test | No prefix cache | `--ignore-eos` (auto) | random-inferencex |
 | single-turn | `--enable-prefix-caching` | none | chatbot-*, rag-*, coding-*, etc. |
-| multi-turn | `--enable-prefix-caching` | none | not yet implemented |
+| multi-turn | `--enable-prefix-caching` | none | multi-turn-short, multi-turn-long |
 
 ## Server
 
@@ -60,6 +60,12 @@ See `src/modes/` for documentation. Always launch server with `scripts/launch_se
 - `--enable-chunked-prefill`: improves throughput under load (always recommended)
 - `--request-rate inf` (InferenceX): fires all requests at t=0 → TTFT includes queue wait
 - Our tool uses steady semaphore concurrency → TTFT reflects actual scheduling latency
+
+## Methods
+
+When investigating problems (performance regressions, unexpected behavior, comparing approaches),
+follow the experimental method in `.claude/methods/experiment.md`:
+Observe → Hypothesize → Design experiment → Execute → Conclude.
 
 ## Cross-Validation with InferenceX
 
