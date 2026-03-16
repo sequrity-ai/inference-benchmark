@@ -151,7 +151,7 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
                   `${value.toFixed(1)} ms${isl ? ` (ISL: ~${isl})` : ''}`,
                   key,
                 ];
-              }
+              }}
             />
             <Legend
               wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
