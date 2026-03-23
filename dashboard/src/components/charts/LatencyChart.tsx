@@ -9,6 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { BenchmarkResult } from '../../types';
+import { PROFILE_META, TYPE_COLORS, SOURCE_COLORS } from '../../profileMeta';
 
 interface LatencyChartProps {
   seriesData: Map<string, BenchmarkResult[]>;
@@ -117,6 +118,14 @@ function shortenSeriesKey(key: string, allKeys: string[]): string {
   return labels.length > 0 ? labels.join(' · ') : partNames[3];
 }
 
+function getUniqueProfiles(seriesData: Map<string, BenchmarkResult[]>): string[] {
+  const profiles = new Set<string>();
+  for (const [, results] of seriesData) {
+    for (const r of results) profiles.add(r.config.profile);
+  }
+  return Array.from(profiles);
+}
+
 export function LatencyChart({ seriesData }: LatencyChartProps) {
   if (seriesData.size === 0) {
     return (
@@ -127,6 +136,9 @@ export function LatencyChart({ seriesData }: LatencyChartProps) {
   }
 
   const seriesNames = Array.from(seriesData.keys());
+  const uniqueProfiles = getUniqueProfiles(seriesData);
+  const singleProfile = uniqueProfiles.length === 1 ? uniqueProfiles[0] : null;
+  const singleMeta = singleProfile ? PROFILE_META[singleProfile] : null;
 
   return (
     <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -138,10 +150,36 @@ export function LatencyChart({ seriesData }: LatencyChartProps) {
             key={metric.key}
             className="rounded-lg border border-[#21262d] bg-[#161b22] p-4"
           >
-            <h3 className="mb-3 text-sm font-medium text-[#e6edf3]">
-              {metric.label}
-              <span className="ml-2 text-xs text-[#8b949e]">median, ms</span>
-            </h3>
+            <div className="mb-3 flex flex-wrap items-center gap-2">
+              <h3 className="text-sm font-medium text-[#e6edf3]">
+                {metric.label}
+                <span className="ml-2 text-xs text-[#8b949e]">median, ms</span>
+              </h3>
+              {singleMeta && (
+                <>
+                  <span
+                    className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
+                    style={{
+                      backgroundColor: TYPE_COLORS[singleMeta.type].bg,
+                      color: TYPE_COLORS[singleMeta.type].text,
+                      borderColor: TYPE_COLORS[singleMeta.type].border,
+                    }}
+                  >
+                    {singleMeta.type}
+                  </span>
+                  <span
+                    className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
+                    style={{
+                      backgroundColor: SOURCE_COLORS[singleMeta.source].bg,
+                      color: SOURCE_COLORS[singleMeta.source].text,
+                      borderColor: SOURCE_COLORS[singleMeta.source].border,
+                    }}
+                  >
+                    {singleMeta.source}
+                  </span>
+                </>
+              )}
+            </div>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />

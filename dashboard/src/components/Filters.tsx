@@ -1,4 +1,5 @@
 import type { FilterState, FilterOptions } from '../types';
+import { PROFILE_META, TYPE_COLORS, SOURCE_COLORS } from '../profileMeta';
 
 interface FiltersProps {
   filters: FilterState;
@@ -20,6 +21,22 @@ const CATEGORY_COLORS: Record<keyof FilterState, string> = {
   backend: '#a855f7',
   profile: '#3fb950',
 };
+
+interface MetaBadgeProps {
+  label: string;
+  colors: { bg: string; text: string; border: string };
+}
+
+function MetaBadge({ label, colors }: MetaBadgeProps) {
+  return (
+    <span
+      className="inline-block rounded-full border px-1.5 py-0 text-[10px] font-medium leading-5"
+      style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }}
+    >
+      {label}
+    </span>
+  );
+}
 
 export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
   const hasActiveFilters = Object.values(filters).some((arr) => arr.length > 0);
@@ -45,11 +62,12 @@ export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
               {options[cat].map((value) => {
                 const active = filters[cat].includes(value);
                 const color = CATEGORY_COLORS[cat];
+                const meta = cat === 'profile' ? PROFILE_META[value] : undefined;
                 return (
                   <button
                     key={value}
                     onClick={() => onToggle(cat, value)}
-                    className="rounded-md border px-2.5 py-1 text-xs font-medium transition-all"
+                    className="flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-medium transition-all"
                     style={{
                       borderColor: active ? color : '#21262d',
                       backgroundColor: active ? `${color}18` : 'transparent',
@@ -57,6 +75,12 @@ export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
                     }}
                   >
                     {value}
+                    {meta && (
+                      <>
+                        <MetaBadge label={meta.type} colors={TYPE_COLORS[meta.type]} />
+                        <MetaBadge label={meta.source} colors={SOURCE_COLORS[meta.source]} />
+                      </>
+                    )}
                   </button>
                 );
               })}

@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { BenchmarkResult } from '../types';
+import { PROFILE_META, TYPE_COLORS, SOURCE_COLORS } from '../profileMeta';
 
 interface DataTableProps {
   data: BenchmarkResult[];
@@ -10,6 +11,8 @@ type SortField =
   | 'modelShort'
   | 'backend'
   | 'profile'
+  | 'type'
+  | 'source'
   | 'concurrency'
   | 'successful_requests'
   | 'failed_requests'
@@ -30,6 +33,8 @@ const COLUMNS: ColumnDef[] = [
   { key: 'modelShort', label: 'Model', align: 'left' },
   { key: 'backend', label: 'Backend', align: 'left' },
   { key: 'profile', label: 'Profile', align: 'left' },
+  { key: 'type', label: 'Type', align: 'left' },
+  { key: 'source', label: 'Source', align: 'left' },
   { key: 'concurrency', label: 'Conc', align: 'right' },
   { key: 'successful_requests', label: 'OK', align: 'right' },
   { key: 'failed_requests', label: 'Fail', align: 'right' },
@@ -69,6 +74,10 @@ function getValue(r: BenchmarkResult, field: SortField): string | number {
       return r.config.backend;
     case 'profile':
       return r.config.profile;
+    case 'type':
+      return PROFILE_META[r.config.profile]?.type ?? '';
+    case 'source':
+      return PROFILE_META[r.config.profile]?.source ?? '';
     case 'concurrency':
       return r.config.concurrency;
     case 'successful_requests':
@@ -151,29 +160,63 @@ export function DataTable({ data }: DataTableProps) {
           </tr>
         </thead>
         <tbody>
-          {sorted.map((r, i) => (
-            <tr
-              key={`${r.filename}-${r.config.concurrency}`}
-              className={`border-b border-[#21262d] transition-colors hover:bg-[#161b22] ${
-                i % 2 === 0 ? 'bg-[#0d1117]' : 'bg-[#0d1117]/50'
-              }`}
-            >
-              {COLUMNS.map((col) => (
-                <td
-                  key={col.key}
-                  className={`whitespace-nowrap px-3 py-2 ${
-                    col.align === 'right' ? 'text-right font-mono' : 'text-left'
-                  } ${
-                    col.key === 'failed_requests' && r.summary.failed_requests > 0
-                      ? 'text-[#f97583]'
-                      : 'text-[#e6edf3]'
-                  }`}
-                >
-                  {getDisplay(r, col)}
-                </td>
-              ))}
-            </tr>
-          ))}
+          {sorted.map((r, i) => {
+            const meta = PROFILE_META[r.config.profile];
+            return (
+              <tr
+                key={`${r.filename}-${r.config.concurrency}`}
+                className={`border-b border-[#21262d] transition-colors hover:bg-[#161b22] ${
+                  i % 2 === 0 ? 'bg-[#0d1117]' : 'bg-[#0d1117]/50'
+                }`}
+              >
+                {COLUMNS.map((col) => {
+                  if (col.key === 'type' && meta) {
+                    const colors = TYPE_COLORS[meta.type];
+                    return (
+                      <td key={col.key} className="whitespace-nowrap px-3 py-2 text-left">
+                        <span
+                          className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
+                          style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }}
+                        >
+                          {meta.type}
+                        </span>
+                      </td>
+                    );
+                  }
+                  if (col.key === 'source' && meta) {
+                    const colors = SOURCE_COLORS[meta.source];
+                    return (
+                      <td key={col.key} className="whitespace-nowrap px-3 py-2 text-left">
+                        <span
+                          className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
+                          style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }}
+                        >
+                          {meta.source}
+                        </span>
+                      </td>
+                    );
+                  }
+                  if ((col.key === 'type' || col.key === 'source') && !meta) {
+                    return <td key={col.key} className="whitespace-nowrap px-3 py-2 text-left text-[#8b949e]">—</td>;
+                  }
+                  return (
+                    <td
+                      key={col.key}
+                      className={`whitespace-nowrap px-3 py-2 ${
+                        col.align === 'right' ? 'text-right font-mono' : 'text-left'
+                      } ${
+                        col.key === 'failed_requests' && r.summary.failed_requests > 0
+                          ? 'text-[#f97583]'
+                          : 'text-[#e6edf3]'
+                      }`}
+                    >
+                      {getDisplay(r, col)}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
