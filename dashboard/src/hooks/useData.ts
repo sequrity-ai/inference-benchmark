@@ -1,5 +1,6 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { BenchmarkResult, FilterState, FilterOptions } from '../types';
+import { PROFILE_META } from '../profileMeta';
 
 export function useData() {
   const [allData, setAllData] = useState<BenchmarkResult[]>([]);
@@ -9,6 +10,9 @@ export function useData() {
     hardware: [],
     model: [],
     backend: [],
+    agentType: [],
+    turnStyle: [],
+    servingStyle: [],
     profile: [],
   });
 
@@ -38,6 +42,9 @@ export function useData() {
     const hw = new Set<string>();
     const model = new Set<string>();
     const backend = new Set<string>();
+    const agentType = new Set<string>();
+    const turnStyle = new Set<string>();
+    const servingStyle = new Set<string>();
     const profile = new Set<string>();
 
     for (const r of allData) {
@@ -45,12 +52,21 @@ export function useData() {
       model.add(r.modelShort);
       backend.add(r.config.backend);
       profile.add(r.config.profile);
+      const meta = PROFILE_META[r.config.profile];
+      if (meta) {
+        agentType.add(meta.agentType);
+        turnStyle.add(meta.turnStyle);
+        servingStyle.add(meta.servingStyle);
+      }
     }
 
     return {
       hardware: Array.from(hw).sort(),
       model: Array.from(model).sort(),
       backend: Array.from(backend).sort(),
+      agentType: Array.from(agentType).sort(),
+      turnStyle: Array.from(turnStyle).sort(),
+      servingStyle: Array.from(servingStyle).sort(),
       profile: Array.from(profile).sort(),
     };
   }, [allData]);
@@ -61,6 +77,18 @@ export function useData() {
       if (filters.model.length > 0 && !filters.model.includes(r.modelShort)) return false;
       if (filters.backend.length > 0 && !filters.backend.includes(r.config.backend)) return false;
       if (filters.profile.length > 0 && !filters.profile.includes(r.config.profile)) return false;
+
+      // Tag-based filtering via profile metadata
+      const meta = PROFILE_META[r.config.profile];
+      if (meta) {
+        if (filters.agentType.length > 0 && !filters.agentType.includes(meta.agentType)) return false;
+        if (filters.turnStyle.length > 0 && !filters.turnStyle.includes(meta.turnStyle)) return false;
+        if (filters.servingStyle.length > 0 && !filters.servingStyle.includes(meta.servingStyle)) return false;
+      } else {
+        // If no metadata, exclude when tag filters are active
+        if (filters.agentType.length > 0 || filters.turnStyle.length > 0 || filters.servingStyle.length > 0) return false;
+      }
+
       return true;
     });
   }, [allData, filters]);
@@ -89,7 +117,7 @@ export function useData() {
   }, []);
 
   const clearFilters = useCallback(() => {
-    setFilters({ hardware: [], model: [], backend: [], profile: [] });
+    setFilters({ hardware: [], model: [], backend: [], agentType: [], turnStyle: [], servingStyle: [], profile: [] });
   }, []);
 
   return {

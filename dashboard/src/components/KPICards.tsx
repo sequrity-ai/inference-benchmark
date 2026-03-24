@@ -1,5 +1,5 @@
 import type { BenchmarkResult } from '../types';
-import { PROFILE_META, TYPE_COLORS } from '../profileMeta';
+import { PROFILE_META, AGENT_TYPE_COLORS } from '../profileMeta';
 
 interface KPICardsProps {
   data: BenchmarkResult[];
@@ -26,12 +26,12 @@ export function KPICards({ data, allData }: KPICardsProps) {
 
   const isFiltered = data.length !== allData.length;
 
-  // Count distinct profiles by type in filtered data
+  // Count distinct profiles by agent type in filtered data
   const profilesInData = new Set(data.map((r) => r.config.profile));
-  const typeCounts: Record<string, number> = { 'prefill-heavy': 0, 'decode-heavy': 0, 'balanced': 0 };
+  const typeCounts: Record<string, number> = { 'chat': 0, 'coding': 0, 'computer-use': 0, 'customer-support': 0 };
   for (const profile of profilesInData) {
     const meta = PROFILE_META[profile];
-    if (meta) typeCounts[meta.type] = (typeCounts[meta.type] ?? 0) + 1;
+    if (meta) typeCounts[meta.agentType] = (typeCounts[meta.agentType] ?? 0) + 1;
   }
 
   const cards = [
@@ -62,9 +62,10 @@ export function KPICards({ data, allData }: KPICardsProps) {
   ];
 
   const typeLabels: Array<{ key: string; short: string }> = [
-    { key: 'prefill-heavy', short: 'Prefill' },
-    { key: 'decode-heavy', short: 'Decode' },
-    { key: 'balanced', short: 'Balanced' },
+    { key: 'chat', short: 'Chat' },
+    { key: 'coding', short: 'Coding' },
+    { key: 'computer-use', short: 'Computer Use' },
+    { key: 'customer-support', short: 'Support' },
   ];
 
   return (
@@ -92,7 +93,7 @@ export function KPICards({ data, allData }: KPICardsProps) {
           {typeLabels.map(({ key, short }) => {
             const count = typeCounts[key] ?? 0;
             if (count === 0) return null;
-            const colors = TYPE_COLORS[key];
+            const colors = AGENT_TYPE_COLORS[key] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' };
             return (
               <span
                 key={key}

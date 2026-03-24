@@ -84,6 +84,9 @@ export interface FilterState {
   hardware: string[];
   model: string[];
   backend: string[];
+  agentType: string[];
+  turnStyle: string[];
+  servingStyle: string[];
   profile: string[];
 }
 
@@ -93,5 +96,8 @@ export interface FilterOptions {
   hardware: string[];
   model: string[];
   backend: string[];
+  agentType: string[];
+  turnStyle: string[];
+  servingStyle: string[];
   profile: string[];
 }

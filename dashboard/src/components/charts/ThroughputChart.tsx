@@ -9,7 +9,7 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 import type { BenchmarkResult } from '../../types';
-import { PROFILE_META, TYPE_COLORS, SOURCE_COLORS } from '../../profileMeta';
+import { PROFILE_META, AGENT_TYPE_COLORS, DATA_SOURCE_COLORS } from '../../profileMeta';
 
 interface ThroughputChartProps {
   seriesData: Map<string, BenchmarkResult[]>;
@@ -126,22 +126,22 @@ export function ThroughputChart({ seriesData }: ThroughputChartProps) {
                   <span
                     className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
                     style={{
-                      backgroundColor: TYPE_COLORS[singleMeta.type].bg,
-                      color: TYPE_COLORS[singleMeta.type].text,
-                      borderColor: TYPE_COLORS[singleMeta.type].border,
+                      backgroundColor: (AGENT_TYPE_COLORS[singleMeta.agentType] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).bg,
+                      color: (AGENT_TYPE_COLORS[singleMeta.agentType] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).text,
+                      borderColor: (AGENT_TYPE_COLORS[singleMeta.agentType] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).border,
                     }}
                   >
-                    {singleMeta.type}
+                    {singleMeta.agentType}
                   </span>
                   <span
                     className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
                     style={{
-                      backgroundColor: SOURCE_COLORS[singleMeta.source].bg,
-                      color: SOURCE_COLORS[singleMeta.source].text,
-                      borderColor: SOURCE_COLORS[singleMeta.source].border,
+                      backgroundColor: (DATA_SOURCE_COLORS[singleMeta.dataSource] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).bg,
+                      color: (DATA_SOURCE_COLORS[singleMeta.dataSource] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).text,
+                      borderColor: (DATA_SOURCE_COLORS[singleMeta.dataSource] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).border,
                     }}
                   >
-                    {singleMeta.source}
+                    {singleMeta.dataSource}
                   </span>
                 </>
               )}

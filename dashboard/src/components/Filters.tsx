@@ -1,5 +1,5 @@
 import type { FilterState, FilterOptions } from '../types';
-import { PROFILE_META, TYPE_COLORS, SOURCE_COLORS } from '../profileMeta';
+import { PROFILE_META, AGENT_TYPE_COLORS, DATA_SOURCE_COLORS } from '../profileMeta';
 
 interface FiltersProps {
   filters: FilterState;
@@ -12,6 +12,9 @@ const CATEGORY_LABELS: Record<keyof FilterState, string> = {
   hardware: 'Hardware',
   model: 'Model',
   backend: 'Backend',
+  agentType: 'Agent Type',
+  turnStyle: 'Turn Style',
+  servingStyle: 'Serving Style',
   profile: 'Profile',
 };
 
@@ -19,7 +22,10 @@ const CATEGORY_COLORS: Record<keyof FilterState, string> = {
   hardware: '#00bcd4',
   model: '#ff9800',
   backend: '#a855f7',
-  profile: '#3fb950',
+  agentType: '#3fb950',
+  turnStyle: '#e78bfa',
+  servingStyle: '#f97583',
+  profile: '#79c0ff',
 };
 
 interface MetaBadgeProps {
@@ -37,6 +43,8 @@ function MetaBadge({ label, colors }: MetaBadgeProps) {
     </span>
   );
 }
+
+const FALLBACK_COLORS = { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' };
 
 export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
   const hasActiveFilters = Object.values(filters).some((arr) => arr.length > 0);
@@ -77,8 +85,14 @@ export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
                     {value}
                     {meta && (
                       <>
-                        <MetaBadge label={meta.type} colors={TYPE_COLORS[meta.type]} />
-                        <MetaBadge label={meta.source} colors={SOURCE_COLORS[meta.source]} />
+                        <MetaBadge
+                          label={meta.agentType}
+                          colors={AGENT_TYPE_COLORS[meta.agentType] || FALLBACK_COLORS}
+                        />
+                        <MetaBadge
+                          label={meta.dataSource}
+                          colors={DATA_SOURCE_COLORS[meta.dataSource] || FALLBACK_COLORS}
+                        />
                       </>
                     )}
                   </button>

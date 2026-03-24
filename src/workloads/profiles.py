@@ -7,6 +7,14 @@ a description, and the data source to use.
 """
 
 from dataclasses import dataclass
+from typing import Optional
+
+
+# Valid tag values (for documentation and validation)
+AGENT_TYPES = ["chat", "coding", "computer-use", "customer-support"]
+TURN_STYLES = ["single-turn", "multi-turn"]
+SERVING_STYLES = ["disaggregated", "not-disaggregated"]
+DATA_SOURCES = ["sharegpt", "swebench", "terminalbench", "file", "random", "test"]
 
 
 @dataclass
@@ -25,6 +33,10 @@ class WorkloadProfile:
     min_turns: int = 1                   # multi-turn: minimum turns per session
     max_turns: int = 1                   # multi-turn: maximum turns per session
     num_sessions: int = 200              # multi-turn: number of concurrent sessions
+    agent_type: str = ""           # "chat" | "coding" | "computer-use" | "customer-support"
+    turn_style: str = "single-turn"  # "single-turn" | "multi-turn"
+    serving_style: str = "not-disaggregated"  # "disaggregated" | "not-disaggregated"
+    data_source: str = ""          # "sharegpt" | "swebench" | "file" | "random" | "test"
 
 
 PROFILES: dict[str, WorkloadProfile] = {
@@ -37,6 +49,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         dataset="sharegpt",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
     ),
     "chatbot-multi-turn": WorkloadProfile(
         name="chatbot-multi-turn",
@@ -47,6 +63,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         dataset="sharegpt",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
     ),
     "rag-retrieval": WorkloadProfile(
         name="rag-retrieval",
@@ -57,6 +77,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         dataset="sharegpt",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
     ),
     "rag-heavy": WorkloadProfile(
         name="rag-heavy",
@@ -67,6 +91,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         dataset="sharegpt",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
     ),
     "coding-assist": WorkloadProfile(
         name="coding-assist",
@@ -77,6 +105,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         dataset="sharegpt",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="coding",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
     ),
     "coding-heavy": WorkloadProfile(
         name="coding-heavy",
@@ -87,6 +119,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         dataset="sharegpt",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="coding",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
     ),
     "summarization": WorkloadProfile(
         name="summarization",
@@ -97,6 +133,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         dataset="sharegpt",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
     ),
     "agentic-tool-use": WorkloadProfile(
         name="agentic-tool-use",
@@ -107,6 +147,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         dataset="sharegpt",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
     ),
     "coding-agent": WorkloadProfile(
         name="coding-agent",
@@ -119,6 +163,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         system_prompt="",  # system prompt is embedded in the JSONL
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="coding",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="swebench",
     ),
     # Legacy profiles from llm-bench (for direct comparison)
     "output-short": WorkloadProfile(
@@ -131,6 +179,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         file_path="data/long_input_short_output.txt",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="file",
     ),
     "output-long": WorkloadProfile(
         name="output-long",
@@ -142,6 +194,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         file_path="data/short_input_long_output.txt",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="file",
     ),
     "test": WorkloadProfile(
         name="test",
@@ -152,6 +208,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         dataset="test",
         mode="single-turn",
         prefix_caching_required=True,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="test",
     ),
     # InferenceX replication profile — for cross-validation only.
     # Uses the same random token generation algorithm as InferenceX
@@ -170,6 +230,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         tokenizer_name="meta-llama/Llama-3.1-8B-Instruct",
         mode="stress-test",
         prefix_caching_required=False,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="random",
     ),
     # Exact InferenceX replication using legacy numpy RNG (np.random.seed + np.random.randint).
     # If TTFT matches InferenceX (~144ms median), confirms TTFT gap is purely RNG/cache artifact.
@@ -183,6 +247,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         tokenizer_name="meta-llama/Llama-3.1-8B-Instruct",
         mode="stress-test",
         prefix_caching_required=False,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="random",
     ),
     # Same as random-inferencex but pre-applies chat template before sending,
     # replicating InferenceX's double-wrap bug (--backend openai-chat --use-chat-template).
@@ -197,6 +265,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         tokenizer_name="meta-llama/Llama-3.1-8B-Instruct",
         mode="stress-test",
         prefix_caching_required=False,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="random",
     ),
     # Multi-turn profiles — growing conversation history with prefix cache reuse
     "multi-turn-short": WorkloadProfile(
@@ -211,6 +283,10 @@ PROFILES: dict[str, WorkloadProfile] = {
         min_turns=3,
         max_turns=5,
         num_sessions=200,
+        agent_type="chat",
+        turn_style="multi-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
     ),
     "multi-turn-long": WorkloadProfile(
         name="multi-turn-long",
@@ -224,13 +300,70 @@ PROFILES: dict[str, WorkloadProfile] = {
         min_turns=5,
         max_turns=10,
         num_sessions=100,
+        agent_type="chat",
+        turn_style="multi-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
+    ),
+    "computer-use-basic": WorkloadProfile(
+        name="computer-use-basic",
+        isl_tokens=4000,
+        osl_tokens=500,
+        isl_stddev=0.15,
+        description="Computer-use agent: screenshot analysis + action generation (placeholder)",
+        dataset="sharegpt",  # placeholder until real dataset available
+        mode="single-turn",
+        prefix_caching_required=True,
+        agent_type="computer-use",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
+    ),
+    "customer-support-basic": WorkloadProfile(
+        name="customer-support-basic",
+        isl_tokens=3000,
+        osl_tokens=800,
+        isl_stddev=0.15,
+        description="Customer support agent: ticket analysis + response (placeholder)",
+        dataset="sharegpt",  # placeholder until real dataset available
+        mode="single-turn",
+        prefix_caching_required=True,
+        agent_type="customer-support",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="sharegpt",
     ),
 }
 
 
-STRESS_TEST_PROFILES = {k: v for k, v in PROFILES.items() if v.mode == "stress-test"}
-SINGLE_TURN_PROFILES = {k: v for k, v in PROFILES.items() if v.mode == "single-turn"}
-MULTI_TURN_PROFILES = {k: v for k, v in PROFILES.items() if v.mode == "multi-turn"}
+def filter_profiles(
+    agent_type: Optional[str] = None,
+    turn_style: Optional[str] = None,
+    serving_style: Optional[str] = None,
+    data_source: Optional[str] = None,
+    mode: Optional[str] = None,
+) -> dict:
+    """Filter profiles by tag values. None means 'any'."""
+    result = {}
+    for name, p in PROFILES.items():
+        if agent_type is not None and p.agent_type != agent_type:
+            continue
+        if turn_style is not None and p.turn_style != turn_style:
+            continue
+        if serving_style is not None and p.serving_style != serving_style:
+            continue
+        if data_source is not None and p.data_source != data_source:
+            continue
+        if mode is not None and p.mode != mode:
+            continue
+        result[name] = p
+    return result
+
+
+# Convenience filters (backward compatible)
+STRESS_TEST_PROFILES = filter_profiles(mode="stress-test")
+SINGLE_TURN_PROFILES = filter_profiles(turn_style="single-turn")
+MULTI_TURN_PROFILES = filter_profiles(turn_style="multi-turn")
 
 
 def get_profile(name: str) -> WorkloadProfile:

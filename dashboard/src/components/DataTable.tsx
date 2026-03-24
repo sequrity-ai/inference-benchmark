@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import type { BenchmarkResult } from '../types';
-import { PROFILE_META, TYPE_COLORS, SOURCE_COLORS } from '../profileMeta';
+import { PROFILE_META, AGENT_TYPE_COLORS, DATA_SOURCE_COLORS } from '../profileMeta';
 
 interface DataTableProps {
   data: BenchmarkResult[];
@@ -75,9 +75,9 @@ function getValue(r: BenchmarkResult, field: SortField): string | number {
     case 'profile':
       return r.config.profile;
     case 'type':
-      return PROFILE_META[r.config.profile]?.type ?? '';
+      return PROFILE_META[r.config.profile]?.agentType ?? '';
     case 'source':
-      return PROFILE_META[r.config.profile]?.source ?? '';
+      return PROFILE_META[r.config.profile]?.dataSource ?? '';
     case 'concurrency':
       return r.config.concurrency;
     case 'successful_requests':
@@ -171,27 +171,27 @@ export function DataTable({ data }: DataTableProps) {
               >
                 {COLUMNS.map((col) => {
                   if (col.key === 'type' && meta) {
-                    const colors = TYPE_COLORS[meta.type];
+                    const colors = AGENT_TYPE_COLORS[meta.agentType] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' };
                     return (
                       <td key={col.key} className="whitespace-nowrap px-3 py-2 text-left">
                         <span
                           className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
                           style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }}
                         >
-                          {meta.type}
+                          {meta.agentType}
                         </span>
                       </td>
                     );
                   }
                   if (col.key === 'source' && meta) {
-                    const colors = SOURCE_COLORS[meta.source];
+                    const colors = DATA_SOURCE_COLORS[meta.dataSource] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' };
                     return (
                       <td key={col.key} className="whitespace-nowrap px-3 py-2 text-left">
                         <span
                           className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
                           style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }}
                         >
-                          {meta.source}
+                          {meta.dataSource}
                         </span>
                       </td>
                     );

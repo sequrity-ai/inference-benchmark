@@ -15,7 +15,8 @@ Profiles: random-inferencex, random-inferencex-legacy
 REQUIRED_CLIENT_FLAGS = ["--ignore-eos"]
 PREFIX_CACHING_REQUIRED = False
 
-PROFILES = ["random-inferencex", "random-inferencex-legacy"]
+from ..workloads.profiles import filter_profiles
+PROFILES = list(filter_profiles(mode="stress-test").keys())
 
 SERVER_NOTES = """
 vLLM: do NOT pass --enable-prefix-caching

@@ -20,10 +20,8 @@ Server requirements (same as single-turn):
 REQUIRED_CLIENT_FLAGS: list[str] = []
 PREFIX_CACHING_REQUIRED = True
 
-PROFILES = [
-    "multi-turn-short",
-    "multi-turn-long",
-]
+from ..workloads.profiles import filter_profiles
+PROFILES = list(filter_profiles(turn_style="multi-turn").keys())
 
 SERVER_NOTES = """
 vLLM: pass --enable-prefix-caching

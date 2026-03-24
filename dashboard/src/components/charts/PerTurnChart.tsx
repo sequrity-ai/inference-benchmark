@@ -142,13 +142,14 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
             <Tooltip
               contentStyle={tooltipStyle}
               labelFormatter={(v) => `Turn ${v}`}
-              formatter={(value: number, name: string) => {
-                const key = name.replace(/_ttft$/, '');
-                const turnIdx = ttftData.findIndex((d) => d[name] === value);
+              formatter={(value: unknown, name: unknown) => {
+                const v = value as number;
+                const key = (name as string).replace(/_ttft$/, '');
+                const turnIdx = ttftData.findIndex((d) => d[name as string] === v);
                 const islKey = `${key}_isl`;
                 const isl = turnIdx >= 0 ? ttftData[turnIdx][islKey] : undefined;
                 return [
-                  `${value.toFixed(1)} ms${isl ? ` (ISL: ~${isl})` : ''}`,
+                  `${v.toFixed(1)} ms${isl ? ` (ISL: ~${isl})` : ''}`,
                   key,
                 ];
               }}
@@ -198,7 +199,7 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
             <Tooltip
               contentStyle={tooltipStyle}
               labelFormatter={(v) => `Turn ${v}`}
-              formatter={(value: number, name: string) => [`${value} tokens`, name]}
+              formatter={(value: unknown, name: unknown) => [`${value as number} tokens`, name as string]}
             />
             <Legend
               wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
@@ -242,7 +243,7 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
             <Tooltip
               contentStyle={tooltipStyle}
               labelFormatter={(v) => `Turn ${v}`}
-              formatter={(value: number, name: string) => [`${value.toFixed(1)} ms`, name]}
+              formatter={(value: unknown, name: unknown) => [`${(value as number).toFixed(1)} ms`, name as string]}
             />
             <Legend
               wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
@@ -320,10 +321,12 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
                 <ZAxis range={[20, 20]} />
                 <Tooltip
                   contentStyle={tooltipStyle}
-                  formatter={(value: number, name: string) => {
-                    if (name === 'Input Tokens') return [`${value}`, name];
-                    if (name === 'TTFT') return [`${value.toFixed(1)} ms`, name];
-                    return [`${value}`, name];
+                  formatter={(value: unknown, name: unknown) => {
+                    const v = value as number;
+                    const n = name as string;
+                    if (n === 'Input Tokens') return [`${v}`, n];
+                    if (n === 'TTFT') return [`${v.toFixed(1)} ms`, n];
+                    return [`${v}`, n];
                   }}
                   labelFormatter={() => ''}
                 />
@@ -372,7 +375,7 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
             <Tooltip
               contentStyle={tooltipStyle}
               labelFormatter={(v) => `Turn ${v}`}
-              formatter={(value: number, name: string) => [`${value} sessions`, name]}
+              formatter={(value: unknown, name: unknown) => [`${value as number} sessions`, name as string]}
             />
             <Legend
               wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}

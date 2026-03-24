@@ -18,18 +18,8 @@ Profiles: chatbot-short, chatbot-multi-turn, rag-retrieval, rag-heavy,
 REQUIRED_CLIENT_FLAGS: list[str] = []
 PREFIX_CACHING_REQUIRED = True
 
-PROFILES = [
-    "chatbot-short",
-    "chatbot-multi-turn",
-    "rag-retrieval",
-    "rag-heavy",
-    "coding-assist",
-    "coding-heavy",
-    "summarization",
-    "agentic-tool-use",
-    "output-short",
-    "output-long",
-]
+from ..workloads.profiles import filter_profiles
+PROFILES = list(filter_profiles(mode="single-turn").keys())
 
 SERVER_NOTES = """
 vLLM: pass --enable-prefix-caching

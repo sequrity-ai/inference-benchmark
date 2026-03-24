@@ -25,6 +25,7 @@ Usage:
 import asyncio
 import argparse
 import json
+import sys
 import time
 import os
 from pathlib import Path
@@ -230,8 +231,8 @@ def save_results(summary, results, output_path: str, config: dict):
 
 def get_args():
     parser = argparse.ArgumentParser(description="inference-benchmark runner")
-    parser.add_argument("--url", required=True, help="Server endpoint URL")
-    parser.add_argument("--model", required=True)
+    parser.add_argument("--url", required=False, help="Server endpoint URL")
+    parser.add_argument("--model", required=False)
     parser.add_argument("--backend", default="vllm", choices=SUPPORTED_BACKENDS,
                         help="Backend type (vllm/sglang/openai → /v1/chat/completions, trtllm → /generate_stream)")
     parser.add_argument("--profile", default="output-short", help="Workload profile name")
@@ -249,11 +250,44 @@ def get_args():
     parser.add_argument("--mode", choices=["stress-test", "single-turn", "multi-turn"],
                         help="Benchmark mode (sets profile defaults and required flags). "
                              "Use --profile for a specific profile within a mode.")
+    parser.add_argument("--list-profiles", action="store_true", help="List available profiles and exit")
+    parser.add_argument("--agent-type", type=str, default=None, help="Filter profiles by agent type")
+    parser.add_argument("--turn-style", type=str, default=None, help="Filter profiles by turn style")
+    parser.add_argument("--serving-style", type=str, default=None, help="Filter profiles by serving style")
+    parser.add_argument("--data-source", type=str, default=None, help="Filter profiles by data source")
     return parser.parse_args()
 
 
 if __name__ == "__main__":
     args = get_args()
+
+    if args.list_profiles:
+        from ..workloads.profiles import filter_profiles, PROFILES, AGENT_TYPES, TURN_STYLES, SERVING_STYLES, DATA_SOURCES
+        filtered = filter_profiles(
+            agent_type=args.agent_type,
+            turn_style=args.turn_style,
+            serving_style=args.serving_style,
+            data_source=args.data_source,
+        )
+        print(f"\n{'Name':<30} {'Agent Type':<18} {'Turn Style':<14} {'Serving':<20} {'Data Source':<12} {'ISL':<6} {'OSL':<6}")
+        print("-" * 110)
+        for name, p in sorted(filtered.items()):
+            print(f"{name:<30} {p.agent_type:<18} {p.turn_style:<14} {p.serving_style:<20} {p.data_source:<12} {p.isl_tokens:<6} {p.osl_tokens:<6}")
+        print(f"\n{len(filtered)} profiles shown (of {len(PROFILES)} total)")
+        if any([args.agent_type, args.turn_style, args.serving_style, args.data_source]):
+            active = []
+            if args.agent_type: active.append(f"agent_type={args.agent_type}")
+            if args.turn_style: active.append(f"turn_style={args.turn_style}")
+            if args.serving_style: active.append(f"serving_style={args.serving_style}")
+            if args.data_source: active.append(f"data_source={args.data_source}")
+            print(f"Filters: {', '.join(active)}")
+        sys.exit(0)
+
+    # --url and --model are required for actual benchmark runs
+    if not args.url or not args.model:
+        print("Error: --url and --model are required for benchmark runs.")
+        print("Use --list-profiles to browse profiles without a server.")
+        sys.exit(1)
 
     if args.mode:
         if args.mode == "multi-turn":
