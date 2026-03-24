@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { FilterState, FilterOptions } from '../types';
 import { PROFILE_META, AGENT_TYPE_COLORS, DATA_SOURCE_COLORS } from '../profileMeta';
 
@@ -104,6 +105,7 @@ function FilterGroup({
 }
 
 export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
+  const [expandedProfile, setExpandedProfile] = useState<string | null>(null);
   const hasActiveFilters = Object.values(filters).some((arr) => arr.length > 0);
 
   // All known profiles from PROFILE_META (complete list regardless of loaded data)
@@ -229,44 +231,74 @@ export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
               const agentColors = meta ? (AGENT_TYPE_COLORS[meta.agentType] || FALLBACK_COLORS) : FALLBACK_COLORS;
               const dsColors = meta ? (DATA_SOURCE_COLORS[meta.dataSource] || FALLBACK_COLORS) : FALLBACK_COLORS;
 
+              const isExpanded = expandedProfile === profileName;
+
               return (
-                <button
-                  key={profileName}
-                  onClick={() => onToggle('profile', profileName)}
-                  className="w-full rounded border px-2.5 py-1.5 text-left transition-all"
-                  style={{
-                    borderColor: isSelected ? '#79c0ff' : matches ? '#21262d' : 'transparent',
-                    backgroundColor: isSelected
-                      ? 'rgba(121,192,255,0.10)'
-                      : matches
-                      ? 'rgba(255,255,255,0.02)'
-                      : 'transparent',
-                    opacity: matches ? 1 : 0.28,
-                  }}
-                >
-                  {/* Profile name row */}
-                  <div className="flex items-center justify-between gap-1">
-                    <span
-                      className="truncate text-xs font-medium"
-                      style={{ color: isSelected ? '#79c0ff' : matches ? '#e6edf3' : '#8b949e' }}
+                <div key={profileName}>
+                  <div
+                    className="flex w-full items-start rounded border transition-all"
+                    style={{
+                      borderColor: isSelected ? '#79c0ff' : matches ? '#21262d' : 'transparent',
+                      backgroundColor: isSelected
+                        ? 'rgba(121,192,255,0.10)'
+                        : matches
+                        ? 'rgba(255,255,255,0.02)'
+                        : 'transparent',
+                      opacity: matches ? 1 : 0.28,
+                    }}
+                  >
+                    {/* Main clickable area — selects the profile filter */}
+                    <button
+                      onClick={() => onToggle('profile', profileName)}
+                      className="flex-1 px-2.5 py-1.5 text-left"
                     >
-                      {profileName}
-                    </span>
-                    {meta && (
-                      <span className="shrink-0 text-[10px] text-[#8b949e]">
-                        {meta.isl}/{meta.osl}
-                      </span>
+                      <div className="flex items-center justify-between gap-1">
+                        <span
+                          className="truncate text-xs font-medium"
+                          style={{ color: isSelected ? '#79c0ff' : matches ? '#e6edf3' : '#8b949e' }}
+                        >
+                          {profileName}
+                        </span>
+                        {meta && (
+                          <span className="shrink-0 text-[10px] text-[#8b949e]">
+                            {meta.isl}/{meta.osl}
+                          </span>
+                        )}
+                      </div>
+                      {meta && (
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          <MetaBadge label={meta.agentType} colors={agentColors} />
+                          <MetaBadge label={meta.dataSource} colors={dsColors} />
+                        </div>
+                      )}
+                    </button>
+
+                    {/* Info button */}
+                    {meta?.description && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedProfile(isExpanded ? null : profileName);
+                        }}
+                        className="shrink-0 px-2 py-2 text-[#8b949e] transition-colors hover:text-[#e6edf3]"
+                        title="Show workload description"
+                      >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <circle cx="12" cy="12" r="10" />
+                          <line x1="12" y1="16" x2="12" y2="12" />
+                          <line x1="12" y1="8" x2="12.01" y2="8" />
+                        </svg>
+                      </button>
                     )}
                   </div>
 
-                  {/* Badges row */}
-                  {meta && (
-                    <div className="mt-1 flex flex-wrap gap-1">
-                      <MetaBadge label={meta.agentType} colors={agentColors} />
-                      <MetaBadge label={meta.dataSource} colors={dsColors} />
+                  {/* Expanded description */}
+                  {isExpanded && meta?.description && (
+                    <div className="mx-1 mb-1 mt-0.5 rounded border border-[#30363d] bg-[#161b22] px-2.5 py-2 text-[11px] leading-relaxed text-[#8b949e]">
+                      {meta.description}
                     </div>
                   )}
-                </button>
+                </div>
               );
             })}
           </div>
