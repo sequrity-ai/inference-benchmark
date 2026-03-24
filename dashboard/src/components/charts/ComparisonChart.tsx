@@ -123,9 +123,10 @@ export function ComparisonChart({ seriesData }: ComparisonChartProps) {
 
       {/* Chart */}
       <div className="rounded-lg border border-[#21262d] bg-[#161b22] p-4">
-        <h3 className="mb-3 text-sm font-medium text-[#e6edf3]">
-          {metricLabel} Comparison
-        </h3>
+        <div className="mb-3 flex items-center gap-2">
+          <h3 className="text-sm font-semibold text-[#e6edf3]">{metricLabel} Comparison</h3>
+          <span className="rounded bg-[#21262d] px-1.5 py-0.5 text-[10px] font-medium text-[#8b949e]">vs concurrency</span>
+        </div>
         <ResponsiveContainer width="100%" height={400}>
           <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
@@ -148,14 +149,15 @@ export function ComparisonChart({ seriesData }: ComparisonChartProps) {
             <Tooltip
               contentStyle={{
                 backgroundColor: '#161b22',
-                border: '1px solid #21262d',
+                border: '1px solid #30363d',
                 borderRadius: '8px',
                 fontSize: '12px',
                 color: '#e6edf3',
+                boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
               }}
               labelFormatter={(v) => `Concurrency: ${v}`}
             />
-            <Legend wrapperStyle={{ fontSize: '11px' }} />
+            <Legend wrapperStyle={{ fontSize: '11px', color: '#c9d1d9' }} />
             <Line
               type="monotone"
               dataKey="Series A"

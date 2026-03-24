@@ -75,21 +75,22 @@ export function KPICards({ data, allData }: KPICardsProps) {
           <div
             key={card.label}
             className="rounded-lg border border-[#21262d] bg-[#161b22] p-4"
-            style={{ borderTopColor: card.accent, borderTopWidth: '2px' }}
+            style={{ borderTopColor: card.accent, borderTopWidth: '3px' }}
           >
-            <div className="mb-1 text-xs text-[#8b949e]">{card.label}</div>
-            <div className="font-mono text-2xl font-semibold tracking-tight">
+            <div className="mb-2 text-[11px] font-semibold uppercase tracking-widest text-[#8b949e]">{card.label}</div>
+            <div className="font-mono text-3xl font-bold tracking-tight text-[#e6edf3]">
               {card.value}
               {card.suffix && (
-                <span className="text-sm text-[#8b949e]">{card.suffix}</span>
+                <span className="ml-1.5 text-sm font-normal text-[#8b949e]">{card.suffix}</span>
               )}
             </div>
           </div>
         ))}
       </div>
       {profilesInData.size > 0 && (
-        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-[#21262d] bg-[#161b22] px-4 py-2.5">
-          <span className="text-xs text-[#8b949e]">Workload mix:</span>
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-[#21262d] bg-[#161b22] px-4 py-2.5" style={{ borderLeftColor: '#00bcd4', borderLeftWidth: '3px' }}>
+          <span className="text-xs font-medium text-[#8b949e]">Workload mix</span>
+          <span className="text-[#30363d]">·</span>
           {typeLabels.map(({ key, short }) => {
             const count = typeCounts[key] ?? 0;
             if (count === 0) return null;
@@ -97,16 +98,16 @@ export function KPICards({ data, allData }: KPICardsProps) {
             return (
               <span
                 key={key}
-                className="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium"
+                className="inline-flex items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-xs font-medium"
                 style={{ backgroundColor: colors.bg, color: colors.text, borderColor: colors.border }}
               >
-                <span className="font-mono font-semibold">{count}</span>
+                <span className="font-mono font-bold">{count}</span>
                 {short}
               </span>
             );
           })}
-          <span className="ml-1 text-xs text-[#8b949e]">
-            ({profilesInData.size} profile{profilesInData.size !== 1 ? 's' : ''})
+          <span className="ml-auto text-xs text-[#8b949e]">
+            {profilesInData.size} profile{profilesInData.size !== 1 ? 's' : ''}
           </span>
         </div>
       )}

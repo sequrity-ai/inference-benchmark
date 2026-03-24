@@ -107,20 +107,22 @@ export function ThroughputChart({ seriesData }: ThroughputChartProps) {
   const singleMeta = singleProfile ? PROFILE_META[singleProfile] : null;
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-      {METRICS.map((metric) => {
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      {METRICS.map((metric, idx) => {
         const chartData = buildChartData(seriesData, metric.field);
+        // Request Throughput is the 3rd chart (idx 2) — span full width to avoid orphan.
+        const isOrphan = idx === 2;
 
         return (
           <div
             key={metric.key}
-            className="rounded-lg border border-[#21262d] bg-[#161b22] p-4"
+            className={`rounded-lg border border-[#21262d] bg-[#161b22] p-4 ${isOrphan ? 'xl:col-span-2' : ''}`}
           >
             <div className="mb-3 flex flex-wrap items-center gap-2">
-              <h3 className="text-sm font-medium text-[#e6edf3]">
+              <h3 className="text-sm font-semibold text-[#e6edf3]">
                 {metric.label}
-                <span className="ml-2 text-xs text-[#8b949e]">{metric.unit}</span>
               </h3>
+              <span className="rounded bg-[#21262d] px-1.5 py-0.5 text-[10px] font-medium text-[#8b949e]">{metric.unit}</span>
               {singleMeta && (
                 <>
                   <span
@@ -146,7 +148,7 @@ export function ThroughputChart({ seriesData }: ThroughputChartProps) {
                 </>
               )}
             </div>
-            <ResponsiveContainer width="100%" height={300}>
+            <ResponsiveContainer width="100%" height={isOrphan ? 320 : 300}>
               <AreaChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
                 <XAxis
@@ -168,10 +170,11 @@ export function ThroughputChart({ seriesData }: ThroughputChartProps) {
                 <Tooltip
                   contentStyle={{
                     backgroundColor: '#161b22',
-                    border: '1px solid #21262d',
+                    border: '1px solid #30363d',
                     borderRadius: '8px',
                     fontSize: '12px',
                     color: '#e6edf3',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
                   }}
                   labelFormatter={(v) => `Concurrency: ${v}`}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -181,7 +184,7 @@ export function ThroughputChart({ seriesData }: ThroughputChartProps) {
                   ]}
                 />
                 <Legend
-                  wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
+                  wrapperStyle={{ fontSize: '11px', color: '#c9d1d9' }}
                   formatter={(value: string) => shortenSeriesKey(value, seriesNames)}
                 />
                 {seriesNames.map((name, i) => (

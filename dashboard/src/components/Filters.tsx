@@ -132,11 +132,11 @@ export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
     <div className="mb-6 rounded-lg border border-[#21262d] bg-[#161b22] p-4">
       {/* Header row */}
       <div className="mb-4 flex items-center justify-between">
-        <span className="text-sm font-medium text-[#8b949e]">Filters</span>
+        <span className="text-sm font-semibold text-[#e6edf3]">Filters</span>
         {hasActiveFilters && (
           <button
             onClick={onClear}
-            className="rounded px-2 py-0.5 text-xs text-[#8b949e] transition-colors hover:bg-[#21262d] hover:text-[#e6edf3]"
+            className="rounded px-2.5 py-1 text-xs font-medium text-[#8b949e] transition-colors hover:bg-[#21262d] hover:text-[#e6edf3]"
           >
             Clear all
           </button>

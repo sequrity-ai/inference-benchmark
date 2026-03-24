@@ -142,11 +142,11 @@ export function DataTable({ data }: DataTableProps) {
     <div className="overflow-x-auto rounded-lg border border-[#21262d]">
       <table className="w-full text-xs">
         <thead>
-          <tr className="border-b border-[#21262d] bg-[#161b22]">
+          <tr className="border-b-2 border-[#30363d] bg-[#161b22]">
             {COLUMNS.map((col) => (
               <th
                 key={col.key}
-                className={`cursor-pointer whitespace-nowrap px-3 py-2.5 font-medium text-[#8b949e] transition-colors hover:text-[#e6edf3] ${
+                className={`cursor-pointer whitespace-nowrap px-3 py-3 text-[11px] font-semibold uppercase tracking-wider text-[#8b949e] transition-colors hover:text-[#e6edf3] ${
                   col.align === 'right' ? 'text-right' : 'text-left'
                 }`}
                 onClick={() => handleSort(col.key)}
@@ -165,8 +165,8 @@ export function DataTable({ data }: DataTableProps) {
             return (
               <tr
                 key={`${r.filename}-${r.config.concurrency}`}
-                className={`border-b border-[#21262d] transition-colors hover:bg-[#161b22] ${
-                  i % 2 === 0 ? 'bg-[#0d1117]' : 'bg-[#0d1117]/50'
+                className={`border-b border-[#21262d] transition-colors hover:bg-[#1c2128] ${
+                  i % 2 === 0 ? 'bg-[#0d1117]' : 'bg-[#161b22]'
                 }`}
               >
                 {COLUMNS.map((col) => {

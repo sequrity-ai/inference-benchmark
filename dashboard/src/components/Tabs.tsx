@@ -15,7 +15,7 @@ const TABS: Array<{ id: TabId; label: string }> = [
 
 export function Tabs({ active, onChange }: TabsProps) {
   return (
-    <div className="mb-6 flex gap-1 rounded-lg border border-[#21262d] bg-[#161b22] p-1">
+    <div className="mb-6 flex gap-0.5 rounded-lg border border-[#21262d] bg-[#0d1117] p-1">
       {TABS.map((tab) => (
         <button
           key={tab.id}
@@ -23,8 +23,15 @@ export function Tabs({ active, onChange }: TabsProps) {
           className={`rounded-md px-4 py-2 text-sm font-medium transition-all ${
             active === tab.id
               ? 'bg-[#21262d] text-[#e6edf3]'
-              : 'text-[#8b949e] hover:text-[#e6edf3]'
+              : 'text-[#8b949e] hover:bg-[#21262d]/50 hover:text-[#c9d1d9]'
           }`}
+          style={
+            active === tab.id
+              ? {
+                  boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.07), 0 1px 3px rgba(0,0,0,0.5), inset 0 -2px 0 #00bcd4',
+                }
+              : {}
+          }
         >
           {tab.label}
         </button>
