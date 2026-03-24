@@ -220,7 +220,8 @@ export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
           </div>
 
           {/* Profile list — scrollable */}
-          <div className="max-h-[220px] space-y-1 overflow-y-auto pr-0.5">
+          <div className="relative">
+          <div className="scrollbar-thin max-h-[320px] space-y-1 overflow-y-auto pr-1">
             {allProfiles.map((profileName) => {
               const meta = PROFILE_META[profileName];
               const isSelected = filters.profile.includes(profileName);
@@ -268,6 +269,12 @@ export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
                 </button>
               );
             })}
+          </div>
+          {/* Bottom fade to hint scrollable */}
+          <div
+            className="pointer-events-none absolute bottom-0 left-0 right-0 h-6 rounded-b"
+            style={{ background: 'linear-gradient(transparent, #0d1117)' }}
+          />
           </div>
         </div>
       </div>
