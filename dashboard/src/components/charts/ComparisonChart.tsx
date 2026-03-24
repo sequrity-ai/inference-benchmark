@@ -155,6 +155,8 @@ export function ComparisonChart({ seriesData }: ComparisonChartProps) {
                 boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
               }}
               labelFormatter={(v) => `Concurrency: ${v}`}
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              itemSorter={(item: any) => -(Number(item.value) || 0)}
             />
             <Line
               type="monotone"

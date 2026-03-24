@@ -212,6 +212,8 @@ export function LatencyChart({ seriesData }: LatencyChartProps) {
                   }}
                   labelFormatter={(v) => `Concurrency: ${v}`}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  itemSorter={(item: any) => -(Number(item.value) || 0)}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(value: any, name: any) => [
                     `${Number(value).toFixed(2)} ms`,
                     shortenSeriesKey(String(name), seriesNames),

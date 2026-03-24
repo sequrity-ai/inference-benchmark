@@ -177,6 +177,8 @@ export function ThroughputChart({ seriesData }: ThroughputChartProps) {
                   }}
                   labelFormatter={(v) => `Concurrency: ${v}`}
                   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  itemSorter={(item: any) => -(Number(item.value) || 0)}
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
                   formatter={(value: any, name: any) => [
                     `${Number(value).toFixed(2)} ${metric.unit}`,
                     shortenSeriesKey(String(name), seriesNames),
