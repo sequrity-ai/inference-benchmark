@@ -6,7 +6,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from 'recharts';
 import type { BenchmarkResult } from '../../types';
@@ -157,7 +156,6 @@ export function ComparisonChart({ seriesData }: ComparisonChartProps) {
               }}
               labelFormatter={(v) => `Concurrency: ${v}`}
             />
-            <Legend wrapperStyle={{ fontSize: '11px', color: '#c9d1d9' }} />
             <Line
               type="monotone"
               dataKey="Series A"

@@ -5,7 +5,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from 'recharts';
 import type { BenchmarkResult } from '../../types';
@@ -182,10 +181,6 @@ export function ThroughputChart({ seriesData }: ThroughputChartProps) {
                     `${Number(value).toFixed(2)} ${metric.unit}`,
                     shortenSeriesKey(String(name), seriesNames),
                   ]}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: '11px', color: '#c9d1d9' }}
-                  formatter={(value: string) => shortenSeriesKey(value, seriesNames)}
                 />
                 {seriesNames.map((name, i) => (
                   <Area

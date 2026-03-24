@@ -5,7 +5,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
   Bar,
   BarChart,
@@ -154,10 +153,6 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
                 ];
               }}
             />
-            <Legend
-              wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-              formatter={(value: string) => value.replace(/_ttft$/, '')}
-            />
             {seriesKeys.map((key, i) => (
               <Line
                 key={key}
@@ -201,10 +196,6 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
               labelFormatter={(v) => `Turn ${v}`}
               formatter={(value: unknown, name: unknown) => [`${value as number} tokens`, name as string]}
             />
-            <Legend
-              wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-              formatter={(value: string) => value}
-            />
             {seriesKeys.map((key, i) => (
               <Bar
                 key={key}
@@ -244,10 +235,6 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
               contentStyle={tooltipStyle}
               labelFormatter={(v) => `Turn ${v}`}
               formatter={(value: unknown, name: unknown) => [`${(value as number).toFixed(1)} ms`, name as string]}
-            />
-            <Legend
-              wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-              formatter={(value: string) => value}
             />
             {seriesKeys.map((key, i) => (
               <Line
@@ -330,9 +317,6 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
                   }}
                   labelFormatter={() => ''}
                 />
-                <Legend
-                  wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-                />
                 {turnGroups.map((points, i) =>
                   points.length > 0 ? (
                     <Scatter
@@ -376,10 +360,6 @@ export function PerTurnChart({ data }: PerTurnChartProps) {
               contentStyle={tooltipStyle}
               labelFormatter={(v) => `Turn ${v}`}
               formatter={(value: unknown, name: unknown) => [`${value as number} sessions`, name as string]}
-            />
-            <Legend
-              wrapperStyle={{ fontSize: '11px', color: '#8b949e' }}
-              formatter={(value: string) => value}
             />
             {seriesKeys.map((key, i) => (
               <Bar

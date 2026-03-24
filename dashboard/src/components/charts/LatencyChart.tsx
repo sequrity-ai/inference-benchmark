@@ -5,7 +5,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  Legend,
   ResponsiveContainer,
 } from 'recharts';
 import type { BenchmarkResult } from '../../types';
@@ -217,10 +216,6 @@ export function LatencyChart({ seriesData }: LatencyChartProps) {
                     `${Number(value).toFixed(2)} ms`,
                     shortenSeriesKey(String(name), seriesNames),
                   ]}
-                />
-                <Legend
-                  wrapperStyle={{ fontSize: '11px', color: '#c9d1d9' }}
-                  formatter={(value: string) => shortenSeriesKey(value, seriesNames)}
                 />
                 {seriesNames.map((name, i) => (
                   <Line
