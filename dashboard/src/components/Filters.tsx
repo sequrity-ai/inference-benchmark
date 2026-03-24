@@ -8,16 +8,6 @@ interface FiltersProps {
   onClear: () => void;
 }
 
-const CATEGORY_LABELS: Record<keyof FilterState, string> = {
-  hardware: 'Hardware',
-  model: 'Model',
-  backend: 'Backend',
-  agentType: 'Agent Type',
-  turnStyle: 'Turn Style',
-  servingStyle: 'Serving Style',
-  profile: 'Profile',
-};
-
 const CATEGORY_COLORS: Record<keyof FilterState, string> = {
   hardware: '#00bcd4',
   model: '#ff9800',
@@ -46,12 +36,102 @@ function MetaBadge({ label, colors }: MetaBadgeProps) {
 
 const FALLBACK_COLORS = { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' };
 
+function PillRow({
+  category,
+  values,
+  active,
+  onToggle,
+}: {
+  category: keyof FilterState;
+  values: string[];
+  active: string[];
+  onToggle: (cat: keyof FilterState, val: string) => void;
+}) {
+  const color = CATEGORY_COLORS[category];
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {values.map((value) => {
+        const isActive = active.includes(value);
+        return (
+          <button
+            key={value}
+            onClick={() => onToggle(category, value)}
+            className="rounded-md border px-2.5 py-1 text-xs font-medium transition-all"
+            style={{
+              borderColor: isActive ? color : '#21262d',
+              backgroundColor: isActive ? `${color}18` : 'transparent',
+              color: isActive ? color : '#8b949e',
+            }}
+          >
+            {value}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function SectionHeader({ label, accent }: { label: string; accent: string }) {
+  return (
+    <div
+      className="mb-3 border-l-2 pl-2.5 text-xs font-semibold uppercase tracking-wider"
+      style={{ borderColor: accent, color: accent }}
+    >
+      {label}
+    </div>
+  );
+}
+
+function FilterGroup({
+  label,
+  category,
+  values,
+  active,
+  onToggle,
+}: {
+  label: string;
+  category: keyof FilterState;
+  values: string[];
+  active: string[];
+  onToggle: (cat: keyof FilterState, val: string) => void;
+}) {
+  return (
+    <div>
+      <div className="mb-1.5 text-xs text-[#8b949e]">{label}</div>
+      <PillRow category={category} values={values} active={active} onToggle={onToggle} />
+    </div>
+  );
+}
+
 export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
   const hasActiveFilters = Object.values(filters).some((arr) => arr.length > 0);
 
+  // All known profiles from PROFILE_META (complete list regardless of loaded data)
+  const allProfiles = Object.keys(PROFILE_META);
+
+  // Count how many pass the current workload tag filters
+  const workloadFiltersActive =
+    filters.agentType.length > 0 ||
+    filters.turnStyle.length > 0 ||
+    filters.servingStyle.length > 0;
+
+  const profileMatchesFilters = (profileName: string): boolean => {
+    const meta = PROFILE_META[profileName];
+    if (!meta) return false;
+    if (filters.agentType.length > 0 && !filters.agentType.includes(meta.agentType)) return false;
+    if (filters.turnStyle.length > 0 && !filters.turnStyle.includes(meta.turnStyle)) return false;
+    if (filters.servingStyle.length > 0 && !filters.servingStyle.includes(meta.servingStyle)) return false;
+    return true;
+  };
+
+  const visibleCount = workloadFiltersActive
+    ? allProfiles.filter(profileMatchesFilters).length
+    : allProfiles.length;
+
   return (
     <div className="mb-6 rounded-lg border border-[#21262d] bg-[#161b22] p-4">
-      <div className="mb-3 flex items-center justify-between">
+      {/* Header row */}
+      <div className="mb-4 flex items-center justify-between">
         <span className="text-sm font-medium text-[#8b949e]">Filters</span>
         {hasActiveFilters && (
           <button
@@ -62,45 +142,134 @@ export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
           </button>
         )}
       </div>
-      <div className="space-y-3">
-        {(Object.keys(CATEGORY_LABELS) as Array<keyof FilterState>).map((cat) => (
-          <div key={cat}>
-            <div className="mb-1.5 text-xs text-[#8b949e]">{CATEGORY_LABELS[cat]}</div>
-            <div className="flex flex-wrap gap-1.5">
-              {options[cat].map((value) => {
-                const active = filters[cat].includes(value);
-                const color = CATEGORY_COLORS[cat];
-                const meta = cat === 'profile' ? PROFILE_META[value] : undefined;
-                return (
-                  <button
-                    key={value}
-                    onClick={() => onToggle(cat, value)}
-                    className="flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-medium transition-all"
-                    style={{
-                      borderColor: active ? color : '#21262d',
-                      backgroundColor: active ? `${color}18` : 'transparent',
-                      color: active ? color : '#8b949e',
-                    }}
-                  >
-                    {value}
-                    {meta && (
-                      <>
-                        <MetaBadge
-                          label={meta.agentType}
-                          colors={AGENT_TYPE_COLORS[meta.agentType] || FALLBACK_COLORS}
-                        />
-                        <MetaBadge
-                          label={meta.dataSource}
-                          colors={DATA_SOURCE_COLORS[meta.dataSource] || FALLBACK_COLORS}
-                        />
-                      </>
-                    )}
-                  </button>
-                );
-              })}
+
+      {/* Two-column layout */}
+      <div className="grid grid-cols-[3fr_2fr] gap-4">
+        {/* LEFT COLUMN — Infrastructure + Workload */}
+        <div className="space-y-4">
+          {/* Section A: Infrastructure */}
+          <div className="rounded-md border border-[#21262d] bg-[#0d1117] p-3">
+            <SectionHeader label="Infrastructure" accent="#00bcd4" />
+            <div className="space-y-3">
+              <FilterGroup
+                label="Hardware"
+                category="hardware"
+                values={options.hardware}
+                active={filters.hardware}
+                onToggle={onToggle}
+              />
+              <FilterGroup
+                label="Model"
+                category="model"
+                values={options.model}
+                active={filters.model}
+                onToggle={onToggle}
+              />
+              <FilterGroup
+                label="Backend"
+                category="backend"
+                values={options.backend}
+                active={filters.backend}
+                onToggle={onToggle}
+              />
             </div>
           </div>
-        ))}
+
+          {/* Section B: Workload */}
+          <div className="rounded-md border border-[#21262d] bg-[#0d1117] p-3">
+            <SectionHeader label="Workload" accent="#3fb950" />
+            <div className="space-y-3">
+              <FilterGroup
+                label="Agent Type"
+                category="agentType"
+                values={options.agentType}
+                active={filters.agentType}
+                onToggle={onToggle}
+              />
+              <FilterGroup
+                label="Turn Style"
+                category="turnStyle"
+                values={options.turnStyle}
+                active={filters.turnStyle}
+                onToggle={onToggle}
+              />
+              <FilterGroup
+                label="Serving Style"
+                category="servingStyle"
+                values={options.servingStyle}
+                active={filters.servingStyle}
+                onToggle={onToggle}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* RIGHT COLUMN — Profile sidebar */}
+        <div className="rounded-md border border-[#21262d] bg-[#0d1117] p-3">
+          {/* Sidebar header */}
+          <div className="mb-3 flex items-center justify-between border-b border-[#21262d] pb-2">
+            <span
+              className="border-l-2 pl-2.5 text-xs font-semibold uppercase tracking-wider"
+              style={{ borderColor: '#79c0ff', color: '#79c0ff' }}
+            >
+              Profiles
+            </span>
+            <span className="text-xs text-[#8b949e]">
+              {visibleCount} of {allProfiles.length}
+            </span>
+          </div>
+
+          {/* Profile list — scrollable */}
+          <div className="max-h-[220px] space-y-1 overflow-y-auto pr-0.5">
+            {allProfiles.map((profileName) => {
+              const meta = PROFILE_META[profileName];
+              const isSelected = filters.profile.includes(profileName);
+              const matches = workloadFiltersActive ? profileMatchesFilters(profileName) : true;
+              const agentColors = meta ? (AGENT_TYPE_COLORS[meta.agentType] || FALLBACK_COLORS) : FALLBACK_COLORS;
+              const dsColors = meta ? (DATA_SOURCE_COLORS[meta.dataSource] || FALLBACK_COLORS) : FALLBACK_COLORS;
+
+              return (
+                <button
+                  key={profileName}
+                  onClick={() => onToggle('profile', profileName)}
+                  className="w-full rounded border px-2.5 py-1.5 text-left transition-all"
+                  style={{
+                    borderColor: isSelected ? '#79c0ff' : matches ? '#21262d' : 'transparent',
+                    backgroundColor: isSelected
+                      ? 'rgba(121,192,255,0.10)'
+                      : matches
+                      ? 'rgba(255,255,255,0.02)'
+                      : 'transparent',
+                    opacity: matches ? 1 : 0.28,
+                  }}
+                >
+                  {/* Profile name row */}
+                  <div className="flex items-center justify-between gap-1">
+                    <span
+                      className="truncate text-xs font-medium"
+                      style={{ color: isSelected ? '#79c0ff' : matches ? '#e6edf3' : '#8b949e' }}
+                    >
+                      {profileName}
+                    </span>
+                    {meta && (
+                      <span className="shrink-0 text-[10px] text-[#8b949e]">
+                        {meta.isl}/{meta.osl}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Badges row */}
+                  {meta && (
+                    <div className="mt-1 flex flex-wrap gap-1">
+                      <MetaBadge label={meta.agentType} colors={agentColors} />
+                      <MetaBadge label={meta.dataSource} colors={dsColors} />
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
