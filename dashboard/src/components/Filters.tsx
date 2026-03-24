@@ -223,7 +223,7 @@ export function Filters({ filters, options, onToggle, onClear }: FiltersProps) {
 
           {/* Profile list — scrollable */}
           <div className="relative">
-          <div className="scrollbar-thin max-h-[320px] space-y-1 overflow-y-auto pr-1">
+          <div className="scrollbar-thin max-h-[320px] space-y-1 overflow-y-auto pb-8 pr-1">
             {allProfiles.map((profileName) => {
               const meta = PROFILE_META[profileName];
               const isSelected = filters.profile.includes(profileName);
