@@ -75,6 +75,10 @@ function detectHardware(filename: string, dirPath: string): string {
   // Infer from directory name
   if (dir.includes('h100_70b_fp8')) return 'H100';
 
+  // Infer from TP size in filename/dir (RunPod 2xH100 benchmarks)
+  if (/_tp2_/.test(fp) || /_tp2_/.test(dir)) return 'H100x2';
+  if (/_tp1_/.test(fp) || /_tp1_/.test(dir)) return 'H100';
+
   return 'Unknown';
 }
 
@@ -82,17 +86,19 @@ function detectQuant(filename: string, model: string, dirPath: string): string {
   const combined = `${filename} ${model} ${dirPath}`.toLowerCase();
   if (combined.includes('fp8')) return 'FP8';
   if (combined.includes('bf16') || combined.includes('bfloat16')) return 'BF16';
-  // Default: 8B models without FP8 marker are BF16
-  if (combined.includes('8b') && !combined.includes('fp8')) return 'BF16';
-  return 'FP8'; // 70B models default to FP8
+  // Default: if no explicit FP8 marker, assume BF16
+  return 'BF16';
 }
 
 function shortenModel(model: string): string {
   let short = model;
-  // Remove common prefixes
+  // Remove local path prefix (e.g. /workspace/models/Llama-3.1-8B-Instruct)
+  short = short.replace(/^.*\//, '');
+  // Remove common HF prefixes
   short = short.replace(/^meta-llama\/Meta-/i, '');
   short = short.replace(/^meta-llama\//i, '');
   short = short.replace(/^neuralmagic\/(Meta-)?/i, '');
+  short = short.replace(/^Qwen\//i, '');
   // Remove -Instruct suffix
   short = short.replace(/-Instruct$/i, '');
   // Remove -FP8 suffix (captured separately in quant)
