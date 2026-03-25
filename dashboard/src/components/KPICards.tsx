@@ -9,7 +9,9 @@ interface KPICardsProps {
 export function KPICards({ data, allData }: KPICardsProps) {
   const totalRuns = data.length;
   const hwConfigs = new Set(data.map((r) => r.hardware)).size;
+  const allHwConfigs = new Set(allData.map((r) => r.hardware)).size;
   const models = new Set(data.map((r) => r.modelShort)).size;
+  const allModels = new Set(allData.map((r) => r.modelShort)).size;
 
   const medianThroughput =
     data.length > 0
@@ -44,13 +46,13 @@ export function KPICards({ data, allData }: KPICardsProps) {
     {
       label: 'Hardware Configs',
       value: hwConfigs,
-      suffix: '',
+      suffix: isFiltered ? ` / ${allHwConfigs}` : '',
       accent: '#ff9800',
     },
     {
       label: 'Models Tested',
       value: models,
-      suffix: '',
+      suffix: isFiltered ? ` / ${allModels}` : '',
       accent: '#a855f7',
     },
     {
