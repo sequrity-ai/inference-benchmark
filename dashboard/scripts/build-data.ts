@@ -136,8 +136,8 @@ function collectJsonFiles(dir: string, relDir: string = ''): Array<{ fullPath: s
 }
 
 function shouldSkip(filename: string, relDir: string): boolean {
-  // Skip crossval and inferencex subdirectories
-  if (relDir.includes('crossval') || relDir.includes('inferencex')) return true;
+  // Skip crossval, inferencex, and archive subdirectories
+  if (relDir.includes('crossval') || relDir.includes('inferencex') || relDir.includes('archive')) return true;
 
   for (const pattern of SKIP_PATTERNS) {
     if (pattern.test(filename)) return true;
