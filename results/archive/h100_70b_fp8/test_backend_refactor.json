@@ -1,0 +1,92 @@
+{
+  "config": {
+    "url": "http://localhost:8000/v1/chat/completions",
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "backend": "vllm",
+    "profile": "output-short",
+    "concurrency": 2,
+    "num_requests": 5,
+    "api_key": "test",
+    "arrival": "steady",
+    "target_rate": 10.0,
+    "warmup": 2,
+    "seed": 42,
+    "timeout": 120,
+    "output": "results/test_backend_refactor.json"
+  },
+  "summary": {
+    "model": "meta-llama/Llama-3.1-8B-Instruct",
+    "profile": "output-short",
+    "concurrency": 2,
+    "num_requests": 5,
+    "duration_s": 10.799430469051003,
+    "successful_requests": 5,
+    "failed_requests": 0,
+    "request_throughput": 0.46298737830008674,
+    "input_token_throughput": 593.5498189807112,
+    "output_token_throughput": 55.928875298650475,
+    "total_token_throughput": 649.4786942793617,
+    "total_input_tokens": 6410,
+    "total_output_tokens": 604,
+    "mean_ttft_ms": 311.24459239654243,
+    "median_ttft_ms": 239.81556296348572,
+    "p90_ttft_ms": 418.49211202934384,
+    "p99_ttft_ms": 418.53358048945665,
+    "mean_tpot_ms": 28.921803802380552,
+    "median_tpot_ms": 29.68133132708317,
+    "p90_tpot_ms": 29.798705201392295,
+    "p99_tpot_ms": 29.81162088450219,
+    "mean_e2el_ms": 3814.505791524425,
+    "median_e2el_ms": 4051.3384218793362,
+    "p90_e2el_ms": 4153.270328789949,
+    "p99_e2el_ms": 4211.550945919007,
+    "errors": []
+  },
+  "per_request": [
+    {
+      "success": true,
+      "ttft_ms": 418.54,
+      "tpot_ms": 29.68,
+      "e2el_ms": 4218.03,
+      "input_tokens": 1282,
+      "output_tokens": 128,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 418.42,
+      "tpot_ms": 28.01,
+      "e2el_ms": 3555.75,
+      "input_tokens": 1282,
+      "output_tokens": 112,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 239.68,
+      "tpot_ms": 29.78,
+      "e2el_ms": 4051.34,
+      "input_tokens": 1282,
+      "output_tokens": 128,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 239.82,
+      "tpot_ms": 29.81,
+      "e2el_ms": 4056.14,
+      "input_tokens": 1282,
+      "output_tokens": 128,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 239.76,
+      "tpot_ms": 27.33,
+      "e2el_ms": 3191.28,
+      "input_tokens": 1282,
+      "output_tokens": 108,
+      "error": null
+    }
+  ]
+}

@@ -1,0 +1,1415 @@
+{
+  "config": {
+    "url": "http://localhost:8000/v1/chat/completions",
+    "model": "/workspace/models/Llama-3.1-8B-Instruct",
+    "backend": "vllm",
+    "profile": "chatbot-short",
+    "concurrency": 512,
+    "num_requests": 150,
+    "api_key": "test",
+    "arrival": "steady",
+    "target_rate": 10.0,
+    "warmup": 5,
+    "seed": 42,
+    "timeout": 300,
+    "output": "results/Llama-3.1-8B_tp2_vllm/Llama-3.1-8B_tp2_vllm_chatbot-short_conc512.json",
+    "ignore_eos": false,
+    "mode": null,
+    "list_profiles": false,
+    "agent_type": null,
+    "turn_style": null,
+    "serving_style": null,
+    "data_source": null
+  },
+  "summary": {
+    "model": "/workspace/models/Llama-3.1-8B-Instruct",
+    "profile": "chatbot-short",
+    "concurrency": 512,
+    "num_requests": 150,
+    "duration_s": 5.248687804676592,
+    "successful_requests": 84,
+    "failed_requests": 66,
+    "request_throughput": 16.004000071247486,
+    "input_token_throughput": 3152.025918794267,
+    "output_token_throughput": 2240.7505337850203,
+    "total_token_throughput": 5392.776452579287,
+    "total_input_tokens": 16544,
+    "total_output_tokens": 11761,
+    "mean_ttft_ms": 345.2104350019778,
+    "median_ttft_ms": 287.3268285766244,
+    "p90_ttft_ms": 550.0062317587435,
+    "p99_ttft_ms": 554.872061451897,
+    "mean_tpot_ms": 8.361261389762374,
+    "median_tpot_ms": 8.362149975104021,
+    "p90_tpot_ms": 8.67019216667463,
+    "p99_tpot_ms": 8.995237891562283,
+    "mean_e2el_ms": 1493.9737746580727,
+    "median_e2el_ms": 1490.4402079991996,
+    "p90_e2el_ms": 2136.2847936339676,
+    "p99_e2el_ms": 2289.8032163456082,
+    "errors": [
+      "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>",
+      "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>",
+      "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>",
+      "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>",
+      "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>",
+      "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>",
+      "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>",
+      "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>",
+      "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>",
+      "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    ]
+  },
+  "per_request": [
+    {
+      "success": true,
+      "ttft_ms": 554.9,
+      "tpot_ms": 8.28,
+      "e2el_ms": 2136.74,
+      "input_tokens": 60,
+      "output_tokens": 195,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 554.87,
+      "tpot_ms": 8.53,
+      "e2el_ms": 657.24,
+      "input_tokens": 45,
+      "output_tokens": 12,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2311.72,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2309.93,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 436.59,
+      "tpot_ms": 8.81,
+      "e2el_ms": 1062.23,
+      "input_tokens": 50,
+      "output_tokens": 71,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 437.18,
+      "tpot_ms": 8.23,
+      "e2el_ms": 2231.18,
+      "input_tokens": 802,
+      "output_tokens": 222,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 437.75,
+      "tpot_ms": 8.61,
+      "e2el_ms": 730.52,
+      "input_tokens": 43,
+      "output_tokens": 34,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 287.68,
+      "tpot_ms": 8.24,
+      "e2el_ms": 2042.83,
+      "input_tokens": 57,
+      "output_tokens": 217,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 209.19,
+      "tpot_ms": 8.01,
+      "e2el_ms": 729.66,
+      "input_tokens": 49,
+      "output_tokens": 68,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 208.93,
+      "tpot_ms": 8.22,
+      "e2el_ms": 2033.99,
+      "input_tokens": 79,
+      "output_tokens": 229,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 278.44,
+      "tpot_ms": 8.39,
+      "e2el_ms": 1813.96,
+      "input_tokens": 1448,
+      "output_tokens": 187,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 457.99,
+      "tpot_ms": 8.67,
+      "e2el_ms": 1758.23,
+      "input_tokens": 106,
+      "output_tokens": 152,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 209.31,
+      "tpot_ms": 8.03,
+      "e2el_ms": 731.27,
+      "input_tokens": 73,
+      "output_tokens": 68,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2309.31,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.93,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 550.3,
+      "tpot_ms": 8.3,
+      "e2el_ms": 2135.22,
+      "input_tokens": 53,
+      "output_tokens": 195,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2309.26,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 436.32,
+      "tpot_ms": 8.4,
+      "e2el_ms": 1997.92,
+      "input_tokens": 64,
+      "output_tokens": 190,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2309.16,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 292.39,
+      "tpot_ms": 8.17,
+      "e2el_ms": 2164.11,
+      "input_tokens": 407,
+      "output_tokens": 233,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 208.33,
+      "tpot_ms": 8.34,
+      "e2el_ms": 1034.42,
+      "input_tokens": 1656,
+      "output_tokens": 102,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 437.89,
+      "tpot_ms": 8.6,
+      "e2el_ms": 730.47,
+      "input_tokens": 44,
+      "output_tokens": 34,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 286.58,
+      "tpot_ms": 8.16,
+      "e2el_ms": 792.73,
+      "input_tokens": 611,
+      "output_tokens": 62,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.36,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2308.74,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 276.65,
+      "tpot_ms": 8.13,
+      "e2el_ms": 772.51,
+      "input_tokens": 42,
+      "output_tokens": 61,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 551.47,
+      "tpot_ms": 8.51,
+      "e2el_ms": 1895.56,
+      "input_tokens": 441,
+      "output_tokens": 162,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2308.58,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.24,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 437.81,
+      "tpot_ms": 8.83,
+      "e2el_ms": 958.89,
+      "input_tokens": 456,
+      "output_tokens": 59,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2308.31,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.04,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2308.49,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2304.03,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2308.52,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2305.81,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 330.78,
+      "tpot_ms": 8.52,
+      "e2el_ms": 1302.36,
+      "input_tokens": 53,
+      "output_tokens": 114,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2303.9,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2308.17,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 553.23,
+      "tpot_ms": 8.42,
+      "e2el_ms": 1690.13,
+      "input_tokens": 114,
+      "output_tokens": 135,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 286.57,
+      "tpot_ms": 8.43,
+      "e2el_ms": 1062.54,
+      "input_tokens": 51,
+      "output_tokens": 92,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 553.22,
+      "tpot_ms": 8.39,
+      "e2el_ms": 2012.44,
+      "input_tokens": 64,
+      "output_tokens": 178,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 354.49,
+      "tpot_ms": 8.29,
+      "e2el_ms": 2061.28,
+      "input_tokens": 551,
+      "output_tokens": 210,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2307.73,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 206.93,
+      "tpot_ms": 8.34,
+      "e2el_ms": 1007.22,
+      "input_tokens": 44,
+      "output_tokens": 99,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 434.64,
+      "tpot_ms": 8.49,
+      "e2el_ms": 1885.85,
+      "input_tokens": 116,
+      "output_tokens": 175,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 435.7,
+      "tpot_ms": 8.31,
+      "e2el_ms": 2106.55,
+      "input_tokens": 61,
+      "output_tokens": 205,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2307.97,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 552.36,
+      "tpot_ms": 8.69,
+      "e2el_ms": 1395.21,
+      "input_tokens": 551,
+      "output_tokens": 97,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 206.89,
+      "tpot_ms": 8.16,
+      "e2el_ms": 819.13,
+      "input_tokens": 576,
+      "output_tokens": 78,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2307.68,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 207.22,
+      "tpot_ms": 8.33,
+      "e2el_ms": 1448.19,
+      "input_tokens": 70,
+      "output_tokens": 152,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 207.58,
+      "tpot_ms": 8.24,
+      "e2el_ms": 2028.01,
+      "input_tokens": 189,
+      "output_tokens": 228,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 285.44,
+      "tpot_ms": 8.27,
+      "e2el_ms": 1707.08,
+      "input_tokens": 44,
+      "output_tokens": 172,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 207.03,
+      "tpot_ms": 8.33,
+      "e2el_ms": 1531.51,
+      "input_tokens": 67,
+      "output_tokens": 162,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2307.42,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2304.79,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2309.05,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 206.64,
+      "tpot_ms": 8.14,
+      "e2el_ms": 2192.34,
+      "input_tokens": 325,
+      "output_tokens": 251,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 284.68,
+      "tpot_ms": 8.35,
+      "e2el_ms": 944.36,
+      "input_tokens": 61,
+      "output_tokens": 79,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2308.73,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 206.68,
+      "tpot_ms": 8.22,
+      "e2el_ms": 2031.12,
+      "input_tokens": 79,
+      "output_tokens": 229,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 206.69,
+      "tpot_ms": 7.29,
+      "e2el_ms": 418.11,
+      "input_tokens": 47,
+      "output_tokens": 32,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.81,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.7,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 206.43,
+      "tpot_ms": 8.03,
+      "e2el_ms": 752.31,
+      "input_tokens": 90,
+      "output_tokens": 71,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2304.27,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.59,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 282.72,
+      "tpot_ms": 8.43,
+      "e2el_ms": 1235.54,
+      "input_tokens": 428,
+      "output_tokens": 113,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2308.46,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2302.22,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2304.08,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.4,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 551.51,
+      "tpot_ms": 8.99,
+      "e2el_ms": 875.12,
+      "input_tokens": 54,
+      "output_tokens": 36,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 449.09,
+      "tpot_ms": 8.49,
+      "e2el_ms": 1612.52,
+      "input_tokens": 60,
+      "output_tokens": 137,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2303.98,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2303.97,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 433.25,
+      "tpot_ms": 8.55,
+      "e2el_ms": 1826.45,
+      "input_tokens": 64,
+      "output_tokens": 167,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2301.78,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2308.05,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 190.14,
+      "tpot_ms": 8.07,
+      "e2el_ms": 2272.09,
+      "input_tokens": 56,
+      "output_tokens": 265,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2307.83,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2301.63,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2303.59,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 549.27,
+      "tpot_ms": 8.6,
+      "e2el_ms": 1529.2,
+      "input_tokens": 68,
+      "output_tokens": 114,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 205.37,
+      "tpot_ms": 7.93,
+      "e2el_ms": 689.33,
+      "input_tokens": 42,
+      "output_tokens": 64,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 204.7,
+      "tpot_ms": 8.36,
+      "e2el_ms": 1425.49,
+      "input_tokens": 1247,
+      "output_tokens": 149,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2305.83,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2301.34,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 432.67,
+      "tpot_ms": 8.17,
+      "e2el_ms": 2295.55,
+      "input_tokens": 49,
+      "output_tokens": 232,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 284.53,
+      "tpot_ms": 8.19,
+      "e2el_ms": 2119.8,
+      "input_tokens": 54,
+      "output_tokens": 228,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 316.22,
+      "tpot_ms": 8.45,
+      "e2el_ms": 1786.88,
+      "input_tokens": 53,
+      "output_tokens": 178,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 205.26,
+      "tpot_ms": 8.33,
+      "e2el_ms": 1472.19,
+      "input_tokens": 388,
+      "output_tokens": 155,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 548.55,
+      "tpot_ms": 8.46,
+      "e2el_ms": 1665.69,
+      "input_tokens": 206,
+      "output_tokens": 132,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 550.2,
+      "tpot_ms": 8.58,
+      "e2el_ms": 1494.14,
+      "input_tokens": 799,
+      "output_tokens": 110,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2300.96,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2302.68,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 434.66,
+      "tpot_ms": 8.63,
+      "e2el_ms": 1409.44,
+      "input_tokens": 59,
+      "output_tokens": 113,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 204.17,
+      "tpot_ms": 8.36,
+      "e2el_ms": 1257.96,
+      "input_tokens": 55,
+      "output_tokens": 129,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 204.73,
+      "tpot_ms": 8.37,
+      "e2el_ms": 1318.5,
+      "input_tokens": 89,
+      "output_tokens": 136,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.77,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 274.17,
+      "tpot_ms": 7.16,
+      "e2el_ms": 496.05,
+      "input_tokens": 52,
+      "output_tokens": 31,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 549.15,
+      "tpot_ms": 9.03,
+      "e2el_ms": 955.56,
+      "input_tokens": 47,
+      "output_tokens": 45,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 283.02,
+      "tpot_ms": 8.35,
+      "e2el_ms": 1511.2,
+      "input_tokens": 54,
+      "output_tokens": 147,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 549.56,
+      "tpot_ms": 8.6,
+      "e2el_ms": 1496.06,
+      "input_tokens": 63,
+      "output_tokens": 110,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 433.16,
+      "tpot_ms": 8.31,
+      "e2el_ms": 2111.63,
+      "input_tokens": 54,
+      "output_tokens": 206,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 547.54,
+      "tpot_ms": 8.69,
+      "e2el_ms": 1399.45,
+      "input_tokens": 45,
+      "output_tokens": 98,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2302.21,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.42,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 329.94,
+      "tpot_ms": 8.52,
+      "e2el_ms": 909.52,
+      "input_tokens": 44,
+      "output_tokens": 68,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2301.99,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2300.03,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.18,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.24,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 203.68,
+      "tpot_ms": 8.35,
+      "e2el_ms": 1347.37,
+      "input_tokens": 546,
+      "output_tokens": 140,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 203.36,
+      "tpot_ms": 7.88,
+      "e2el_ms": 668.58,
+      "input_tokens": 58,
+      "output_tokens": 62,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2306.06,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2305.98,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 203.97,
+      "tpot_ms": 8.08,
+      "e2el_ms": 2288.63,
+      "input_tokens": 55,
+      "output_tokens": 265,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 203.65,
+      "tpot_ms": 8.37,
+      "e2el_ms": 1309.09,
+      "input_tokens": 146,
+      "output_tokens": 135,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 203.98,
+      "tpot_ms": 8.28,
+      "e2el_ms": 1620.49,
+      "input_tokens": 64,
+      "output_tokens": 174,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 271.46,
+      "tpot_ms": 8.27,
+      "e2el_ms": 2009.15,
+      "input_tokens": 67,
+      "output_tokens": 214,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2305.57,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 272.91,
+      "tpot_ms": 8.44,
+      "e2el_ms": 1184.84,
+      "input_tokens": 60,
+      "output_tokens": 108,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 281.74,
+      "tpot_ms": 8.09,
+      "e2el_ms": 2287.62,
+      "input_tokens": 96,
+      "output_tokens": 252,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 281.05,
+      "tpot_ms": 8.35,
+      "e2el_ms": 1892.34,
+      "input_tokens": 59,
+      "output_tokens": 197,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 282.18,
+      "tpot_ms": 8.36,
+      "e2el_ms": 1486.74,
+      "input_tokens": 581,
+      "output_tokens": 144,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2303.69,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 281.86,
+      "tpot_ms": 8.15,
+      "e2el_ms": 2182.03,
+      "input_tokens": 48,
+      "output_tokens": 237,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 279.91,
+      "tpot_ms": 8.35,
+      "e2el_ms": 1890.59,
+      "input_tokens": 103,
+      "output_tokens": 197,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2303.52,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2303.46,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 286.97,
+      "tpot_ms": 8.44,
+      "e2el_ms": 1037.88,
+      "input_tokens": 63,
+      "output_tokens": 89,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2303.33,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2303.23,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 314.18,
+      "tpot_ms": 8.44,
+      "e2el_ms": 1454.17,
+      "input_tokens": 54,
+      "output_tokens": 135,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2303.06,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 347.63,
+      "tpot_ms": 8.56,
+      "e2el_ms": 1752.02,
+      "input_tokens": 63,
+      "output_tokens": 167,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2302.89,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2302.82,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 429.48,
+      "tpot_ms": 8.69,
+      "e2el_ms": 1246.76,
+      "input_tokens": 299,
+      "output_tokens": 94,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2302.68,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 429.43,
+      "tpot_ms": 8.37,
+      "e2el_ms": 2020.22,
+      "input_tokens": 49,
+      "output_tokens": 194,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2302.55,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2300.4,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    },
+    {
+      "success": true,
+      "ttft_ms": 430.74,
+      "tpot_ms": 8.55,
+      "e2el_ms": 1825.02,
+      "input_tokens": 47,
+      "output_tokens": 167,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 430.56,
+      "tpot_ms": 8.67,
+      "e2el_ms": 1323.75,
+      "input_tokens": 80,
+      "output_tokens": 103,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 430.33,
+      "tpot_ms": 8.71,
+      "e2el_ms": 1257.64,
+      "input_tokens": 50,
+      "output_tokens": 95,
+      "error": null
+    },
+    {
+      "success": true,
+      "ttft_ms": 431.28,
+      "tpot_ms": 8.6,
+      "e2el_ms": 1438.06,
+      "input_tokens": 87,
+      "output_tokens": 117,
+      "error": null
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 2300.06,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "Response payload is not completed: <TransferEncodingError: 400, message='Not enough data to satisfy transfer length header.'>"
+    }
+  ]
+}

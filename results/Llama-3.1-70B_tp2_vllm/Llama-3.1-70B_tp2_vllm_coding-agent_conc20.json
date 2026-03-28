@@ -1,0 +1,1865 @@
+{
+  "config": {
+    "url": "http://localhost:8000/v1/chat/completions",
+    "model": "/workspace/models/Llama-3.1-70B-Instruct",
+    "backend": "vllm",
+    "profile": "coding-agent",
+    "concurrency": 20,
+    "num_requests": 200,
+    "api_key": "test",
+    "arrival": "steady",
+    "target_rate": 10.0,
+    "warmup": 5,
+    "seed": 42,
+    "timeout": 300,
+    "output": "results/Llama-3.1-70B_tp2_vllm/Llama-3.1-70B_tp2_vllm_coding-agent_conc20.json",
+    "ignore_eos": false,
+    "mode": null,
+    "list_profiles": false,
+    "agent_type": null,
+    "turn_style": null,
+    "serving_style": null,
+    "data_source": null
+  },
+  "summary": {
+    "model": "/workspace/models/Llama-3.1-70B-Instruct",
+    "profile": "coding-agent",
+    "concurrency": 20,
+    "num_requests": 200,
+    "duration_s": 2.4118386982008815,
+    "successful_requests": 0,
+    "failed_requests": 200,
+    "request_throughput": 0.0,
+    "input_token_throughput": 0.0,
+    "output_token_throughput": 0.0,
+    "total_token_throughput": 0.0,
+    "total_input_tokens": 0,
+    "total_output_tokens": 0,
+    "mean_ttft_ms": 0.0,
+    "median_ttft_ms": 0.0,
+    "p90_ttft_ms": 0.0,
+    "p99_ttft_ms": 0.0,
+    "mean_tpot_ms": 0.0,
+    "median_tpot_ms": 0.0,
+    "p90_tpot_ms": 0.0,
+    "p99_tpot_ms": 0.0,
+    "mean_e2el_ms": 0.0,
+    "median_e2el_ms": 0.0,
+    "p90_e2el_ms": 0.0,
+    "p99_e2el_ms": 0.0,
+    "errors": [
+      "HTTP 400: {\"error\":{\"message\":\"You passed 3552 input tokens and requested 545 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3551 tokens. Please r",
+      "HTTP 400: {\"error\":{\"message\":\"You passed 3646 input tokens and requested 451 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3645 tokens. Please r",
+      "HTTP 400: {\"error\":{\"message\":\"You passed 3740 input tokens and requested 357 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3739 tokens. Please r",
+      "HTTP 400: {\"error\":{\"message\":\"You passed 3715 input tokens and requested 382 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3714 tokens. Please r",
+      "HTTP 400: {\"error\":{\"message\":\"You passed 3654 input tokens and requested 443 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3653 tokens. Please r",
+      "HTTP 400: {\"error\":{\"message\":\"You passed 3734 input tokens and requested 363 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3733 tokens. Please r",
+      "HTTP 400: {\"error\":{\"message\":\"You passed 3640 input tokens and requested 457 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3639 tokens. Please r",
+      "HTTP 400: {\"error\":{\"message\":\"You passed 3772 input tokens and requested 325 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3771 tokens. Please r",
+      "HTTP 400: {\"error\":{\"message\":\"You passed 3822 input tokens and requested 275 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3821 tokens. Please r",
+      "HTTP 400: {\"error\":{\"message\":\"You passed 3721 input tokens and requested 376 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3720 tokens. Please r"
+    ]
+  },
+  "per_request": [
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 271.28,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3552 input tokens and requested 545 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3551 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 270.9,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3646 input tokens and requested 451 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3645 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 274.84,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3740 input tokens and requested 357 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3739 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 274.59,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3715 input tokens and requested 382 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3714 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 274.31,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3654 input tokens and requested 443 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3653 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 274.18,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3734 input tokens and requested 363 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3733 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 273.73,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3640 input tokens and requested 457 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3639 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 273.62,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3772 input tokens and requested 325 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3771 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 269.22,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3822 input tokens and requested 275 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3821 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 273.4,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3721 input tokens and requested 376 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3720 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 269.55,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3702 input tokens and requested 395 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3701 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 273.04,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3815 input tokens and requested 282 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3814 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 272.94,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3848 input tokens and requested 249 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3847 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 268.93,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3766 input tokens and requested 331 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3765 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 268.81,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3660 input tokens and requested 437 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3659 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 272.38,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3656 input tokens and requested 441 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3655 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 272.13,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3721 input tokens and requested 376 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3720 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 267.54,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3651 input tokens and requested 446 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3650 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 267.97,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3644 input tokens and requested 453 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3643 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 271.65,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3608 input tokens and requested 489 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3607 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.59,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3602 input tokens and requested 495 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3601 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.84,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3772 input tokens and requested 325 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3771 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.31,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3833 input tokens and requested 264 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3832 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.15,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3708 input tokens and requested 389 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3707 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.06,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3758 input tokens and requested 339 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3757 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.94,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3603 input tokens and requested 494 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3602 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.81,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3768 input tokens and requested 329 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3767 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.69,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3846 input tokens and requested 251 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3845 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 226.78,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3713 input tokens and requested 384 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3712 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 226.56,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3756 input tokens and requested 341 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3755 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 226.42,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3647 input tokens and requested 450 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3646 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 226.3,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3629 input tokens and requested 468 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3628 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.93,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3751 input tokens and requested 346 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3750 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.78,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3758 input tokens and requested 339 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3757 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.65,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3748 input tokens and requested 349 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3747 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.5,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3754 input tokens and requested 343 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3753 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.35,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3604 input tokens and requested 493 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3603 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.21,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3787 input tokens and requested 310 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3786 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.05,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3559 input tokens and requested 538 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3558 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.88,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3672 input tokens and requested 425 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3671 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.66,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3551 input tokens and requested 546 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3550 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.14,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3569 input tokens and requested 528 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3568 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.9,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3556 input tokens and requested 541 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3555 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.71,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3798 input tokens and requested 299 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3797 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.51,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3540 input tokens and requested 557 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3539 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.3,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3875 input tokens and requested 222 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3874 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.11,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3783 input tokens and requested 314 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3782 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.91,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3705 input tokens and requested 392 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3704 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.72,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3688 input tokens and requested 409 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3687 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.53,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3742 input tokens and requested 355 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3741 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.35,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3686 input tokens and requested 411 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3685 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.17,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3749 input tokens and requested 348 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3748 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 226.38,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3532 input tokens and requested 565 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3531 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.15,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3721 input tokens and requested 376 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3720 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.95,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3826 input tokens and requested 271 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3825 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.76,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3824 input tokens and requested 273 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3823 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.57,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3741 input tokens and requested 356 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3740 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.35,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3781 input tokens and requested 316 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3780 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.14,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3725 input tokens and requested 372 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3724 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.94,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3654 input tokens and requested 443 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3653 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.14,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3739 input tokens and requested 358 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3738 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.79,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3715 input tokens and requested 382 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3714 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.52,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3639 input tokens and requested 458 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3638 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.28,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3804 input tokens and requested 293 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3803 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.05,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3755 input tokens and requested 342 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3754 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 220.86,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3766 input tokens and requested 331 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3765 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 220.64,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3626 input tokens and requested 471 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3625 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 220.43,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3795 input tokens and requested 302 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3794 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 220.15,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3773 input tokens and requested 324 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3772 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 219.91,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3682 input tokens and requested 415 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3681 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 219.68,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3666 input tokens and requested 431 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3665 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 219.46,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3873 input tokens and requested 224 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3872 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 223.78,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3742 input tokens and requested 355 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3741 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.89,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3757 input tokens and requested 340 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3756 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.65,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3673 input tokens and requested 424 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3672 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.41,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3803 input tokens and requested 294 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3802 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.17,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3512 input tokens and requested 585 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3511 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.96,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3691 input tokens and requested 406 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3690 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.73,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3605 input tokens and requested 492 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3604 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.51,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3744 input tokens and requested 353 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3743 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 223.68,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3737 input tokens and requested 360 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3736 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 223.28,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3729 input tokens and requested 368 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3728 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.98,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3707 input tokens and requested 390 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3706 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.69,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3793 input tokens and requested 304 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3792 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.42,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3773 input tokens and requested 324 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3772 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.15,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3773 input tokens and requested 324 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3772 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.89,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3634 input tokens and requested 463 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3633 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.6,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3707 input tokens and requested 390 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3706 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.34,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3551 input tokens and requested 546 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3550 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.07,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3622 input tokens and requested 475 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3621 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 220.78,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3872 input tokens and requested 225 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3871 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 220.53,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3821 input tokens and requested 276 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3820 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 219.39,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3588 input tokens and requested 509 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3587 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 225.24,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3634 input tokens and requested 463 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3633 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 225.0,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3588 input tokens and requested 509 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3587 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 224.74,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3683 input tokens and requested 414 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3682 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 224.46,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3640 input tokens and requested 457 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3639 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 224.2,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3794 input tokens and requested 303 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3793 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 223.92,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3846 input tokens and requested 251 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3845 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 223.65,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3679 input tokens and requested 418 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3678 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 214.6,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3844 input tokens and requested 253 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3843 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 214.03,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3594 input tokens and requested 503 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3593 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 213.62,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3742 input tokens and requested 355 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3741 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 213.24,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3781 input tokens and requested 316 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3780 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 212.86,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3597 input tokens and requested 500 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3596 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 212.49,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3836 input tokens and requested 261 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3835 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 212.13,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3623 input tokens and requested 474 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3622 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 211.78,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3730 input tokens and requested 367 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3729 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 211.43,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3763 input tokens and requested 334 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3762 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 211.1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3730 input tokens and requested 367 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3729 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 210.72,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3610 input tokens and requested 487 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3609 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 210.37,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3661 input tokens and requested 436 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3660 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 210.03,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3663 input tokens and requested 434 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3662 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 208.61,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3657 input tokens and requested 440 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3656 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 208.15,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3806 input tokens and requested 291 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3805 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 207.75,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3505 input tokens and requested 592 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3504 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 207.37,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3652 input tokens and requested 445 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3651 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 206.95,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3686 input tokens and requested 411 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3685 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 206.6,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3737 input tokens and requested 360 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3736 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 216.24,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3679 input tokens and requested 418 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3678 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 234.69,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3771 input tokens and requested 326 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3770 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 233.99,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3621 input tokens and requested 476 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3620 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 233.47,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3774 input tokens and requested 323 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3773 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 232.98,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3734 input tokens and requested 363 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3733 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 232.5,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3609 input tokens and requested 488 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3608 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 232.05,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3843 input tokens and requested 254 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3842 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 231.58,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3559 input tokens and requested 538 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3558 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 231.12,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3742 input tokens and requested 355 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3741 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.66,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3653 input tokens and requested 444 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3652 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.2,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3644 input tokens and requested 453 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3643 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.77,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3706 input tokens and requested 391 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3705 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.33,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3705 input tokens and requested 392 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3704 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.86,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3693 input tokens and requested 404 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3692 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.43,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3729 input tokens and requested 368 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3728 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.99,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3458 input tokens and requested 639 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3457 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.53,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3691 input tokens and requested 406 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3690 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.08,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3741 input tokens and requested 356 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3740 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 226.2,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3794 input tokens and requested 303 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3793 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 225.75,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3759 input tokens and requested 338 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3758 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.06,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3678 input tokens and requested 419 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3677 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.86,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3705 input tokens and requested 392 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3704 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.56,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3707 input tokens and requested 390 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3706 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.38,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3766 input tokens and requested 331 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3765 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.21,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3786 input tokens and requested 311 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3785 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.05,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3684 input tokens and requested 413 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3683 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.89,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3793 input tokens and requested 304 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3792 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.73,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3726 input tokens and requested 371 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3725 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.58,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3647 input tokens and requested 450 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3646 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.39,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3817 input tokens and requested 280 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3816 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.24,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3707 input tokens and requested 390 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3706 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.09,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3721 input tokens and requested 376 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3720 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.93,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3736 input tokens and requested 361 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3735 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.79,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3754 input tokens and requested 343 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3753 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 231.4,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3700 input tokens and requested 397 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3699 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 231.26,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3882 input tokens and requested 215 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3881 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 231.12,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3747 input tokens and requested 350 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3746 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.96,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3604 input tokens and requested 493 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3603 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.68,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3852 input tokens and requested 245 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3851 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 230.52,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3629 input tokens and requested 468 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3628 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 229.89,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3613 input tokens and requested 484 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3612 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.99,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3461 input tokens and requested 636 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3460 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.72,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3734 input tokens and requested 363 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3733 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.54,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3710 input tokens and requested 387 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3709 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.37,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3724 input tokens and requested 373 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3723 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.21,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3710 input tokens and requested 387 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3709 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 228.07,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3839 input tokens and requested 258 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3838 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.95,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3693 input tokens and requested 404 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3692 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.84,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3565 input tokens and requested 532 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3564 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.72,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3661 input tokens and requested 436 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3660 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.62,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3779 input tokens and requested 318 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3778 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.51,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3748 input tokens and requested 349 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3747 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 227.4,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3832 input tokens and requested 265 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3831 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 234.49,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3878 input tokens and requested 219 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3877 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 233.88,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3563 input tokens and requested 534 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3562 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 233.73,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3726 input tokens and requested 371 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3725 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 233.62,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3763 input tokens and requested 334 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3762 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 233.52,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3682 input tokens and requested 415 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3681 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 233.4,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3813 input tokens and requested 284 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3812 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 233.27,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3390 input tokens and requested 707 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3389 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 233.16,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3663 input tokens and requested 434 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3662 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 224.25,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3639 input tokens and requested 458 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3638 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 223.48,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3749 input tokens and requested 348 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3748 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.92,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3872 input tokens and requested 225 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3871 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 222.38,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3616 input tokens and requested 481 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3615 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.83,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3781 input tokens and requested 316 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3780 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 221.32,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3791 input tokens and requested 306 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3790 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 220.81,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3640 input tokens and requested 457 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3639 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 220.33,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3527 input tokens and requested 570 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3526 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 219.85,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3737 input tokens and requested 360 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3736 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 219.38,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3753 input tokens and requested 344 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3752 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 218.9,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3621 input tokens and requested 476 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3620 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 218.43,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3745 input tokens and requested 352 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3744 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 216.56,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3620 input tokens and requested 477 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3619 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 216.12,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3619 input tokens and requested 478 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3618 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 215.6,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3708 input tokens and requested 389 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3707 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 215.1,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3835 input tokens and requested 262 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3834 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 214.53,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3663 input tokens and requested 434 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3662 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 214.04,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3699 input tokens and requested 398 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3698 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 213.55,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3560 input tokens and requested 537 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3559 tokens. Please r"
+    },
+    {
+      "success": false,
+      "ttft_ms": null,
+      "tpot_ms": null,
+      "e2el_ms": 213.07,
+      "input_tokens": 0,
+      "output_tokens": 0,
+      "error": "HTTP 400: {\"error\":{\"message\":\"You passed 3692 input tokens and requested 405 output tokens. However, the model's context length is only 4096 tokens, resulting in a maximum input length of 3691 tokens. Please r"
+    }
+  ]
+}
