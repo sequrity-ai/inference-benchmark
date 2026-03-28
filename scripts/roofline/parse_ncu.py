@@ -78,60 +78,101 @@ def estimate_gemm_bytes(input_shapes_str: str) -> float:
         return 0
 
 
+def compute_attention_flops(model_info: dict, batch_size: int, seq_len: int, phase: str, num_layers: int) -> float:
+    """Compute flash attention FLOPs analytically per layer.
+
+    FLOPs = 2 * batch * num_heads * seq_len * kv_len * head_dim * 2 (fwd)
+    For prefill: kv_len = seq_len
+    For decode: kv_len = seq_len (KV cache length), query_len = 1
+    """
+    num_heads = model_info.get("num_attention_heads", 32)
+    head_dim = model_info.get("head_dim", 128)
+
+    if phase == "decode":
+        # decode: Q is [batch, 1, heads, dim], K/V are [batch, seq_len, kv_heads, dim]
+        # FLOPs ≈ 2 * batch * num_heads * 1 * seq_len * head_dim * 2
+        return 4 * batch_size * num_heads * seq_len * head_dim
+    else:
+        # prefill: Q,K,V are all [batch, seq_len, heads, dim]
+        # FLOPs ≈ 2 * batch * num_heads * seq_len * seq_len * head_dim * 2
+        return 4 * batch_size * num_heads * seq_len * seq_len * head_dim
+
+
 def parse_torch_profiler_json(data: dict) -> list[KernelRecord]:
     """Parse a PyTorch profiler JSON output into KernelRecords."""
     records = []
+    model_info = data.get("model_info", {})
+    batch_size = data.get("batch_size", 1)
+    seq_len = data.get("seq_len", 512)
+    phase = data.get("phase", "prefill")
+    num_layers = data.get("num_layers_profiled", 2)
+
+    # Pre-compute attention FLOPs per layer (analytically)
+    attn_flops_per_layer = compute_attention_flops(model_info, batch_size, seq_len, phase, num_layers)
 
     for k in data.get("kernel_summary", []):
         name = k["name"]
         category = classify_kernel(name)
         if category == "profiler-overhead":
             continue
+
+        # Skip low-level CUDA GEMM kernels (nvjet, cublas) — they are child
+        # kernels of aten::mm which already has correct FLOPs and timing.
+        # Including both would double-count.
+        if category == "gemm" and not name.startswith("aten::"):
+            continue
+
         cuda_time_us = k["cuda_time_us"]
         calls = k["calls"]
         flops = k["flops"]
 
-        # Estimate bytes for GEMM operations
+        # Compute bytes and AI
         theoretical_bytes = 0
-        if category == "gemm" or "mm" in name.lower():
+
+        if category == "gemm":
+            # Use actual tensor shapes from profiler
             theoretical_bytes = estimate_gemm_bytes(k.get("input_shapes", ""))
             if theoretical_bytes == 0 and flops > 0:
-                # Fallback: for BF16 GEMM, AI ≈ M*N*K*2 / (M*K + K*N + M*N) * 2bytes
-                # Typical AI for large GEMMs is ~100-300 FLOP/byte
-                # Use a conservative estimate based on known H100 characteristics
-                theoretical_bytes = flops / 200  # assume ~200 FLOP/byte for large GEMM
+                # Fallback: estimate from FLOPs assuming typical large GEMM AI
+                theoretical_bytes = flops / 150  # conservative estimate
 
-        elif flops == 0 and cuda_time_us > 0:
-            # Memory-bound kernel: estimate bytes from duration assuming peak bandwidth
-            # peak_bw = 3.35 TB/s = 3.35e12 bytes/s = 3.35e6 bytes/us
+        elif category == "attention":
+            # Compute FLOPs analytically from model architecture
+            flops = attn_flops_per_layer  # total across profiled layers
+            # Flash attention memory: reads Q,K,V + writes O, all in BF16
+            # Per head: Q=[bs,seq,dim], K=[bs,kv_len,dim], V=[bs,kv_len,dim], O=[bs,seq,dim]
+            num_heads = model_info.get("num_attention_heads", 32)
+            head_dim = model_info.get("head_dim", 128)
+            if phase == "decode":
+                q_len = 1
+                kv_len = seq_len
+            else:
+                q_len = seq_len
+                kv_len = seq_len
+            # Bytes: read Q + K + V + write O, all BF16 (2 bytes)
+            theoretical_bytes = 2 * batch_size * num_heads * head_dim * (q_len + 2 * kv_len + q_len)
+
+        elif category in ("elementwise", "activation", "reduce", "layernorm", "rope"):
+            # Memory-bound: estimate bytes from duration at peak bandwidth
             theoretical_bytes = cuda_time_us * H100_SXM.hbm_bandwidth_tb_s * 1e6
+            # Elementwise: ~0.5-1 FLOP per byte
+            flops = theoretical_bytes * 0.5
 
-            # Estimate FLOPs for elementwise ops: ~1-2 FLOPs per element
-            # For typical BF16 elementwise: read + write = 4 bytes, 1-2 FLOPs
-            if category in ("elementwise", "activation", "reduce", "layernorm", "rope"):
-                flops = theoretical_bytes * 0.5  # ~0.5 FLOP/byte for elementwise
-            elif category == "attention":
-                # Flash attention FLOPs: 2 * batch * heads * seq_len^2 * head_dim
-                # We don't know exact dims, so estimate from time relative to GEMM
-                flops = theoretical_bytes * 50  # attention is moderately compute-heavy
-            elif category == "memory":
-                flops = 0  # pure data movement
-                theoretical_bytes = cuda_time_us * H100_SXM.hbm_bandwidth_tb_s * 1e6
+        elif category == "memory" or category == "indexing":
+            # Pure data movement
+            theoretical_bytes = cuda_time_us * H100_SXM.hbm_bandwidth_tb_s * 1e6
+            flops = 0
 
         # Compute derived metrics
         if theoretical_bytes > 0 and flops > 0:
             arithmetic_intensity = flops / theoretical_bytes
-        elif category == "memory":
-            arithmetic_intensity = 0.01  # pure memory ops
+        elif category in ("memory", "indexing"):
+            arithmetic_intensity = 0.01
         else:
             arithmetic_intensity = 0
 
         if cuda_time_us > 0 and flops > 0:
             achieved_tflops = flops / (cuda_time_us * 1e-6) / 1e12
-        elif cuda_time_us > 0 and theoretical_bytes > 0:
-            # For memory-bound kernels, report achieved bandwidth as TFLOPS equivalent
-            achieved_bw_tb_s = theoretical_bytes / (cuda_time_us * 1e-6) / 1e12
-            achieved_tflops = achieved_bw_tb_s * arithmetic_intensity
         else:
             achieved_tflops = 0
 

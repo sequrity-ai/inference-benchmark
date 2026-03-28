@@ -141,9 +141,9 @@ def profile_with_torch(model, input_ids, phase, config, output_path, past_key_va
     prof.export_chrome_trace(trace_path)
     print(f"  Chrome trace: {trace_path}", file=sys.stderr)
 
-    # Extract per-kernel data
+    # Extract per-kernel data with shapes for AI calculation
     kernels = []
-    for evt in prof.key_averages():
+    for evt in prof.key_averages(group_by_input_shape=True):
         device_time = evt.self_device_time_total if hasattr(evt, 'self_device_time_total') else 0
         if device_time > 0:
             kernels.append({
@@ -155,16 +155,15 @@ def profile_with_torch(model, input_ids, phase, config, output_path, past_key_va
                 "input_shapes": str(evt.input_shapes) if evt.input_shapes else "",
             })
 
-    # Also get the detailed event list for individual kernel launches
-    cuda_events = []
-    for evt in prof.events():
-        dev_time = getattr(evt, 'device_time_total', 0) or getattr(evt, 'cuda_time_total', 0) or 0
-        if dev_time > 0:
-            cuda_events.append({
-                "name": evt.name,
-                "duration_us": dev_time,
-                "flops": getattr(evt, 'flops', 0) or 0,
-            })
+    # Extract model architecture info for analytical FLOP computation
+    model_info = {
+        "hidden_size": getattr(config, "hidden_size", 0),
+        "num_attention_heads": getattr(config, "num_attention_heads", 0),
+        "num_key_value_heads": getattr(config, "num_key_value_heads", 0),
+        "head_dim": getattr(config, "head_dim", 0) or (getattr(config, "hidden_size", 0) // max(getattr(config, "num_attention_heads", 1), 1)),
+        "intermediate_size": getattr(config, "intermediate_size", 0),
+        "vocab_size": getattr(config, "vocab_size", 0),
+    }
 
     result = {
         "model": os.path.basename(os.environ.get("ROOFLINE_MODEL_PATH", "unknown")),
@@ -173,6 +172,7 @@ def profile_with_torch(model, input_ids, phase, config, output_path, past_key_va
         "seq_len": input_ids.shape[1],
         "num_layers_profiled": int(os.environ.get("ROOFLINE_LAYERS", "2")),
         "profiler": "torch",
+        "model_info": model_info,
         "kernel_summary": sorted(kernels, key=lambda x: -x["cuda_time_us"]),
         "total_cuda_time_us": sum(k["cuda_time_us"] for k in kernels),
         "total_flops": sum(k["flops"] for k in kernels),
