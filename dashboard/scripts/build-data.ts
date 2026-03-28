@@ -270,9 +270,35 @@ function main() {
     return a.config.concurrency - b.config.concurrency;
   });
 
+  // Strip fields not used by the dashboard to reduce payload size
+  const CONFIG_KEEP = new Set(['backend', 'profile', 'concurrency', 'model', 'mode', 'num_requests']);
+  const SUMMARY_KEEP = new Set([
+    'concurrency', 'num_requests', 'duration_s', 'successful_requests', 'failed_requests',
+    'request_throughput', 'input_token_throughput', 'output_token_throughput', 'total_token_throughput',
+    'total_input_tokens', 'total_output_tokens',
+    'mean_ttft_ms', 'median_ttft_ms', 'p90_ttft_ms', 'p99_ttft_ms',
+    'mean_tpot_ms', 'median_tpot_ms', 'p90_tpot_ms', 'p99_tpot_ms',
+    'mean_e2el_ms', 'median_e2el_ms', 'p90_e2el_ms', 'p99_e2el_ms',
+    'errors',
+  ]);
+
+  const slimResults = dedupedResults.map(r => {
+    const config: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(r.config)) {
+      if (CONFIG_KEEP.has(k)) config[k] = v;
+    }
+    const summary: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(r.summary)) {
+      if (SUMMARY_KEEP.has(k)) summary[k] = v;
+    }
+    const slim: Record<string, unknown> = { config, summary, hardware: r.hardware, quant: r.quant, modelShort: r.modelShort, seriesKey: r.seriesKey };
+    if ((r as Record<string, unknown>).perTurn) slim.perTurn = (r as Record<string, unknown>).perTurn;
+    return slim;
+  });
+
   // Ensure output directory exists
   fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
-  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(dedupedResults, null, 2));
+  fs.writeFileSync(OUTPUT_FILE, JSON.stringify(slimResults));
 
   console.log(`\nResults:`);
   console.log(`  Included: ${dedupedResults.length}`);
