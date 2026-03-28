@@ -85,6 +85,8 @@ def parse_torch_profiler_json(data: dict) -> list[KernelRecord]:
     for k in data.get("kernel_summary", []):
         name = k["name"]
         category = classify_kernel(name)
+        if category == "profiler-overhead":
+            continue
         cuda_time_us = k["cuda_time_us"]
         calls = k["calls"]
         flops = k["flops"]
@@ -223,7 +225,7 @@ def main():
         files = [input_path]
 
     for f in files:
-        if not f.exists() or not f.suffix == ".json":
+        if not f.exists() or f.suffix != ".json" or "trace" in f.name:
             continue
 
         print(f"Parsing: {f.name}...")

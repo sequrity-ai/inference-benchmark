@@ -120,10 +120,14 @@ KERNEL_CATEGORIES: list[tuple[str, str]] = [
     (r"sample|argmax|top_p|top_k.*sample", "sampling"),
     # Memory operations (copy, concat, reshape, slice)
     (r"memcpy|memset|Memcpy|Memset|aten::copy_|aten::cat\b|aten::slice|aten::reshape|CatArrayBatchedCopy|unrolled_elementwise.*copy", "memory"),
-    # Rotary embeddings
-    (r"rotary|rope|RoPE", "rope"),
+    # Rotary embeddings (cos, sin, gather for position encoding)
+    (r"rotary|rope|RoPE|aten::cos\b|aten::sin\b", "rope"),
     # Reduce operations (not allreduce)
     (r"reduce_kernel|aten::sum\b", "reduce"),
+    # Indexing / embedding lookup / position generation
+    (r"aten::gather|aten::arange|aten::index|vectorized_gather|indexSelect|aten::embedding", "indexing"),
+    # Profiler/runtime overhead (skip)
+    (r"Activity Buffer|Lazy Function|Runtime Triggered|aten::random_|distribution_elementwise|distribution_nullary", "profiler-overhead"),
 ]
 
 _compiled_categories = [(re.compile(pat, re.IGNORECASE), cat) for pat, cat in KERNEL_CATEGORIES]
