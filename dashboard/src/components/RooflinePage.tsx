@@ -186,19 +186,19 @@ function ScatterTooltip({ active, payload }: ScatterTooltipProps) {
           <tr>
             <td style={{ color: '#8b949e', paddingRight: 12 }}>Arith. Intensity</td>
             <td style={{ fontFamily: 'monospace', color: '#e6edf3' }}>
-              {k.arithmetic_intensity.toFixed(1)} FLOP/B
+              {(k.arithmetic_intensity ?? 0).toFixed(1)} FLOP/B
             </td>
           </tr>
           <tr>
             <td style={{ color: '#8b949e', paddingRight: 12 }}>Achieved TFLOPS</td>
             <td style={{ fontFamily: 'monospace', color: '#e6edf3' }}>
-              {k.achieved_tflops.toFixed(2)}
+              {(k.achieved_tflops ?? 0).toFixed(2)}
             </td>
           </tr>
           <tr>
             <td style={{ color: '#8b949e', paddingRight: 12 }}>CUDA time</td>
             <td style={{ fontFamily: 'monospace', color: '#e6edf3' }}>
-              {k.cuda_time_us.toFixed(1)} µs
+              {(k.cuda_time_us ?? 0).toFixed(1)} µs
             </td>
           </tr>
           <tr>
@@ -257,7 +257,7 @@ function BarTooltip({ active, payload, label }: BarTooltipProps) {
             {entry.name}
           </span>
           <span style={{ fontFamily: 'monospace', color: '#e6edf3' }}>
-            {entry.value.toFixed(1)}%
+            {(entry.value ?? 0).toFixed(1)}%
           </span>
         </div>
       ))}
@@ -784,13 +784,13 @@ export function RooflinePage() {
                           {k.batch_size}
                         </td>
                         <td className="py-2 pr-4 text-right font-mono text-xs text-[#e6edf3]">
-                          {k.cuda_time_us.toFixed(1)}
+                          {(k.cuda_time_us ?? 0).toFixed(1)}
                         </td>
                         <td className="py-2 pr-4 text-right font-mono text-xs text-[#e6edf3]">
-                          {k.arithmetic_intensity.toFixed(1)}
+                          {(k.arithmetic_intensity ?? 0).toFixed(1)}
                         </td>
                         <td className="py-2 pr-4 text-right font-mono text-xs text-[#e6edf3]">
-                          {k.achieved_tflops.toFixed(2)}
+                          {(k.achieved_tflops ?? 0).toFixed(2)}
                         </td>
                         <td className="py-2 text-right">
                           <span
