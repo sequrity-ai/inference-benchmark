@@ -9,8 +9,11 @@ import { ThroughputChart } from './components/charts/ThroughputChart';
 import { ComparisonChart } from './components/charts/ComparisonChart';
 import { PerTurnChart } from './components/charts/PerTurnChart';
 import { DataTable } from './components/DataTable';
+import { RooflinePage } from './components/RooflinePage';
 import type { TabId } from './types';
 import './index.css';
+
+type PageId = 'benchmark' | 'roofline';
 
 function App() {
   const {
@@ -25,11 +28,12 @@ function App() {
     clearFilters,
   } = useData();
 
+  const [activePage, setActivePage] = useState<PageId>('benchmark');
   const [activeTab, setActiveTab] = useState<TabId>('latency');
 
   if (error) {
     return (
-      <Layout totalRuns={0} loading={false}>
+      <Layout totalRuns={0} loading={false} activePage={activePage} onPageChange={setActivePage}>
         <div className="flex h-64 items-center justify-center rounded-lg border border-[#f97583]/30 bg-[#f97583]/10 text-[#f97583]">
           <div className="text-center">
             <div className="mb-2 text-lg font-semibold">Failed to load data</div>
@@ -44,8 +48,10 @@ function App() {
   }
 
   return (
-    <Layout totalRuns={allData.length} loading={loading}>
-      {loading ? (
+    <Layout totalRuns={allData.length} loading={loading} activePage={activePage} onPageChange={setActivePage}>
+      {activePage === 'roofline' ? (
+        <RooflinePage />
+      ) : loading ? (
         <div className="flex h-64 items-center justify-center">
           <div className="text-[#8b949e]">Loading benchmark data...</div>
         </div>
