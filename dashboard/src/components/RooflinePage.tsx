@@ -96,7 +96,8 @@ function logTick(value: number): string {
 }
 
 // ── Shorten kernel name for tooltip ──────────────────────────────────────────
-function shortKernelName(name: string): string {
+function shortKernelName(name: string | undefined): string {
+  if (!name) return '(unknown)';
   // If it's an aten:: op, use that
   const aten = name.match(/^(aten::\w+)/);
   if (aten) return aten[1];
@@ -141,7 +142,8 @@ interface ScatterTooltipProps {
 
 function ScatterTooltip({ active, payload }: ScatterTooltipProps) {
   if (!active || !payload?.length) return null;
-  const k = payload[0].payload;
+  const k = payload[0]?.payload;
+  if (!k) return null;
   return (
     <div
       style={{
