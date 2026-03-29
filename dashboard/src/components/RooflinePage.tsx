@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, Component, type ReactNode } from 'react';
 import {
   ComposedChart,
   Scatter,
@@ -67,6 +67,27 @@ function buildRooflineCeiling(): Array<{ ai: number; tflops: number }> {
 
 const ROOFLINE_CEILING = buildRooflineCeiling();
 
+// ── Error boundary to prevent white-page crashes from Recharts ────────────────
+interface EBProps { children: ReactNode; fallback?: ReactNode }
+interface EBState { hasError: boolean; error?: Error }
+class ChartErrorBoundary extends Component<EBProps, EBState> {
+  state: EBState = { hasError: false };
+  static getDerivedStateFromError(error: Error) { return { hasError: true, error }; }
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback ?? (
+        <div className="flex h-64 items-center justify-center rounded-lg border border-red-800 bg-red-900/20 text-red-400">
+          <div className="text-center">
+            <div className="text-sm font-semibold">Chart rendering error</div>
+            <div className="mt-1 text-xs opacity-70">{this.state.error?.message}</div>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 // ── Log tick formatter ────────────────────────────────────────────────────────
 function logTick(value: number): string {
   if (value >= 1000) return `${(value / 1000).toFixed(0)}k`;
@@ -95,6 +116,8 @@ interface DotProps {
 
 function KernelDot({ cx = 0, cy = 0, payload }: DotProps) {
   if (!payload) return null;
+  // Guard against NaN from log scale computation
+  if (!Number.isFinite(cx) || !Number.isFinite(cy)) return null;
   const color = categoryColor(payload.category);
   return (
     <circle
@@ -305,11 +328,14 @@ export function RooflinePage() {
   // Kernels mapped to axis-compatible field names for Recharts scatter
   // XAxis dataKey="ai", YAxis dataKey="tflops" — must match field names in data objects
   const scatterKernels = useMemo(() => {
-    return allKernels.map((k) => ({
-      ...k,
-      ai: k.arithmetic_intensity,
-      tflops: k.achieved_tflops,
-    }));
+    return allKernels
+      .filter((k) => k.arithmetic_intensity > 0 && k.achieved_tflops > 0
+        && Number.isFinite(k.arithmetic_intensity) && Number.isFinite(k.achieved_tflops))
+      .map((k) => ({
+        ...k,
+        ai: k.arithmetic_intensity,
+        tflops: k.achieved_tflops,
+      }));
   }, [allKernels]);
 
   // Stats
@@ -555,6 +581,7 @@ export function RooflinePage() {
             No data for selected filters
           </div>
         ) : (
+          <ChartErrorBoundary>
           <ResponsiveContainer width="100%" height={480}>
             <ComposedChart margin={{ top: 10, right: 24, bottom: 40, left: 20 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
@@ -641,6 +668,7 @@ export function RooflinePage() {
               ))}
             </ComposedChart>
           </ResponsiveContainer>
+          </ChartErrorBoundary>
         )}
       </div>
 
