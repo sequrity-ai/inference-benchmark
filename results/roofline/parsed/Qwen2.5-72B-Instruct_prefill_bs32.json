@@ -1,0 +1,654 @@
+{
+  "model": "Qwen2.5-72B-Instruct",
+  "phase": "prefill",
+  "batch_size": 32,
+  "seq_len": 512,
+  "num_layers_profiled": 2,
+  "profiler": "torch",
+  "source_file": "Qwen2.5-72B-Instruct_prefill_bs32.json",
+  "total_kernels": 56,
+  "kernels": [
+    {
+      "name": "aten::mm",
+      "category": "gemm",
+      "cuda_time_us": 43073.42400000001,
+      "calls": 4,
+      "flops": 31748398252032,
+      "theoretical_bytes": 1721761792,
+      "arithmetic_intensity": 18439.483556638246,
+      "achieved_tflops": 737.0762596452046
+    },
+    {
+      "name": "aten::mm",
+      "category": "gemm",
+      "cuda_time_us": 22091.494,
+      "calls": 2,
+      "flops": 15874199126016,
+      "theoretical_bytes": 1721761792,
+      "arithmetic_intensity": 9219.741778319123,
+      "achieved_tflops": 718.5661198837889
+    },
+    {
+      "name": "aten::mm",
+      "category": "gemm",
+      "cuda_time_us": 6118.448000000002,
+      "calls": 2,
+      "flops": 4398046511104,
+      "theoretical_bytes": 671088640,
+      "arithmetic_intensity": 6553.6,
+      "achieved_tflops": 718.8173391526738
+    },
+    {
+      "name": "aten::addmm",
+      "category": "gemm",
+      "cuda_time_us": 6081.424999999995,
+      "calls": 2,
+      "flops": 4398046511104,
+      "theoretical_bytes": 29320310074.02667,
+      "arithmetic_intensity": 150.0,
+      "achieved_tflops": 723.1934145539909
+    },
+    {
+      "name": "aten::copy_",
+      "category": "memory",
+      "cuda_time_us": 4717.200999999999,
+      "calls": 12,
+      "flops": 0,
+      "theoretical_bytes": 15802623349.999998,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<c10::BFloat16, c10::BFloat16, c10::BFloat16, at::native::binary_internal::MulFunctor<float> > >(at::TensorIteratorBase&, at::native::BinaryFunctor<c10::BFloat16, c10::BFloat16, c10::BFloat16, at::native::binary_internal::MulFunctor<float> > const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<c10::BFloat16, c10::BFloat16, c10::BFloat16, at::native::binary_internal::MulFunctor<float> > >(at::TensorIteratorBase&, at::native::BinaryFunctor<c10::BFloat16, c10::BFloat16, c10::BFloat16, at::native::binary_internal::MulFunctor<float> > const&)::{lambda(int)#1})",
+      "category": "elementwise",
+      "cuda_time_us": 3363.543999999997,
+      "calls": 12,
+      "flops": 5633936199.999995,
+      "theoretical_bytes": 11267872399.99999,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "void at::native::unrolled_elementwise_kernel<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, 4, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1> >(int, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#7}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>, TrivialOffsetCalculator<1, unsigned int>, TrivialOffsetCalculator<1, unsigned int>, at::native::memory::LoadWithCast<1>, at::native::memory::StoreWithCast<1>)",
+      "category": "elementwise",
+      "cuda_time_us": 2158.1360000000027,
+      "calls": 6,
+      "flops": 3614877800.000005,
+      "theoretical_bytes": 7229755600.00001,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::mul",
+      "category": "elementwise",
+      "cuda_time_us": 1857.4680000000008,
+      "calls": 2,
+      "flops": 3111258900.000001,
+      "theoretical_bytes": 6222517800.000002,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<8, at::native::BinaryFunctor<c10::BFloat16, c10::BFloat16, c10::BFloat16, at::native::binary_internal::MulFunctor<float> >, std::array<char*, 3ul> >(int, at::native::BinaryFunctor<c10::BFloat16, c10::BFloat16, c10::BFloat16, at::native::binary_internal::MulFunctor<float> >, std::array<char*, 3ul>)",
+      "category": "elementwise",
+      "cuda_time_us": 1857.4680000000008,
+      "calls": 2,
+      "flops": 3111258900.000001,
+      "theoretical_bytes": 6222517800.000002,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::mul",
+      "category": "elementwise",
+      "cuda_time_us": 1841.913999999997,
+      "calls": 5,
+      "flops": 3085205949.999995,
+      "theoretical_bytes": 6170411899.99999,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float> > >(at::TensorIteratorBase&, at::native::BinaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float> > const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::BinaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float> > >(at::TensorIteratorBase&, at::native::BinaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float> > const&)::{lambda(int)#1})",
+      "category": "elementwise",
+      "cuda_time_us": 1841.913999999997,
+      "calls": 4,
+      "flops": 3085205949.999995,
+      "theoretical_bytes": 6170411899.99999,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "aten::pow",
+      "category": "elementwise",
+      "cuda_time_us": 1768.922000000015,
+      "calls": 5,
+      "flops": 2962944350.0000253,
+      "theoretical_bytes": 5925888700.000051,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::(anonymous namespace)::pow_tensor_scalar_kernel_impl<float, float>(at::TensorIteratorBase&, float)::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::(anonymous namespace)::pow_tensor_scalar_kernel_impl<float, float>(at::TensorIteratorBase&, float)::{lambda(float)#1}, std::array<char*, 2ul>)",
+      "category": "elementwise",
+      "cuda_time_us": 1768.922000000015,
+      "calls": 5,
+      "flops": 2962944350.0000253,
+      "theoretical_bytes": 5925888700.000051,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::mul",
+      "category": "elementwise",
+      "cuda_time_us": 1678.2680000000055,
+      "calls": 4,
+      "flops": 2811098900.000009,
+      "theoretical_bytes": 5622197800.000018,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::_flash_attention_forward",
+      "category": "attention",
+      "cuda_time_us": 1605.1470000000008,
+      "calls": 2,
+      "flops": 274877906944,
+      "theoretical_bytes": 1073741824,
+      "arithmetic_intensity": 256.0,
+      "achieved_tflops": 171.2478090442806
+    },
+    {
+      "name": "void pytorch_flash::flash_fwd_kernel<Flash_fwd_kernel_traits<128, 128, 64, 4, false, false, cutlass::bfloat16_t, Flash_kernel_traits<128, 128, 64, 4, cutlass::bfloat16_t> >, false, true, false, false, true, true, false, false>(pytorch_flash::Flash_fwd_params)",
+      "category": "attention",
+      "cuda_time_us": 1605.1470000000008,
+      "calls": 2,
+      "flops": 274877906944,
+      "theoretical_bytes": 1073741824,
+      "arithmetic_intensity": 256.0,
+      "achieved_tflops": 171.2478090442806
+    },
+    {
+      "name": "Memcpy PtoP (Device -> Device)",
+      "category": "memory",
+      "cuda_time_us": 1572.6350000000061,
+      "calls": 6,
+      "flops": 0,
+      "theoretical_bytes": 5268327250.00002,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "aten::addmm",
+      "category": "gemm",
+      "cuda_time_us": 1518.1400000000103,
+      "calls": 4,
+      "flops": 1099511627776,
+      "theoretical_bytes": 7330077518.506667,
+      "arithmetic_intensity": 150.0,
+      "achieved_tflops": 724.2491652785596
+    },
+    {
+      "name": "aten::mul",
+      "category": "elementwise",
+      "cuda_time_us": 1464.2849999999953,
+      "calls": 5,
+      "flops": 2452677374.999992,
+      "theoretical_bytes": 4905354749.999984,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6749999999999998
+    },
+    {
+      "name": "aten::cat",
+      "category": "memory",
+      "cuda_time_us": 1387.4509999999982,
+      "calls": 5,
+      "flops": 0,
+      "theoretical_bytes": 4647960849.999994,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "void at::native::(anonymous namespace)::CatArrayBatchedCopy<at::native::(anonymous namespace)::OpaqueType<2u>, unsigned int, 4, 64, 64>(at::native::(anonymous namespace)::OpaqueType<2u>*, at::native::(anonymous namespace)::CatArrInputTensorMetadata<at::native::(anonymous namespace)::OpaqueType<2u>, unsigned int, 64, 64>, at::native::(anonymous namespace)::TensorSizeStride<unsigned int, 4u>, int, unsigned int)",
+      "category": "memory",
+      "cuda_time_us": 1376.186999999998,
+      "calls": 4,
+      "flops": 0,
+      "theoretical_bytes": 4610226449.999993,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "aten::silu",
+      "category": "activation",
+      "cuda_time_us": 1283.1000000000058,
+      "calls": 2,
+      "flops": 2149192500.0000095,
+      "theoretical_bytes": 4298385000.000019,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<8, at::native::(anonymous namespace)::silu_kernel(at::TensorIteratorBase&)::{lambda()#1}::operator()() const::{lambda()#6}::operator()() const::{lambda(c10::BFloat16)#1}, std::array<char*, 2ul> >(int, at::native::(anonymous namespace)::silu_kernel(at::TensorIteratorBase&)::{lambda()#1}::operator()() const::{lambda()#6}::operator()() const::{lambda(c10::BFloat16)#1}, std::array<char*, 2ul>)",
+      "category": "activation",
+      "cuda_time_us": 1283.1000000000058,
+      "calls": 2,
+      "flops": 2149192500.0000095,
+      "theoretical_bytes": 4298385000.000019,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::CUDAFunctor_add<c10::BFloat16> >(at::TensorIteratorBase&, at::native::CUDAFunctor_add<c10::BFloat16> const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::CUDAFunctor_add<c10::BFloat16> >(at::TensorIteratorBase&, at::native::CUDAFunctor_add<c10::BFloat16> const&)::{lambda(int)#1})",
+      "category": "elementwise",
+      "cuda_time_us": 1116.573000000004,
+      "calls": 4,
+      "flops": 1870259775.0000067,
+      "theoretical_bytes": 3740519550.0000134,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<8, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::bfloat16_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda(float)#1}, std::array<char*, 2ul>)",
+      "category": "elementwise",
+      "cuda_time_us": 1047.036999999989,
+      "calls": 6,
+      "flops": 1753786974.9999814,
+      "theoretical_bytes": 3507573949.999963,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::add",
+      "category": "elementwise",
+      "cuda_time_us": 1020.028999999995,
+      "calls": 4,
+      "flops": 1708548574.9999917,
+      "theoretical_bytes": 3417097149.9999833,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<8, at::native::CUDAFunctor_add<c10::BFloat16>, std::array<char*, 3ul> >(int, at::native::CUDAFunctor_add<c10::BFloat16>, std::array<char*, 3ul>)",
+      "category": "elementwise",
+      "cuda_time_us": 1020.028999999995,
+      "calls": 4,
+      "flops": 1708548574.9999917,
+      "theoretical_bytes": 3417097149.9999833,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::add",
+      "category": "elementwise",
+      "cuda_time_us": 987.006000000003,
+      "calls": 2,
+      "flops": 1653235050.0000052,
+      "theoretical_bytes": 3306470100.0000105,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "aten::mean",
+      "category": "elementwise",
+      "cuda_time_us": 738.2049999999954,
+      "calls": 5,
+      "flops": 1236493374.9999924,
+      "theoretical_bytes": 2472986749.9999847,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "void at::native::reduce_kernel<512, 1, at::native::ReduceOp<float, at::native::MeanOps<float, float, float, float>, unsigned int, float, 4, 4> >(at::native::ReduceOp<float, at::native::MeanOps<float, float, float, float>, unsigned int, float, 4, 4>)",
+      "category": "reduce",
+      "cuda_time_us": 738.2049999999954,
+      "calls": 4,
+      "flops": 1236493374.9999924,
+      "theoretical_bytes": 2472986749.9999847,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "void at::native::elementwise_kernel<128, 4, at::native::gpu_kernel_impl_nocast<at::native::neg_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#9}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::neg_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#9}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::neg_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#9}::operator()() const::{lambda(c10::BFloat16)#1}>(at::TensorIteratorBase&, at::native::neg_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#9}::operator()() const::{lambda(c10::BFloat16)#1} const&)::{lambda(int)#1})",
+      "category": "elementwise",
+      "cuda_time_us": 413.6950000000015,
+      "calls": 4,
+      "flops": 692939125.0000026,
+      "theoretical_bytes": 1385878250.0000052,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "aten::neg",
+      "category": "elementwise",
+      "cuda_time_us": 365.05499999999665,
+      "calls": 2,
+      "flops": 611467124.9999944,
+      "theoretical_bytes": 1222934249.9999888,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "aten::mul",
+      "category": "elementwise",
+      "cuda_time_us": 220.99099999999635,
+      "calls": 4,
+      "flops": 370159924.9999939,
+      "theoretical_bytes": 740319849.9999878,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "aten::gather",
+      "category": "indexing",
+      "cuda_time_us": 183.93600000000015,
+      "calls": 1,
+      "flops": 0,
+      "theoretical_bytes": 616185600.0000005,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "void at::native::vectorized_gather_kernel<16, long>(char*, char*, long*, int, long, long, long, long, bool)",
+      "category": "indexing",
+      "cuda_time_us": 183.93600000000015,
+      "calls": 1,
+      "flops": 0,
+      "theoretical_bytes": 616185600.0000005,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "aten::add",
+      "category": "elementwise",
+      "cuda_time_us": 129.56700000000092,
+      "calls": 2,
+      "flops": 217024725.00000155,
+      "theoretical_bytes": 434049450.0000031,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::copy_",
+      "category": "memory",
+      "cuda_time_us": 57.11899999999923,
+      "calls": 6,
+      "flops": 0,
+      "theoretical_bytes": 191348649.99999744,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "aten::neg",
+      "category": "elementwise",
+      "cuda_time_us": 48.640000000004875,
+      "calls": 2,
+      "flops": 81472000.00000817,
+      "theoretical_bytes": 162944000.00001633,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "Memset (Device)",
+      "category": "memory",
+      "cuda_time_us": 13.952000000025691,
+      "calls": 14,
+      "flops": 0,
+      "theoretical_bytes": 46739200.00008606,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "void at::native::(anonymous namespace)::CatArrayBatchedCopy<at::native::(anonymous namespace)::OpaqueType<4u>, unsigned int, 3, 64, 64>(at::native::(anonymous namespace)::OpaqueType<4u>*, at::native::(anonymous namespace)::CatArrInputTensorMetadata<at::native::(anonymous namespace)::OpaqueType<4u>, unsigned int, 64, 64>, at::native::(anonymous namespace)::TensorSizeStride<unsigned int, 4u>, int, unsigned int)",
+      "category": "memory",
+      "cuda_time_us": 11.264000000000124,
+      "calls": 1,
+      "flops": 0,
+      "theoretical_bytes": 37734400.00000041,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "aten::mul",
+      "category": "elementwise",
+      "cuda_time_us": 7.295999999999822,
+      "calls": 2,
+      "flops": 12220799.999999702,
+      "theoretical_bytes": 24441599.999999404,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::AUnaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float> >, std::array<char*, 2ul> >(int, at::native::AUnaryFunctor<float, float, float, at::native::binary_internal::MulFunctor<float> >, std::array<char*, 2ul>)",
+      "category": "elementwise",
+      "cuda_time_us": 7.295999999999822,
+      "calls": 2,
+      "flops": 12220799.999999702,
+      "theoretical_bytes": 24441599.999999404,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "aten::add",
+      "category": "elementwise",
+      "cuda_time_us": 6.528000000011161,
+      "calls": 5,
+      "flops": 10934400.000018695,
+      "theoretical_bytes": 21868800.00003739,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::CUDAFunctorOnSelf_add<float>, std::array<char*, 2ul> >(int, at::native::CUDAFunctorOnSelf_add<float>, std::array<char*, 2ul>)",
+      "category": "elementwise",
+      "cuda_time_us": 6.528000000011161,
+      "calls": 4,
+      "flops": 10934400.000018695,
+      "theoretical_bytes": 21868800.00003739,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::rsqrt",
+      "category": "elementwise",
+      "cuda_time_us": 5.343999999994594,
+      "calls": 5,
+      "flops": 8951199.999990946,
+      "theoretical_bytes": 17902399.99998189,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::rsqrt_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::rsqrt_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+      "category": "elementwise",
+      "cuda_time_us": 5.343999999994594,
+      "calls": 4,
+      "flops": 8951199.999990946,
+      "theoretical_bytes": 17902399.99998189,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.6750000000000003
+    },
+    {
+      "name": "aten::bmm",
+      "category": "gemm",
+      "cuda_time_us": 4.575999999999567,
+      "calls": 1,
+      "flops": 2097152,
+      "theoretical_bytes": 2102272,
+      "arithmetic_intensity": 0.997564539698003,
+      "achieved_tflops": 0.45829370629374966
+    },
+    {
+      "name": "aten::sin",
+      "category": "rope",
+      "cuda_time_us": 4.096000000000004,
+      "calls": 1,
+      "flops": 6860800.0000000065,
+      "theoretical_bytes": 13721600.000000013,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::sin_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::sin_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+      "category": "elementwise",
+      "cuda_time_us": 4.096000000000004,
+      "calls": 1,
+      "flops": 6860800.0000000065,
+      "theoretical_bytes": 13721600.000000013,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::cos",
+      "category": "rope",
+      "cuda_time_us": 4.031999999999698,
+      "calls": 1,
+      "flops": 6753599.999999494,
+      "theoretical_bytes": 13507199.999998989,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "void at::native::vectorized_elementwise_kernel<4, at::native::cos_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul> >(int, at::native::cos_kernel_cuda(at::TensorIteratorBase&)::{lambda()#2}::operator()() const::{lambda()#2}::operator()() const::{lambda(float)#1}, std::array<char*, 2ul>)",
+      "category": "elementwise",
+      "cuda_time_us": 4.031999999999698,
+      "calls": 1,
+      "flops": 6753599.999999494,
+      "theoretical_bytes": 13507199.999998989,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::copy_",
+      "category": "memory",
+      "cuda_time_us": 3.5839999999998327,
+      "calls": 1,
+      "flops": 0,
+      "theoretical_bytes": 12006399.99999944,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "void at::native::elementwise_kernel<128, 2, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#4}::operator()() const::{lambda(long)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#4}::operator()() const::{lambda(long)#1} const&)::{lambda(int)#1}>(int, at::native::gpu_kernel_impl_nocast<at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#4}::operator()() const::{lambda(long)#1}>(at::TensorIteratorBase&, at::native::direct_copy_kernel_cuda(at::TensorIteratorBase&)::{lambda()#3}::operator()() const::{lambda()#4}::operator()() const::{lambda(long)#1} const&)::{lambda(int)#1})",
+      "category": "elementwise",
+      "cuda_time_us": 3.5839999999998327,
+      "calls": 1,
+      "flops": 6003199.99999972,
+      "theoretical_bytes": 12006399.99999944,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    },
+    {
+      "name": "aten::copy_",
+      "category": "memory",
+      "cuda_time_us": 3.487999999999829,
+      "calls": 1,
+      "flops": 0,
+      "theoretical_bytes": 11684799.999999426,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "aten::arange",
+      "category": "indexing",
+      "cuda_time_us": 1.087999999999738,
+      "calls": 1,
+      "flops": 0,
+      "theoretical_bytes": 3644799.9999991227,
+      "arithmetic_intensity": 0.01,
+      "achieved_tflops": 0
+    },
+    {
+      "name": "void (anonymous namespace)::elementwise_kernel_with_index<int, at::native::arange_cuda_out(c10::Scalar const&, c10::Scalar const&, c10::Scalar const&, at::Tensor&)::{lambda()#1}::operator()() const::{lambda()#4}::operator()() const::{lambda(long)#1}>(int, at::native::arange_cuda_out(c10::Scalar const&, c10::Scalar const&, c10::Scalar const&, at::Tensor&)::{lambda()#1}::operator()() const::{lambda()#4}::operator()() const::{lambda(long)#1}, function_traits<at::native::arange_cuda_out(c10::Scalar const&, c10::Scalar const&, c10::Scalar const&, at::Tensor&)::{lambda()#1}::operator()() const::{lambda()#4}::operator()() const::{lambda(long)#1}>::result_type*)",
+      "category": "elementwise",
+      "cuda_time_us": 1.087999999999738,
+      "calls": 1,
+      "flops": 1822399.9999995613,
+      "theoretical_bytes": 3644799.9999991227,
+      "arithmetic_intensity": 0.5,
+      "achieved_tflops": 1.675
+    }
+  ],
+  "category_summary": {
+    "gemm": {
+      "total_cuda_time_us": 78887.50700000001,
+      "total_flops": 57518204125184,
+      "total_bytes": 40767102088.53333,
+      "kernel_count": 6,
+      "call_count": 15,
+      "duration_pct": 64.8314203652158,
+      "avg_arithmetic_intensity": 1410.8975418530495,
+      "avg_achieved_tflops": 729.1167678195736
+    },
+    "memory": {
+      "total_cuda_time_us": 9142.881000000025,
+      "total_flops": 0,
+      "total_bytes": 30628651350.00009,
+      "kernel_count": 9,
+      "call_count": 50,
+      "duration_pct": 7.513812820325862,
+      "avg_arithmetic_intensity": 0.0,
+      "avg_achieved_tflops": 0.0
+    },
+    "elementwise": {
+      "total_cuda_time_us": 26758.804000000022,
+      "total_flops": 44820996700.00003,
+      "total_bytes": 89641993400.00006,
+      "kernel_count": 31,
+      "call_count": 115,
+      "duration_pct": 21.990950615214896,
+      "avg_arithmetic_intensity": 0.5,
+      "avg_achieved_tflops": 1.6749999999999998
+    },
+    "attention": {
+      "total_cuda_time_us": 3210.2940000000017,
+      "total_flops": 549755813888,
+      "total_bytes": 2147483648,
+      "kernel_count": 2,
+      "call_count": 4,
+      "duration_pct": 2.638287451648462,
+      "avg_arithmetic_intensity": 256.0,
+      "avg_achieved_tflops": 171.2478090442806
+    },
+    "activation": {
+      "total_cuda_time_us": 2566.2000000000116,
+      "total_flops": 4298385000.000019,
+      "total_bytes": 8596770000.000038,
+      "kernel_count": 2,
+      "call_count": 4,
+      "duration_pct": 2.1089573909493367,
+      "avg_arithmetic_intensity": 0.5,
+      "avg_achieved_tflops": 1.675
+    },
+    "reduce": {
+      "total_cuda_time_us": 738.2049999999954,
+      "total_flops": 1236493374.9999924,
+      "total_bytes": 2472986749.9999847,
+      "kernel_count": 1,
+      "call_count": 4,
+      "duration_pct": 0.6066724693265289,
+      "avg_arithmetic_intensity": 0.5,
+      "avg_achieved_tflops": 1.6750000000000003
+    },
+    "indexing": {
+      "total_cuda_time_us": 368.96000000000004,
+      "total_flops": 0,
+      "total_bytes": 1236016000.0,
+      "kernel_count": 3,
+      "call_count": 3,
+      "duration_pct": 0.3032191251518447,
+      "avg_arithmetic_intensity": 0.0,
+      "avg_achieved_tflops": 0.0
+    },
+    "rope": {
+      "total_cuda_time_us": 8.127999999999702,
+      "total_flops": 13614399.9999995,
+      "total_bytes": 27228799.999999,
+      "kernel_count": 2,
+      "call_count": 2,
+      "duration_pct": 0.006679762167265023,
+      "avg_arithmetic_intensity": 0.5,
+      "avg_achieved_tflops": 1.6750000000000003
+    }
+  }
+}

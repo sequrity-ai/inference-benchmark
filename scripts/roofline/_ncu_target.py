@@ -116,7 +116,7 @@ def build_kv_cache(model, input_ids):
     return past
 
 
-def profile_with_torch(model, input_ids, phase, config, output_path, past_key_values=None):
+def profile_with_torch(model, input_ids, phase, config, output_path, past_key_values=None, model_name=None):
     """Profile using torch.profiler and export results."""
     from torch.profiler import profile as torch_profile, ProfilerActivity
 
@@ -166,7 +166,7 @@ def profile_with_torch(model, input_ids, phase, config, output_path, past_key_va
     }
 
     result = {
-        "model": os.path.basename(os.environ.get("ROOFLINE_MODEL_PATH", "unknown")),
+        "model": model_name or os.path.basename(os.environ.get("ROOFLINE_MODEL_PATH", "unknown")),
         "phase": phase,
         "batch_size": input_ids.shape[0],
         "seq_len": input_ids.shape[1],
