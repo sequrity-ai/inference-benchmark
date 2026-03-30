@@ -27,7 +27,7 @@ CATEGORY_COLORS = {
     "gemm":          "#0072B2",  # blue
     "layernorm":     "#009E73",  # green
     "softmax":       "#CC79A7",  # pink
-    "activation":    "#56B4E9",  # sky blue
+    "activation":    "#CC79A7",  # pink/mauve
     "rope":          "#D55E00",  # vermilion
     "moe-routing":   "#F0E442",  # yellow
     "moe-dispatch":  "#999999",  # gray

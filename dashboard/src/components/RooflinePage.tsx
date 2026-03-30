@@ -26,7 +26,7 @@ const CATEGORY_COLORS: Record<string, string> = {
   attention:    '#E69F00',
   elementwise:  '#666666',
   memory:       '#BBBBBB',
-  activation:   '#56B4E9',
+  activation:   '#CC79A7',
   reduce:       '#009E73',
   rope:         '#D55E00',
   'moe-routing':'#F0E442',
