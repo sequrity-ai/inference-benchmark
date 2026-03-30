@@ -31,6 +31,65 @@ class KernelRecord:
     achieved_tflops: float
 
 
+def parse_shape_dims(input_shapes_str: str) -> list[list[int]]:
+    """Parse input_shapes string like '[[4, 512, 4096], [4096, 14336]]' into list of dim lists."""
+    try:
+        dims = re.findall(r'\[[\d,\s]+\]', input_shapes_str)
+        return [[int(x.strip()) for x in d.strip('[]').split(',')] for d in dims]
+    except Exception:
+        return []
+
+
+def tensor_numel(dims: list[int]) -> int:
+    """Total number of elements in a tensor."""
+    n = 1
+    for d in dims:
+        n *= d
+    return n
+
+
+# FLOPs per element for common elementwise ops
+ELEMENTWISE_FLOPS: dict[str, float] = {
+    "aten::mul": 1, "aten::add": 1, "aten::neg": 1, "aten::sub": 1,
+    "aten::pow": 1, "aten::rsqrt": 1, "aten::mean": 1,
+    "aten::silu": 4, "aten::gelu": 4,  # activation: exp + mul + add + ...
+    "aten::cos": 8, "aten::sin": 8,    # transcendental
+}
+
+
+def estimate_elementwise(name: str, input_shapes_str: str, cuda_time_us: float) -> tuple[float, float]:
+    """Estimate FLOPs and bytes for elementwise/unary/reduction ops from shapes.
+
+    Returns (flops, bytes).
+    """
+    shapes = parse_shape_dims(input_shapes_str)
+    if not shapes:
+        # Fallback: estimate from time at peak bandwidth
+        est_bytes = cuda_time_us * H100_SXM.hbm_bandwidth_tb_s * 1e6
+        return est_bytes * 0.5, est_bytes
+
+    # Use first input tensor to estimate size
+    numel = tensor_numel(shapes[0])
+    bytes_per_elem = 2  # BF16
+
+    # FLOPs: look up by op name
+    flops_per_elem = 1.0
+    for op, fpe in ELEMENTWISE_FLOPS.items():
+        if op in name:
+            flops_per_elem = fpe
+            break
+
+    # Bytes: read all inputs + write output
+    # Most ops: read 1-2 inputs, write 1 output
+    num_inputs = len(shapes)
+    total_read = sum(tensor_numel(s) for s in shapes if s) * bytes_per_elem
+    total_write = numel * bytes_per_elem  # output same size as first input
+    total_bytes = total_read + total_write
+    total_flops = numel * flops_per_elem
+
+    return total_flops, total_bytes
+
+
 def estimate_gemm_bytes(input_shapes_str: str) -> float:
     """Estimate DRAM bytes for a GEMM from input shapes.
 
@@ -153,13 +212,12 @@ def parse_torch_profiler_json(data: dict) -> list[KernelRecord]:
             theoretical_bytes = 2 * batch_size * num_heads * head_dim * (q_len + 2 * kv_len + q_len)
 
         elif category in ("elementwise", "activation", "reduce", "layernorm", "rope"):
-            # Memory-bound: estimate bytes from duration at peak bandwidth
-            theoretical_bytes = cuda_time_us * H100_SXM.hbm_bandwidth_tb_s * 1e6
-            # Elementwise: ~0.5-1 FLOP per byte
-            flops = theoretical_bytes * 0.5
+            # Estimate from tensor shapes when available
+            flops, theoretical_bytes = estimate_elementwise(
+                name, k.get("input_shapes", ""), cuda_time_us)
 
         elif category == "memory" or category == "indexing":
-            # Pure data movement
+            # Pure data movement — estimate bytes from duration
             theoretical_bytes = cuda_time_us * H100_SXM.hbm_bandwidth_tb_s * 1e6
             flops = 0
 
