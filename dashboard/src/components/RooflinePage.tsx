@@ -685,10 +685,10 @@ export function RooflinePage() {
             No data for selected filters
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height={280}>
+          <ResponsiveContainer width="100%" height={320}>
             <BarChart
               data={barData}
-              margin={{ top: 5, right: 24, bottom: 24, left: 20 }}
+              margin={{ top: 5, right: 140, bottom: 24, left: 20 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#21262d" vertical={false} />
               <XAxis
@@ -713,7 +713,10 @@ export function RooflinePage() {
               />
               <Tooltip content={<BarTooltip />} cursor={{ fill: 'rgba(255,255,255,0.04)' }} />
               <Legend
-                wrapperStyle={{ fontSize: 11, color: '#8b949e', paddingTop: 8 }}
+                layout="vertical"
+                align="right"
+                verticalAlign="middle"
+                wrapperStyle={{ fontSize: 11, color: '#8b949e', paddingLeft: 12 }}
                 formatter={(value) => (
                   <span style={{ color: '#8b949e' }}>{value}</span>
                 )}
