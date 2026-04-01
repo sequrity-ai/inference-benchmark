@@ -11,13 +11,13 @@ set -uo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$REPO_ROOT"
 
-PYTHON="${PYTHON:-python3}"
+PYTHON="${PYTHON:-/root/miniconda3/envs/huggingface/bin/python}"
 PORT=8000
 API_KEY="test"
 WARMUP=5
 TIMEOUT=300
 CONC_SWEEP="1 10 20 40 80 120 160 200 256 320"
-PROFILES="chatbot-short rag-retrieval rag-heavy coding-assist coding-heavy"
+PROFILES="chat-short chat-medium chat-long coding-agent prefill-heavy decode-heavy"
 MAX_SERVER_WAIT=1200  # 20 min for large models (72B/70B BF16 need >10min to load)
 
 log() { echo -e "\033[0;32m[ORCH]\033[0m $1"; }

@@ -594,6 +594,118 @@ class ShareGPTMultiTurnDataset(BaseDataset):
             return self._flat_available.pop(0)
 
 
+class TrajectoryMultiTurnDataset(BaseDataset):
+    """
+    Loads real multi-turn agent trajectories from pre-extracted JSONL files.
+
+    Used for SWEBench and TerminalBench profiles. Each line in the JSONL is a
+    complete session: {"session_id": ..., "turns": [{"messages": [...], "osl_tokens": N}, ...]}
+
+    Filters sessions by turn count (min_turns, max_turns) and builds
+    growing-history requests like ShareGPTMultiTurnDataset.
+    """
+
+    def __init__(
+        self,
+        filepath: str,
+        min_turns: int = 3,
+        max_turns: int = 30,
+        num_sessions: int = 100,
+        random_seed: int = 42,
+        max_isl_tokens: int = 131072,
+        max_osl_tokens: int = 2000,
+    ):
+        self.filepath = filepath
+        self.min_turns = min_turns
+        self.max_turns = max_turns
+        self.num_sessions = num_sessions
+        self.random_seed = random_seed
+        self.max_isl_tokens = max_isl_tokens
+        self.max_osl_tokens = max_osl_tokens
+        self._sessions: Optional[list[MultiTurnSession]] = None
+        self._flat_requests: Optional[list[BenchmarkRequest]] = None
+        self._flat_available: Optional[list[BenchmarkRequest]] = None
+        self._lock = threading.Lock()
+        self._rng = random.Random(random_seed)
+
+    def _load(self):
+        if self._sessions is not None:
+            return
+        with self._lock:
+            if self._sessions is not None:
+                return
+            import json
+
+            sessions = []
+            with open(self.filepath, "r") as f:
+                for line in f:
+                    line = line.strip()
+                    if not line:
+                        continue
+                    entry = json.loads(line)
+                    raw_turns = entry.get("turns", [])
+
+                    if len(raw_turns) < self.min_turns:
+                        continue
+
+                    # Truncate to max_turns
+                    raw_turns = raw_turns[:self.max_turns]
+
+                    # Build BenchmarkRequest list, filtering by ISL/OSL bounds
+                    turns = []
+                    for t in raw_turns:
+                        messages = t["messages"]
+                        osl = min(t.get("osl_tokens", 500), self.max_osl_tokens)
+                        # Estimate ISL from message content
+                        isl_est = sum(
+                            int(len(m.get("content", "").split()) * 1.35)
+                            for m in messages
+                        )
+                        if isl_est > self.max_isl_tokens:
+                            break
+                        turns.append(BenchmarkRequest(messages=messages, max_tokens=osl))
+
+                    if len(turns) < self.min_turns:
+                        continue
+
+                    sessions.append(MultiTurnSession(
+                        session_id=len(sessions),
+                        turns=turns,
+                    ))
+
+            rng = random.Random(self.random_seed)
+            rng.shuffle(sessions)
+            self._sessions = sessions[:self.num_sessions]
+            self._build_flat_requests()
+
+    def _build_flat_requests(self):
+        """Build interleaved round-robin: [A1, B1, C1, A2, B2, C2, ...]"""
+        if not self._sessions:
+            self._flat_requests = []
+            self._flat_available = []
+            return
+        max_num_turns = max(len(s.turns) for s in self._sessions)
+        flat = []
+        for turn_idx in range(max_num_turns):
+            for session in self._sessions:
+                if turn_idx < len(session.turns):
+                    flat.append(session.turns[turn_idx])
+        self._flat_requests = flat
+        self._flat_available = list(flat)
+
+    @property
+    def sessions(self) -> list[MultiTurnSession]:
+        self._load()
+        return self._sessions
+
+    def get_next_request(self) -> BenchmarkRequest:
+        self._load()
+        with self._lock:
+            if not self._flat_available:
+                self._flat_available = list(self._flat_requests)
+            return self._flat_available.pop(0)
+
+
 def make_dataset(profile) -> BaseDataset:
     """Factory: create the right dataset for a workload profile."""
     from .profiles import WorkloadProfile
@@ -609,8 +721,8 @@ def make_dataset(profile) -> BaseDataset:
         return ShareGPTDataset(
             num_prompts=1000,
             system_prompt=profile.system_prompt,
-            max_isl_tokens=profile.isl_tokens,    # treat isl_tokens as max bound
-            max_osl_tokens=profile.osl_tokens,    # treat osl_tokens as max bound
+            max_isl_tokens=profile.isl_tokens,
+            max_osl_tokens=profile.osl_tokens,
         )
     elif profile.dataset == "random":
         return RandomTokenDataset(
@@ -639,6 +751,15 @@ def make_dataset(profile) -> BaseDataset:
             max_turns=profile.max_turns,
             num_sessions=profile.num_sessions,
             system_prompt=profile.system_prompt,
+            max_isl_tokens=profile.isl_tokens,
+            max_osl_tokens=profile.osl_tokens,
+        )
+    elif profile.dataset in ("swebench-multi-turn", "terminalbench-multi-turn"):
+        return TrajectoryMultiTurnDataset(
+            filepath=profile.file_path,
+            min_turns=profile.min_turns,
+            max_turns=profile.max_turns,
+            num_sessions=profile.num_sessions,
             max_isl_tokens=profile.isl_tokens,
             max_osl_tokens=profile.osl_tokens,
         )

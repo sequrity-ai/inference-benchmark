@@ -106,9 +106,33 @@ function shortenModel(model: string): string {
   return short;
 }
 
+// Old → new profile name mapping (matches profiles.py PROFILE_ALIASES)
+const PROFILE_ALIASES: Record<string, string> = {
+  'chatbot-short': 'chat-short',
+  'chatbot-multi-turn': 'chat-medium',
+  'chatbot-multi-turn': 'chat-medium',
+  'rag-retrieval': 'chat-medium',
+  'rag-heavy': 'chat-medium',
+  'coding-assist': 'chat-medium',
+  'coding-heavy': 'chat-medium',
+  'summarization': 'chat-medium',
+  'agentic-tool-use': 'chat-medium',
+  'computer-use-basic': 'chat-short',
+  'customer-support-basic': 'chat-short',
+  'output-short': 'prefill-heavy',
+  'output-long': 'decode-heavy',
+  'random-inferencex': 'random-1k',
+  'random-inferencex-legacy': 'random-1k',
+  'random-inferencex-doublewrap': 'random-1k',
+  'multi-turn-short': 'chat-multiturn-short',
+  'multi-turn-medium': 'chat-multiturn-medium',
+  'multi-turn-long': 'chat-multiturn-long',
+};
+
 function normalizeProfile(profile: string): string {
-  // Normalize underscores to hyphens for consistency
-  return profile.replace(/_/g, '-');
+  // Normalize underscores to hyphens, then resolve aliases
+  const normalized = profile.replace(/_/g, '-');
+  return PROFILE_ALIASES[normalized] ?? normalized;
 }
 
 function detectBackendFromFilename(filename: string, configBackend: string): string {

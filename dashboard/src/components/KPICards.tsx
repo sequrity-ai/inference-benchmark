@@ -30,7 +30,7 @@ export function KPICards({ data, allData }: KPICardsProps) {
 
   // Count distinct profiles by agent type in filtered data
   const profilesInData = new Set(data.map((r) => r.config.profile));
-  const typeCounts: Record<string, number> = { 'chat': 0, 'coding': 0, 'computer-use': 0, 'customer-support': 0 };
+  const typeCounts: Record<string, number> = { 'chat': 0, 'coding': 0, 'terminal': 0 };
   for (const profile of profilesInData) {
     const meta = PROFILE_META[profile];
     if (meta) typeCounts[meta.agentType] = (typeCounts[meta.agentType] ?? 0) + 1;
@@ -66,8 +66,7 @@ export function KPICards({ data, allData }: KPICardsProps) {
   const typeLabels: Array<{ key: string; short: string }> = [
     { key: 'chat', short: 'Chat' },
     { key: 'coding', short: 'Coding' },
-    { key: 'computer-use', short: 'Computer Use' },
-    { key: 'customer-support', short: 'Support' },
+    { key: 'terminal', short: 'Terminal' },
   ];
 
   return (

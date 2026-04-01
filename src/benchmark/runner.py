@@ -130,14 +130,14 @@ async def run_multi_turn_benchmark(
     Returns (results_by_turn, duration) where results_by_turn is a dict
     mapping turn_index → list[RequestResult].
     """
-    from ..workloads.dataset import ShareGPTMultiTurnDataset
+    from ..workloads.dataset import ShareGPTMultiTurnDataset, TrajectoryMultiTurnDataset
 
     backend = get_backend(backend_name)
     profile = get_profile(profile_name)
     dataset = make_dataset(profile)
 
-    if not isinstance(dataset, ShareGPTMultiTurnDataset):
-        raise ValueError(f"Profile '{profile_name}' does not use sharegpt-multi-turn dataset")
+    if not isinstance(dataset, (ShareGPTMultiTurnDataset, TrajectoryMultiTurnDataset)):
+        raise ValueError(f"Profile '{profile_name}' does not use a multi-turn dataset")
 
     sessions = dataset.sessions
     if not sessions:
@@ -293,7 +293,7 @@ if __name__ == "__main__":
         if args.mode == "multi-turn":
             print("NOTE: multi-turn mode requires server launched with --enable-prefix-caching (vLLM)")
             if args.profile == "output-short":  # default — override for multi-turn
-                args.profile = "multi-turn-short"
+                args.profile = "chat-multiturn-short"
         if args.mode == "stress-test":
             if not args.ignore_eos:
                 print("NOTE: stress-test mode auto-enables --ignore-eos (required for FP8 models)")

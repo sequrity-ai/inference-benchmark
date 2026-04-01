@@ -10,9 +10,8 @@ Client requirements:
   - --ignore-eos: NOT recommended (real text hits EOS naturally)
   - Warmup requests are important: first N requests populate the prefix cache
 
-Profiles: chatbot-short, chatbot-multi-turn, rag-retrieval, rag-heavy,
-          coding-assist, coding-heavy, summarization, agentic-tool-use,
-          output-short, output-long
+Profiles: chat-short, chat-medium, chat-long, coding-agent,
+          prefill-heavy, decode-heavy, random-1k
 """
 
 REQUIRED_CLIENT_FLAGS: list[str] = []
