@@ -11,7 +11,7 @@
 #
 set -euo pipefail
 
-PYTHON=/home/khl22/.conda/envs/huggingface/bin/python
+PYTHON="${PYTHON:-$(which python)}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 # Defaults (override via flags)

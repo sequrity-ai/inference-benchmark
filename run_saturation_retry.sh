@@ -2,7 +2,7 @@
 # High concurrency saturation retry — proper GPU cleanup between runs
 set -uo pipefail
 
-PYTHON="${PYTHON:-/root/miniconda3/envs/huggingface/bin/python}"
+PYTHON="${PYTHON:-$(which python)}"
 PORT=8000
 API_KEY="test"
 WARMUP=5

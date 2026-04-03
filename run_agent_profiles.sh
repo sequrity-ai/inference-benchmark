@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Run agentic-tool-use and coding-agent profiles across all models (SGLang + vLLM)
 set -uo pipefail
-PYTHON="${PYTHON:-/root/miniconda3/envs/huggingface/bin/python}"
+PYTHON="${PYTHON:-$(which python)}"
 PORT=8000; API_KEY="test"; WARMUP=5; TIMEOUT=300; MAX_WAIT=1200
 CONC_SWEEP="1 10 20 40 80 120 160 200 256 320"
 PROFILES="agentic-tool-use coding-agent"
-cd /root/inference-benchmark
+REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$REPO_ROOT"
 
 log() { echo -e "\033[0;32m[AGENT]\033[0m $1"; }
 err() { echo -e "\033[0;31m[ERR]\033[0m $1"; }

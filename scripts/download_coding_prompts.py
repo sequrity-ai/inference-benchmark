@@ -33,7 +33,7 @@ PREFIXES = [
     "harbor/task_analysis/swebench-verified-sequrity-codex-new38-100/",
 ]
 
-OUTPUT_PATH = Path("/home/khl22/inference/inference-benchmark/data/coding_agent_prompts.jsonl")
+OUTPUT_PATH = Path(__file__).resolve().parent.parent / "data" / "coding_agent_prompts.jsonl"
 OUTPUT_PATH.parent.mkdir(parents=True, exist_ok=True)
 
 

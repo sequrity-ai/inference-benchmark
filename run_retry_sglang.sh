@@ -2,7 +2,7 @@
 # Retry failed SGLang benchmarks: Qwen2.5-72B and Llama-3.1-70B
 set -uo pipefail
 
-PYTHON="${PYTHON:-/root/miniconda3/envs/huggingface/bin/python}"
+PYTHON="${PYTHON:-$(which python)}"
 PORT=8000
 API_KEY="test"
 WARMUP=5

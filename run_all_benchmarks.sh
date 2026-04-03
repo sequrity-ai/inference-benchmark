@@ -11,7 +11,7 @@ set -uo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$REPO_ROOT"
 
-PYTHON="${PYTHON:-/root/miniconda3/envs/huggingface/bin/python}"
+PYTHON="${PYTHON:-$(which python)}"
 PORT=8000
 API_KEY="test"
 WARMUP=5

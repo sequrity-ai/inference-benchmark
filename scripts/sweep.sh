@@ -12,7 +12,7 @@
 #
 set -euo pipefail
 
-PYTHON=/home/khl22/.conda/envs/huggingface/bin/python
+PYTHON="${PYTHON:-$(which python)}"
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 URL="http://localhost:8000/v1/chat/completions"

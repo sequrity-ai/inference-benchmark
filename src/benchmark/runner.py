@@ -161,6 +161,19 @@ async def run_multi_turn_benchmark(
         results_by_turn: dict[int, list] = {i: [] for i in range(max_turns)}
         benchmark_start = time.perf_counter()
 
+        async def dispatch(session_id: int, request, t_idx: int):
+            async with semaphore:
+                result = await backend.send_request(
+                    session=session_http,
+                    url=url,
+                    model=model,
+                    messages=request.messages,
+                    max_tokens=request.max_tokens,
+                    api_key=api_key,
+                    ignore_eos=ignore_eos,
+                )
+            return t_idx, result
+
         # Interleaved round-robin: process all sessions' turn N before turn N+1
         for turn_idx in range(max_turns):
             turn_requests = []
@@ -172,19 +185,6 @@ async def run_multi_turn_benchmark(
                 continue
 
             print(f"  Turn {turn_idx + 1}/{max_turns}: dispatching {len(turn_requests)} requests...")
-
-            async def dispatch(session_id: int, request, t_idx: int):
-                async with semaphore:
-                    result = await backend.send_request(
-                        session=session_http,
-                        url=url,
-                        model=model,
-                        messages=request.messages,
-                        max_tokens=request.max_tokens,
-                        api_key=api_key,
-                        ignore_eos=ignore_eos,
-                    )
-                return t_idx, result
 
             tasks = [dispatch(sid, req, turn_idx) for sid, req in turn_requests]
             completed = await asyncio.gather(*tasks)

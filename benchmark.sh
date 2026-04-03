@@ -13,9 +13,7 @@
 # =============================================================================
 set -euo pipefail
 
-PYTHON="${PYTHON:-/home/khl22/.conda/envs/huggingface/bin/python}"
-# On RunPod: PYTHON=python3 ./benchmark.sh chatbot
-command -v "$PYTHON" &>/dev/null || PYTHON=python3
+PYTHON="${PYTHON:-$(which python)}"
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
 cd "$REPO_ROOT"
 
@@ -75,30 +73,29 @@ run() {
 # =============================================================================
 
 output_short_long() {
-    # File-based prompts (identical prompt every request).
-    # ⚠️  TTFT is misleading when prefix caching is ON (100% cache hit after warmup).
-    # ⚠️  TTFT is valid when prefix caching is OFF.
-    # TPOT and throughput are always valid.
-    echo "### output-short + output-long sweep ###"
-    echo "Mode:    single-turn"
-    echo "Server:  ./scripts/launch_server.sh single-turn --model $MODEL"
+    # Synthetic stress test (random tokens, --ignore-eos auto-set by stress-test mode).
+    # prefill-heavy: high ISL, stresses prefill throughput.
+    # decode-heavy: high OSL, stresses decode throughput.
+    # TPOT and throughput are the primary metrics; TTFT valid (random tokens, no shared prefix).
+    echo "### prefill-heavy + decode-heavy sweep ###"
+    echo "Mode:    stress-test (random tokens)"
+    echo "Server:  ./scripts/launch_server.sh stress-test --model $MODEL"
     echo "Model:   $MODEL"
     echo "Server:  $URL"
     echo "Backend: $BACKEND"
-    echo "NOTE: --enable-prefix-caching on server → TTFT not representative (cache hits)"
     echo ""
 
     for CONC in $CONC_STANDARD; do
         NREQ=200
         [[ "$CONC" -eq 1 ]] && NREQ=50
-        run "output-short" "$CONC" "$NREQ"
+        run "prefill-heavy" "$CONC" "$NREQ"
     done
 
     for CONC in $CONC_STANDARD; do
         NREQ=200
         [[ "$CONC" -eq 1 ]] && NREQ=50
         [[ "$CONC" -ge 80 ]] && NREQ=100
-        run "output-long" "$CONC" "$NREQ"
+        run "decode-heavy" "$CONC" "$NREQ"
     done
 }
 
@@ -120,19 +117,17 @@ chatbot() {
 }
 
 production() {
-    # All production profiles (ShareGPT real text, varied ISL/OSL).
-    # Requires server max_model_len >= 12000 for coding-heavy.
-    # TTFT valid (ShareGPT = varied prompts, no prefix cache effect).
-    echo "### All production profiles ###"
+    # New production profiles (real text, varied ISL/OSL).
+    # Requires server max_model_len >= 17000 for coding-agent (ISL ~17K).
+    # TTFT valid (varied prompts, no shared prefix).
+    echo "### New production profiles ###"
     echo "Mode:    single-turn"
     echo "Server:  ./scripts/launch_server.sh single-turn --model $MODEL"
     echo "Model:   $MODEL"
     echo "Server:  $URL"
-    echo "Requires: max_model_len >= 12000 for coding-heavy"
     echo ""
 
-    for PROFILE in chatbot-short chatbot-multi-turn rag-retrieval rag-heavy \
-                   coding-assist coding-heavy summarization agentic-tool-use; do
+    for PROFILE in chat-short chat-medium chat-long coding-agent; do
         for CONC in $CONC_STANDARD; do
             run "$PROFILE" "$CONC" "200"
         done

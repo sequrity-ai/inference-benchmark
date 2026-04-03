@@ -2,11 +2,12 @@
 # Multi-turn sweep — 1x H100 (GPU0 only) models on SGLang
 set -uo pipefail
 export CUDA_VISIBLE_DEVICES=0
-PYTHON="${PYTHON:-/root/miniconda3/envs/huggingface/bin/python}"
+PYTHON="${PYTHON:-$(which python)}"
 PORT=8000; API_KEY="test"; WARMUP=3; TIMEOUT=300; MAX_WAIT=600
 MT_PROFILES="multi-turn-short multi-turn-medium multi-turn-long"
 CONC_SWEEP="1 10 20 40 80"
-cd /root/inference-benchmark
+REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$REPO_ROOT"
 
 log() { echo -e "\033[0;32m[MT]\033[0m $1"; }
 err() { echo -e "\033[0;31m[ERR]\033[0m $1"; }

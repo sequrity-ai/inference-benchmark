@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # vLLM-only high concurrency saturation (chatbot-short at 400,512,640,768)
 set -uo pipefail
-PYTHON="${PYTHON:-/root/miniconda3/envs/huggingface/bin/python}"
+PYTHON="${PYTHON:-$(which python)}"
 PORT=8000; API_KEY="test"; WARMUP=5; TIMEOUT=300; MAX_SERVER_WAIT=1800
 CONC_HIGH="400 512 640 768"
 REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"; cd "$REPO_ROOT"

@@ -23,7 +23,7 @@ from scripts.roofline.roofline_config import (
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 TARGET_SCRIPT = SCRIPT_DIR / "_ncu_target.py"
-PYTHON = os.environ.get("PYTHON", "/root/miniconda3/envs/huggingface/bin/python")
+PYTHON = os.environ.get("PYTHON", sys.executable)
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 
 

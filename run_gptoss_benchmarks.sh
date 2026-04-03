@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Benchmark GPT-OSS-20B and GPT-OSS-120B on SGLang + vLLM
 set -uo pipefail
-PYTHON="${PYTHON:-/root/miniconda3/envs/huggingface/bin/python}"
+PYTHON="${PYTHON:-$(which python)}"
 PORT=8000; API_KEY="test"; WARMUP=5; TIMEOUT=300; MAX_WAIT=1200
 CONC_SWEEP="1 10 20 40 80 120 160 200 256 320"
 PROFILES="chatbot-short rag-retrieval rag-heavy coding-assist coding-heavy agentic-tool-use coding-agent"
-cd /root/inference-benchmark
+REPO_ROOT="$(cd "$(dirname "$0")" && pwd)"
+cd "$REPO_ROOT"
 
 log() { echo -e "\033[0;32m[GPTOSS]\033[0m $1"; }
 err() { echo -e "\033[0;31m[ERR]\033[0m $1"; }

@@ -18,7 +18,7 @@
 # =============================================================================
 set -euo pipefail
 
-PYTHON=/home/khl22/.conda/envs/huggingface/bin/python
+PYTHON="${PYTHON:-$(which python)}"
 
 # Defaults
 MODEL="meta-llama/Llama-3.1-8B-Instruct"

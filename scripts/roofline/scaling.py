@@ -17,7 +17,7 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
 
-sys.path.insert(0, '/root/Distributed_Mobile_Inference')
+sys.path.insert(0, os.environ.get("LLMSERVE_ROOT", str(Path(__file__).resolve().parent.parent.parent.parent / "llmserve")))
 
 from llmcompass.design_space_exploration.dse import template_to_system, read_architecture_template
 from llmcompass.software_model.transformer import (
@@ -28,10 +28,13 @@ from llmcompass.software_model.utils import Tensor, data_type_dict
 
 # ── Config ────────────────────────────────────────────────────────────
 
-OUTPUT_DIR = Path("/root/inference-benchmark/results/roofline/scaling")
+OUTPUT_DIR = Path(__file__).resolve().parent.parent.parent / "results" / "roofline" / "scaling"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
-DEVICE_CONFIG = "/root/Distributed_Mobile_Inference/device_configs/H100.json"
+DEVICE_CONFIG = os.environ.get(
+    "DEVICE_CONFIG",
+    str(Path(os.environ.get("LLMSERVE_ROOT", str(Path(__file__).resolve().parent.parent.parent.parent / "llmserve"))) / "device_configs" / "H100.json")
+)
 
 MODELS = {
     "Llama-3.1-8B": {"d_model": 4096, "n_heads": 32, "n_layers": 32},
