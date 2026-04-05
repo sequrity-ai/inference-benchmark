@@ -78,12 +78,16 @@ pkill -9 -f "vllm.entrypoints"
 
 ## Large Model VRAM Notes
 
-70B/72B models at BF16 use ~136-140GB for weights on 2x80GB GPUs:
+### Current hardware: 4x H100 SXM5 80GB (320GB total)
 
 | Model | TP | max_model_len | gpu_mem | Notes |
 |-------|:--:|:------------:|:-------:|-------|
-| Llama 8B / Qwen 9B | 1 or 2 | 32768 | 0.90 | Fits easily |
-| Qwen3.5 27B | 2 | 16384 | 0.92 | Moderate VRAM pressure |
-| Qwen2.5 72B / Llama 70B | 2 | 4096 | 0.95 | Tight — <10GB/GPU for KV cache |
+| Llama 8B / Qwen 9B | 1 | 32768 | 0.90 | Single GPU, plenty of room |
+| gpt-oss-20b (MoE) | 1 | 32768 | 0.90 | MXFP4, fits single GPU |
+| Qwen3.5-27B | 2 | 16384 | 0.92 | Comfortable |
+| Llama 70B / Qwen 72B (BF16) | 2 or 4 | 4096-32768 | 0.95 | TP=4 gives much more KV headroom |
+| gpt-oss-120b (MoE) | 1 or 2 | 32768 | 0.90 | MXFP4, single GPU possible |
+| MiniMax-M2.5 (MoE) | 4 | TBD | 0.90 | 215GB weights, comfortable on 4 GPUs |
+| GLM-4.6-FP8 (MoE) | 4 | TBD | 0.98 | 337GB weights, tight on 320GB VRAM |
 
-For 70B+ models, FP8 quantization or more GPUs recommended for full context windows.
+See `.claude/tools/model-registry.md` for full VRAM planning table.

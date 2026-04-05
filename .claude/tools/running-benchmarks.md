@@ -5,7 +5,7 @@
 | Goal | Command |
 |------|---------|
 | Single profile, single concurrency | `./scripts/bench.sh --profile chatbot-short --concurrency 20 --mode single-turn` |
-| Chatbot sweep | `./benchmark.sh chatbot` |
+| Chat sweep | `./benchmark.sh chat` |
 | All production profiles | `./benchmark.sh production` |
 | Cross-validate with InferenceX | `./benchmark.sh cross_validate` |
 | Full matrix (all models × engines) | `bash run_all_benchmarks.sh all` |
@@ -25,7 +25,7 @@ Runs a named target across multiple concurrency levels. Edit the CONFIG section 
 ```bash
 BENCH_URL=http://localhost:8000/v1/chat/completions ./benchmark.sh chatbot
 ```
-- **Targets:** `chatbot`, `production`, `output_short_long`, `cross_validate`
+- **Targets:** `chat`, `production`, `stress`, `cross_validate`
 - **Config env vars:** `BENCH_URL`, `BENCH_MODEL`, `PYTHON`
 - **Default concurrency:** `1 10 20 40 80 120`
 
@@ -36,8 +36,8 @@ bash run_all_benchmarks.sh all > /tmp/master_bench.log 2>&1 &
 ```
 - **Resume support:** Skips existing result files
 - **Concurrency sweep:** `1 10 20 40 80 120 160 200 256 320`
-- **Profiles:** `chatbot-short rag-retrieval rag-heavy coding-assist coding-heavy`
-- **Model registry** defined in script: Llama 8B, Qwen3.5 9B/27B, Qwen2.5 72B, Llama 70B
+- **Profiles:** See `src/workloads/profiles.py` for current profile names (Tier 1-4)
+- **Model registry** defined in `.claude/tools/model-registry.md`
 
 ## Server Launch
 

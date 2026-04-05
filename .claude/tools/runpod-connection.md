@@ -71,14 +71,5 @@ Example: `https://szfphnq91bba5v-8000.proxy.runpod.net`
 
 ## Model Storage
 
-Models are downloaded to `/workspace/models/` on the network volume:
-```bash
-# Download with HF token (for gated models like Llama)
-HF_TOKEN=<token> huggingface-cli download meta-llama/Llama-3.1-8B-Instruct --local-dir /workspace/models/Llama-3.1-8B-Instruct
-```
-
-| Model | Gated? | Notes |
-|-------|--------|-------|
-| Llama 3.1 8B/70B | Yes | Requires HF license acceptance |
-| Llama 3.3 70B | Yes | Separate gate from 3.1 |
-| Qwen models | No | Open access |
+Models are downloaded to `/workspace/models/` on the network volume.
+See `.claude/tools/model-registry.md` for the full list of downloaded models and access requirements.

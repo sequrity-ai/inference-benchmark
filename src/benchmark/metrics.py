@@ -70,6 +70,12 @@ class BenchmarkSummary:
     p90_tpot_ms: float = 0.0
     p99_tpot_ms: float = 0.0
 
+    # ITL (ms) — individual inter-token latencies (all tokens pooled)
+    mean_itl_ms: float = 0.0
+    median_itl_ms: float = 0.0
+    p90_itl_ms: float = 0.0
+    p99_itl_ms: float = 0.0
+
     # E2EL (ms)
     mean_e2el_ms: float = 0.0
     median_e2el_ms: float = 0.0
@@ -123,6 +129,7 @@ def aggregate(results, duration_s: float, model: str = "", profile: str = "", co
 
     ttfts = []
     tpots = []
+    itls = []   # all individual inter-token latencies pooled across requests
     e2els = []
 
     for r in results:
@@ -135,6 +142,8 @@ def aggregate(results, duration_s: float, model: str = "", profile: str = "", co
                 ttfts.append(r.ttft * 1000)  # convert to ms
             if r.tpot is not None:
                 tpots.append(r.tpot * 1000)
+            if r.itl:
+                itls.extend(t * 1000 for t in r.itl)  # convert to ms
             if r.e2el is not None:
                 e2els.append(r.e2el * 1000)
         else:
@@ -161,6 +170,12 @@ def aggregate(results, duration_s: float, model: str = "", profile: str = "", co
         summary.median_tpot_ms = statistics.median(tpots)
         summary.p90_tpot_ms = _percentile(tpots, 90)
         summary.p99_tpot_ms = _percentile(tpots, 99)
+
+    if itls:
+        summary.mean_itl_ms = statistics.mean(itls)
+        summary.median_itl_ms = statistics.median(itls)
+        summary.p90_itl_ms = _percentile(itls, 90)
+        summary.p99_itl_ms = _percentile(itls, 99)
 
     if e2els:
         summary.mean_e2el_ms = statistics.mean(e2els)
@@ -271,6 +286,7 @@ def print_summary(s: BenchmarkSummary) -> None:
     print(f"{'─' * 52}")
     print(f" TTFT  mean/p50/p90/p99:   {s.mean_ttft_ms:.1f} / {s.median_ttft_ms:.1f} / {s.p90_ttft_ms:.1f} / {s.p99_ttft_ms:.1f} ms")
     print(f" TPOT  mean/p50/p90/p99:   {s.mean_tpot_ms:.1f} / {s.median_tpot_ms:.1f} / {s.p90_tpot_ms:.1f} / {s.p99_tpot_ms:.1f} ms")
+    print(f" ITL   mean/p50/p90/p99:   {s.mean_itl_ms:.1f} / {s.median_itl_ms:.1f} / {s.p90_itl_ms:.1f} / {s.p99_itl_ms:.1f} ms")
     print(f" E2EL  mean/p50/p90/p99:   {s.mean_e2el_ms:.1f} / {s.median_e2el_ms:.1f} / {s.p90_e2el_ms:.1f} / {s.p99_e2el_ms:.1f} ms")
     print(f"{'=' * 52}\n")
     if s.errors:

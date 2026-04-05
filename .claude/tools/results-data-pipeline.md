@@ -58,11 +58,7 @@ The build script:
 
 ## Current Inventory
 
-| Dataset | Files | Status |
-|---------|------:|--------|
-| Llama-3.1-8B TP=1 SGLang | 50 | Complete |
-| Llama-3.1-8B TP=2 SGLang | 50 | Complete |
-| Qwen2.5-72B TP=2 SGLang | 25 | Partial |
-| Qwen3.5 (all configs) | 0 | Blocked (CuDNN) |
-| All vLLM runs | 0 | Not started |
-| InferenceX cross-validation | exists | In `inferencex_llama31_8b/` |
+Old results (2xH100, March 2026, old profile names) archived to `gs://sequrity-experiments/inference-benchmark/results/archive/2xH100-mar2026/`.
+
+New round (4xH100, April 2026) starting fresh with current profiles from `src/workloads/profiles.py`.
+See `.claude/docs/gcs_structure.md` for the full GCS layout and proposed v2 structure.

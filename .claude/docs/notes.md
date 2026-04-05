@@ -1,4 +1,7 @@
-# llm-bench Code Walkthrough Notes
+# llm-bench Code Walkthrough Notes (Legacy Reference)
+
+> **Note:** This documents the OLD InferenceX benchmark tool that inference-benchmark was built to replace.
+> Kept as reference for understanding design decisions and gaps we fixed.
 
 ## benchmark_dataset.py — Data layer
 

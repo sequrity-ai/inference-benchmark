@@ -215,6 +215,7 @@ def save_results(summary, results, output_path: str, config: dict):
                 "success": r.success,
                 "ttft_ms": round(r.ttft * 1000, 2) if r.ttft else None,
                 "tpot_ms": round(r.tpot * 1000, 2) if r.tpot else None,
+                "itl_ms": [round(t * 1000, 2) for t in r.itl] if r.itl else [],
                 "e2el_ms": round(r.e2el * 1000, 2) if r.e2el else None,
                 "input_tokens": r.input_tokens,
                 "output_tokens": r.output_tokens,
