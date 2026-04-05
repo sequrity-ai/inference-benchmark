@@ -42,9 +42,9 @@ declare -a MODELS=(
     # --- Medium MoE (TP=2 only — TP=1 OOMs: 80GB weights > single GPU usable VRAM) ---
     "gpt-oss-120b|/workspace/models/gpt-oss-120b|2||--enable-chunked-prefill|32768|0.80"
     # --- Large dense (TP=4 safe, TP=2 low-conc only) ---
-    "Qwen2.5-72B|/workspace/models/Qwen2.5-72B-Instruct|4,2|--trust-remote-code|--enable-chunked-prefill --trust-remote-code|4096|0.95"
-    "Llama-3.1-70B|/workspace/models/Llama-3.1-70B-Instruct|4,2||--enable-chunked-prefill|4096|0.95"
-    "Llama-3.3-70B|/workspace/models/Llama-3.3-70B-Instruct|4,2||--enable-chunked-prefill|4096|0.95"
+    "Qwen2.5-72B|/workspace/models/Qwen2.5-72B-Instruct|4,2|--trust-remote-code --disable-piecewise-cuda-graph|--enable-chunked-prefill --trust-remote-code|4096|0.90"
+    "Llama-3.1-70B|/workspace/models/Llama-3.1-70B-Instruct|4,2|--disable-piecewise-cuda-graph|--enable-chunked-prefill|4096|0.90"
+    "Llama-3.3-70B|/workspace/models/Llama-3.3-70B-Instruct|4,2|--disable-piecewise-cuda-graph|--enable-chunked-prefill|4096|0.90"
     # --- Large MoE (TP=4) --- SKIPPED: GPUs 0,1 have leaked memory, only 2 GPUs available
     # "MiniMax-M2.5|/workspace/models/MiniMax-M2.5|4||--enable-chunked-prefill|8192|0.80"
     # GLM-4.6-FP8 skipped for now — 337GB weights may not fit 4x80GB
@@ -189,9 +189,29 @@ run_engine() {
             continue
         fi
 
+        # SGLang: skip MXFP4 models (flashinfer tinygemm kernel broken with current CUDA)
+        if [[ "$engine" == "sglang" ]]; then
+            case "$name" in
+                gpt-oss-20b|gpt-oss-120b)
+                    warn "SKIP $name on SGLang — MXFP4 tinygemm kernel incompatible"
+                    continue
+                    ;;
+            esac
+        fi
+
         local run_date=$(date +%Y-%m-%d)
         IFS=',' read -ra tps <<< "$tp_list"
         for tp in "${tps[@]}"; do
+            # SGLang: skip TP=4 for 70B+ models (CUDA illegal memory access in rc build)
+            if [[ "$engine" == "sglang" && "$tp" -ge 4 ]]; then
+                case "$name" in
+                    Qwen2.5-72B|Llama-3.1-70B|Llama-3.3-70B)
+                        warn "SKIP $name TP=$tp on SGLang — CUDA crash in 0.5.10rc0"
+                        continue
+                        ;;
+                esac
+            fi
+
             local tag="${name}_tp${tp}_${engine}"
             local results_dir="results/${tag}/${run_date}"
             mkdir -p "$results_dir"
