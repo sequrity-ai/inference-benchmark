@@ -19,6 +19,8 @@ const METRIC_OPTIONS = [
   { value: 'p90_ttft_ms', label: 'TTFT (p90, ms)' },
   { value: 'median_tpot_ms', label: 'TPOT (median, ms)' },
   { value: 'p90_tpot_ms', label: 'TPOT (p90, ms)' },
+  { value: 'median_itl_ms', label: 'ITL (median, ms)' },
+  { value: 'p90_itl_ms', label: 'ITL (p90, ms)' },
   { value: 'median_e2el_ms', label: 'E2EL (median, ms)' },
   { value: 'output_token_throughput', label: 'Output Tok/s' },
   { value: 'total_token_throughput', label: 'Total Tok/s' },

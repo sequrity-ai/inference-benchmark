@@ -18,6 +18,7 @@ type SortField =
   | 'failed_requests'
   | 'output_token_throughput'
   | 'median_tpot_ms'
+  | 'median_itl_ms'
   | 'median_ttft_ms'
   | 'median_e2el_ms';
 
@@ -49,6 +50,12 @@ const COLUMNS: ColumnDef[] = [
     label: 'TPOT p50',
     align: 'right',
     format: (r) => r.summary.median_tpot_ms.toFixed(2),
+  },
+  {
+    key: 'median_itl_ms',
+    label: 'ITL p50',
+    align: 'right',
+    format: (r) => r.summary.median_itl_ms?.toFixed(2) ?? '—',
   },
   {
     key: 'median_ttft_ms',
@@ -88,6 +95,8 @@ function getValue(r: BenchmarkResult, field: SortField): string | number {
       return r.summary.output_token_throughput;
     case 'median_tpot_ms':
       return r.summary.median_tpot_ms;
+    case 'median_itl_ms':
+      return r.summary.median_itl_ms ?? 0;
     case 'median_ttft_ms':
       return r.summary.median_ttft_ms;
     case 'median_e2el_ms':

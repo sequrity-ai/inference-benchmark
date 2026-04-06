@@ -44,6 +44,13 @@ const METRICS: LatencyMetric[] = [
     p99Field: 'p99_tpot_ms',
   },
   {
+    key: 'itl',
+    label: 'Inter-Token Latency (ITL)',
+    medianField: 'median_itl_ms',
+    p90Field: 'p90_itl_ms',
+    p99Field: 'p99_itl_ms',
+  },
+  {
     key: 'e2el',
     label: 'End-to-End Latency (E2EL)',
     medianField: 'median_e2el_ms',
@@ -141,11 +148,10 @@ export function LatencyChart({ seriesData }: LatencyChartProps) {
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      {METRICS.map((metric, idx) => {
+      {METRICS.map((metric) => {
         const chartData = buildChartData(seriesData, metric.medianField);
-        // E2EL is the 3rd chart (idx 2). If we're in 2-col layout, it would be orphaned.
-        // Span it full-width so it never floats alone on the left.
-        const isOrphan = idx === 2;
+        // With 4 metrics in a 2-col grid, no orphans
+        const isOrphan = false;
 
         return (
           <div

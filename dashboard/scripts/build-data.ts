@@ -69,15 +69,16 @@ function detectHardware(filename: string, dirPath: string): string {
 
   if (fp.includes('h100x2') || dir.includes('h100x2')) return 'H100x2';
   if (fp.includes('h100_tcp') || dir.includes('h100_tcp')) return 'H100-TCP';
-  if (fp.includes('h100') || dir.includes('h100')) return 'H100';
   if (fp.includes('a6000') || dir.includes('a6000')) return 'A6000';
 
   // Infer from directory name
   if (dir.includes('h100_70b_fp8')) return 'H100';
 
-  // Infer from TP size in filename/dir (RunPod 2xH100 benchmarks)
+  // Infer from TP size in directory path (4xH100 RunPod)
+  if (/_tp4_/.test(dir)) return 'H100x4';
   if (/_tp2_/.test(fp) || /_tp2_/.test(dir)) return 'H100x2';
   if (/_tp1_/.test(fp) || /_tp1_/.test(dir)) return 'H100';
+  if (fp.includes('h100') || dir.includes('h100')) return 'H100';
 
   return 'Unknown';
 }
@@ -302,6 +303,7 @@ function main() {
     'total_input_tokens', 'total_output_tokens',
     'mean_ttft_ms', 'median_ttft_ms', 'p90_ttft_ms', 'p99_ttft_ms',
     'mean_tpot_ms', 'median_tpot_ms', 'p90_tpot_ms', 'p99_tpot_ms',
+    'mean_itl_ms', 'median_itl_ms', 'p90_itl_ms', 'p99_itl_ms',
     'mean_e2el_ms', 'median_e2el_ms', 'p90_e2el_ms', 'p99_e2el_ms',
     'errors',
   ]);

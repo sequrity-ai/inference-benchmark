@@ -38,6 +38,10 @@ export interface BenchmarkSummary {
   median_tpot_ms: number;
   p90_tpot_ms: number;
   p99_tpot_ms: number;
+  mean_itl_ms: number;
+  median_itl_ms: number;
+  p90_itl_ms: number;
+  p99_itl_ms: number;
   mean_e2el_ms: number;
   median_e2el_ms: number;
   p90_e2el_ms: number;
