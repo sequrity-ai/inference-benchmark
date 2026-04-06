@@ -175,11 +175,14 @@ function InvisibleTooltip({ active, payload, label, onHover, metricKey, metricLa
   return null;
 }
 
-function SidePanel({ hover, seriesNames }: { hover: HoverState | null; seriesNames: string[] }) {
-  if (!hover) {
+function SidePanel({ hover, pinned, seriesNames, onUnpin }: { hover: HoverState | null; pinned: HoverState | null; seriesNames: string[]; onUnpin: () => void }) {
+  const display = pinned || hover;
+
+  if (!display) {
     return (
       <div className="flex h-full items-center justify-center px-2 text-center text-[11px] text-[#484f58]">
-        Hover any chart to see values
+        Hover any chart to see values.
+        <br />Click to pin.
       </div>
     );
   }
@@ -187,11 +190,21 @@ function SidePanel({ hover, seriesNames }: { hover: HoverState | null; seriesNam
   return (
     <div className="flex h-full flex-col overflow-hidden">
       <div className="flex-shrink-0 border-b border-[#21262d] pb-1.5 mb-1.5">
-        <div className="text-[11px] font-semibold text-[#e6edf3]">{hover.metricLabel}</div>
-        <div className="text-[10px] text-[#8b949e]">Concurrency: {hover.concurrency}</div>
+        <div className="flex items-center justify-between">
+          <div className="text-[11px] font-semibold text-[#e6edf3]">{display.metricLabel}</div>
+          {pinned && (
+            <button
+              onClick={onUnpin}
+              className="rounded px-1.5 py-0.5 text-[9px] font-medium text-[#f0883e] border border-[#f0883e33] bg-[#f0883e11] hover:bg-[#f0883e22]"
+            >
+              pinned — click to unpin
+            </button>
+          )}
+        </div>
+        <div className="text-[10px] text-[#8b949e]">Concurrency: {display.concurrency}</div>
       </div>
       <div className="flex-1 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#30363d #0d1117' }}>
-        {hover.entries.map((entry) => (
+        {display.entries.map((entry) => (
           <div
             key={entry.name}
             className="flex items-center gap-1.5 border-b border-[#161b22] py-[3px]"
@@ -210,7 +223,7 @@ function SidePanel({ hover, seriesNames }: { hover: HoverState | null; seriesNam
         ))}
       </div>
       <div className="flex-shrink-0 border-t border-[#21262d] pt-1 mt-1 text-[10px] text-[#484f58]">
-        {hover.entries.length} series · ms
+        {display.entries.length} series · ms
       </div>
     </div>
   );
@@ -218,14 +231,26 @@ function SidePanel({ hover, seriesNames }: { hover: HoverState | null; seriesNam
 
 export function LatencyChart({ seriesData }: LatencyChartProps) {
   const [hover, setHover] = useState<HoverState | null>(null);
+  const [pinned, setPinned] = useState<HoverState | null>(null);
 
   const handleHover = useCallback((state: HoverState | null) => {
-    setHover(state);
-  }, []);
+    if (!pinned) setHover(state);
+  }, [pinned]);
 
   const handleMouseLeave = useCallback(() => {
-    setHover(null);
-  }, []);
+    if (!pinned) setHover(null);
+  }, [pinned]);
+
+  const handleChartClick = useCallback(() => {
+    if (pinned) {
+      // Unpin
+      setPinned(null);
+      setHover(null);
+    } else if (hover) {
+      // Pin current hover
+      setPinned(hover);
+    }
+  }, [pinned, hover]);
 
   if (seriesData.size === 0) {
     return (
@@ -287,6 +312,8 @@ export function LatencyChart({ seriesData }: LatencyChartProps) {
                     data={chartData}
                     margin={{ top: 5, right: 10, bottom: 5, left: 10 }}
                     onMouseLeave={handleMouseLeave}
+                    onClick={handleChartClick}
+                    style={{ cursor: pinned ? 'pointer' : 'crosshair' }}
                   >
                     <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
                     <XAxis
@@ -332,7 +359,7 @@ export function LatencyChart({ seriesData }: LatencyChartProps) {
       {/* Shared side panel */}
       <div className="hidden w-60 flex-shrink-0 xl:block">
         <div className="sticky top-4 rounded-lg border border-[#21262d] bg-[#0d1117] p-3" style={{ height: 'calc(100vh - 200px)', maxHeight: '700px' }}>
-          <SidePanel hover={hover} seriesNames={seriesNames} />
+          <SidePanel hover={hover} pinned={pinned} seriesNames={seriesNames} onUnpin={() => { setPinned(null); setHover(null); }} />
         </div>
       </div>
     </div>
