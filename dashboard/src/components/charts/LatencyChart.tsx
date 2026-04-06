@@ -24,6 +24,7 @@ const COLORS = [
 type LatencyMetric = {
   key: string;
   label: string;
+  shortLabel: string;
   medianField: keyof BenchmarkResult['summary'];
   p90Field: keyof BenchmarkResult['summary'];
   p99Field: keyof BenchmarkResult['summary'];
@@ -33,6 +34,7 @@ const METRICS: LatencyMetric[] = [
   {
     key: 'ttft',
     label: 'Time to First Token (TTFT)',
+    shortLabel: 'TTFT',
     medianField: 'median_ttft_ms',
     p90Field: 'p90_ttft_ms',
     p99Field: 'p99_ttft_ms',
@@ -40,6 +42,7 @@ const METRICS: LatencyMetric[] = [
   {
     key: 'tpot',
     label: 'Time per Output Token (TPOT)',
+    shortLabel: 'TPOT',
     medianField: 'median_tpot_ms',
     p90Field: 'p90_tpot_ms',
     p99Field: 'p99_tpot_ms',
@@ -47,6 +50,7 @@ const METRICS: LatencyMetric[] = [
   {
     key: 'itl',
     label: 'Inter-Token Latency (ITL)',
+    shortLabel: 'ITL',
     medianField: 'median_itl_ms',
     p90Field: 'p90_itl_ms',
     p99Field: 'p99_itl_ms',
@@ -54,6 +58,7 @@ const METRICS: LatencyMetric[] = [
   {
     key: 'e2el',
     label: 'End-to-End Latency (E2EL)',
+    shortLabel: 'E2EL',
     medianField: 'median_e2el_ms',
     p90Field: 'p90_e2el_ms',
     p99Field: 'p99_e2el_ms',
@@ -68,6 +73,8 @@ interface HoverEntry {
 }
 
 interface HoverState {
+  metricKey: string;
+  metricLabel: string;
   concurrency: number;
   entries: HoverEntry[];
 }
@@ -141,19 +148,47 @@ function getUniqueProfiles(seriesData: Map<string, BenchmarkResult[]>): string[]
   return Array.from(profiles);
 }
 
-function SidePanel({ hover }: { hover: HoverState | null }) {
+// Custom tooltip that captures payload and calls onHover, renders nothing visible
+function InvisibleTooltip({ active, payload, label, onHover, metricKey, metricLabel }: {
+  active?: boolean;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload?: any[];
+  label?: number;
+  onHover: (state: HoverState | null) => void;
+  metricKey: string;
+  metricLabel: string;
+}) {
+  if (active && payload && payload.length > 0 && label != null) {
+    const entries: HoverEntry[] = payload
+      .filter((p) => p.value != null)
+      .map((p) => ({
+        name: p.dataKey as string,
+        shortName: p.dataKey as string, // will be shortened by parent
+        value: p.value as number,
+        color: p.color as string,
+      }))
+      .sort((a, b) => b.value - a.value);
+
+    // Fire in a microtask to avoid setState during render
+    queueMicrotask(() => onHover({ metricKey, metricLabel, concurrency: label, entries }));
+  }
+  return null;
+}
+
+function SidePanel({ hover, seriesNames }: { hover: HoverState | null; seriesNames: string[] }) {
   if (!hover) {
     return (
-      <div className="flex h-full items-center justify-center text-[11px] text-[#484f58]">
-        Hover chart to see values
+      <div className="flex h-full items-center justify-center px-2 text-center text-[11px] text-[#484f58]">
+        Hover any chart to see values
       </div>
     );
   }
 
   return (
     <div className="flex h-full flex-col overflow-hidden">
-      <div className="mb-1.5 flex-shrink-0 border-b border-[#21262d] pb-1.5 text-[11px] font-medium text-[#8b949e]">
-        Concurrency: {hover.concurrency}
+      <div className="flex-shrink-0 border-b border-[#21262d] pb-1.5 mb-1.5">
+        <div className="text-[11px] font-semibold text-[#e6edf3]">{hover.metricLabel}</div>
+        <div className="text-[10px] text-[#8b949e]">Concurrency: {hover.concurrency}</div>
       </div>
       <div className="flex-1 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#30363d #0d1117' }}>
         {hover.entries.map((entry) => (
@@ -166,7 +201,7 @@ function SidePanel({ hover }: { hover: HoverState | null }) {
               style={{ backgroundColor: entry.color }}
             />
             <span className="min-w-0 flex-1 truncate text-[10px] text-[#c9d1d9]" title={entry.name}>
-              {entry.shortName}
+              {shortenSeriesKey(entry.name, seriesNames)}
             </span>
             <span className="flex-shrink-0 text-[10px] font-mono text-[#e6edf3]">
               {entry.value.toFixed(2)}
@@ -174,56 +209,43 @@ function SidePanel({ hover }: { hover: HoverState | null }) {
           </div>
         ))}
       </div>
+      <div className="flex-shrink-0 border-t border-[#21262d] pt-1 mt-1 text-[10px] text-[#484f58]">
+        {hover.entries.length} series · ms
+      </div>
     </div>
   );
 }
 
-function LatencyChartCard({
-  metric,
-  seriesData,
-  seriesNames,
-  singleMeta,
-}: {
-  metric: LatencyMetric;
-  seriesData: Map<string, BenchmarkResult[]>;
-  seriesNames: string[];
-  singleMeta: (typeof PROFILE_META)[string] | null;
-}) {
+export function LatencyChart({ seriesData }: LatencyChartProps) {
   const [hover, setHover] = useState<HoverState | null>(null);
-  const chartData = buildChartData(seriesData, metric.medianField);
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const handleMouseMove = useCallback((state: any) => {
-    if (!state?.activePayload?.length) return;
-    const payload = state.activePayload;
-    const conc = state.activeLabel as number;
-    const entries: HoverEntry[] = payload
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .filter((p: any) => p.value != null)
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      .map((p: any) => ({
-        name: p.dataKey as string,
-        shortName: shortenSeriesKey(p.dataKey as string, seriesNames),
-        value: p.value as number,
-        color: p.color as string,
-      }))
-      .sort((a: HoverEntry, b: HoverEntry) => b.value - a.value);
-    setHover({ concurrency: conc, entries });
-  }, [seriesNames]);
+  const handleHover = useCallback((state: HoverState | null) => {
+    setHover(state);
+  }, []);
 
   const handleMouseLeave = useCallback(() => {
     setHover(null);
   }, []);
 
+  if (seriesData.size === 0) {
+    return (
+      <div className="flex h-64 items-center justify-center rounded-lg border border-[#21262d] bg-[#161b22] text-[#8b949e]">
+        No data matches current filters
+      </div>
+    );
+  }
+
+  const seriesNames = Array.from(seriesData.keys());
+  const uniqueProfiles = getUniqueProfiles(seriesData);
+  const singleProfile = uniqueProfiles.length === 1 ? uniqueProfiles[0] : null;
+  const singleMeta = singleProfile ? PROFILE_META[singleProfile] : null;
+
   return (
-    <div className="rounded-lg border border-[#21262d] bg-[#161b22] p-4">
-      <div className="mb-3 flex flex-wrap items-center gap-2">
-        <h3 className="text-sm font-semibold text-[#e6edf3]">
-          {metric.label}
-        </h3>
-        <span className="rounded bg-[#21262d] px-1.5 py-0.5 text-[10px] font-medium text-[#8b949e]">median · ms</span>
+    <div className="flex gap-4">
+      {/* Charts grid */}
+      <div className="min-w-0 flex-1">
         {singleMeta && (
-          <>
+          <div className="mb-3 flex flex-wrap items-center gap-2">
             <span
               className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
               style={{
@@ -244,84 +266,75 @@ function LatencyChartCard({
             >
               {singleMeta.dataSource}
             </span>
-          </>
+          </div>
         )}
-      </div>
-      <div className="flex gap-3">
-        <div className="min-w-0 flex-1">
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart
-              data={chartData}
-              margin={{ top: 5, right: 10, bottom: 5, left: 10 }}
-              onMouseMove={handleMouseMove}
-              onMouseLeave={handleMouseLeave}
-            >
-              <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
-              <XAxis
-                dataKey="concurrency"
-                scale="log"
-                domain={['dataMin', 'dataMax']}
-                type="number"
-                tick={{ fill: '#8b949e', fontSize: 11 }}
-                axisLine={{ stroke: '#21262d' }}
-                tickLine={{ stroke: '#21262d' }}
-                label={{ value: 'Concurrency', position: 'insideBottom', offset: -2, fill: '#8b949e', fontSize: 11 }}
-              />
-              <YAxis
-                tick={{ fill: '#8b949e', fontSize: 11 }}
-                axisLine={{ stroke: '#21262d' }}
-                tickLine={{ stroke: '#21262d' }}
-                label={{ value: 'ms', angle: -90, position: 'insideLeft', fill: '#8b949e', fontSize: 11 }}
-              />
-              <Tooltip content={() => null} cursor={{ stroke: '#30363d', strokeWidth: 1 }} />
-              {seriesNames.map((name, i) => (
-                <Line
-                  key={name}
-                  type="monotone"
-                  dataKey={name}
-                  stroke={COLORS[i % COLORS.length]}
-                  strokeWidth={2}
-                  dot={{ r: 3, fill: COLORS[i % COLORS.length] }}
-                  activeDot={{ r: 5 }}
-                  connectNulls
-                />
-              ))}
-            </LineChart>
-          </ResponsiveContainer>
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          {METRICS.map((metric) => {
+            const chartData = buildChartData(seriesData, metric.medianField);
+            return (
+              <div
+                key={metric.key}
+                className="rounded-lg border border-[#21262d] bg-[#161b22] p-4"
+              >
+                <div className="mb-2">
+                  <h3 className="text-sm font-semibold text-[#e6edf3]">
+                    {metric.label}
+                  </h3>
+                  <span className="text-[10px] text-[#8b949e]">median · ms</span>
+                </div>
+                <ResponsiveContainer width="100%" height={260}>
+                  <LineChart
+                    data={chartData}
+                    margin={{ top: 5, right: 10, bottom: 5, left: 10 }}
+                    onMouseLeave={handleMouseLeave}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
+                    <XAxis
+                      dataKey="concurrency"
+                      scale="log"
+                      domain={['dataMin', 'dataMax']}
+                      type="number"
+                      tick={{ fill: '#8b949e', fontSize: 11 }}
+                      axisLine={{ stroke: '#21262d' }}
+                      tickLine={{ stroke: '#21262d' }}
+                      label={{ value: 'Concurrency', position: 'insideBottom', offset: -2, fill: '#8b949e', fontSize: 11 }}
+                    />
+                    <YAxis
+                      tick={{ fill: '#8b949e', fontSize: 11 }}
+                      axisLine={{ stroke: '#21262d' }}
+                      tickLine={{ stroke: '#21262d' }}
+                      label={{ value: 'ms', angle: -90, position: 'insideLeft', fill: '#8b949e', fontSize: 11 }}
+                    />
+                    <Tooltip
+                      content={<InvisibleTooltip onHover={handleHover} metricKey={metric.key} metricLabel={metric.shortLabel} />}
+                      cursor={{ stroke: '#30363d', strokeWidth: 1 }}
+                    />
+                    {seriesNames.map((name, i) => (
+                      <Line
+                        key={name}
+                        type="monotone"
+                        dataKey={name}
+                        stroke={COLORS[i % COLORS.length]}
+                        strokeWidth={2}
+                        dot={{ r: 3, fill: COLORS[i % COLORS.length] }}
+                        activeDot={{ r: 5 }}
+                        connectNulls
+                      />
+                    ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            );
+          })}
         </div>
-        <div className="w-52 flex-shrink-0 rounded border border-[#21262d] bg-[#0d1117] p-2" style={{ height: 300 }}>
-          <SidePanel hover={hover} />
+      </div>
+
+      {/* Shared side panel */}
+      <div className="hidden w-60 flex-shrink-0 xl:block">
+        <div className="sticky top-4 rounded-lg border border-[#21262d] bg-[#0d1117] p-3" style={{ height: 'calc(100vh - 200px)', maxHeight: '700px' }}>
+          <SidePanel hover={hover} seriesNames={seriesNames} />
         </div>
       </div>
-    </div>
-  );
-}
-
-export function LatencyChart({ seriesData }: LatencyChartProps) {
-  if (seriesData.size === 0) {
-    return (
-      <div className="flex h-64 items-center justify-center rounded-lg border border-[#21262d] bg-[#161b22] text-[#8b949e]">
-        No data matches current filters
-      </div>
-    );
-  }
-
-  const seriesNames = Array.from(seriesData.keys());
-  const uniqueProfiles = getUniqueProfiles(seriesData);
-  const singleProfile = uniqueProfiles.length === 1 ? uniqueProfiles[0] : null;
-  const singleMeta = singleProfile ? PROFILE_META[singleProfile] : null;
-
-  return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      {METRICS.map((metric) => (
-        <LatencyChartCard
-          key={metric.key}
-          metric={metric}
-          seriesData={seriesData}
-          seriesNames={seriesNames}
-          singleMeta={singleMeta}
-        />
-      ))}
     </div>
   );
 }
