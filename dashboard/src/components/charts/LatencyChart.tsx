@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import {
   LineChart,
   Line,
@@ -148,7 +148,8 @@ function getUniqueProfiles(seriesData: Map<string, BenchmarkResult[]>): string[]
   return Array.from(profiles);
 }
 
-// Custom tooltip that captures payload and calls onHover, renders nothing visible
+// Custom tooltip that captures payload and calls onHover, renders nothing visible.
+// Uses a ref to deduplicate and avoid infinite render loops.
 function InvisibleTooltip({ active, payload, label, onHover, metricKey, metricLabel }: {
   active?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -158,19 +159,26 @@ function InvisibleTooltip({ active, payload, label, onHover, metricKey, metricLa
   metricKey: string;
   metricLabel: string;
 }) {
-  if (active && payload && payload.length > 0 && label != null) {
-    const entries: HoverEntry[] = payload
-      .filter((p) => p.value != null)
-      .map((p) => ({
-        name: p.dataKey as string,
-        shortName: p.dataKey as string, // will be shortened by parent
-        value: p.value as number,
-        color: p.color as string,
-      }))
-      .sort((a, b) => b.value - a.value);
+  const lastKey = useRef('');
 
-    // Fire in a microtask to avoid setState during render
-    queueMicrotask(() => onHover({ metricKey, metricLabel, concurrency: label, entries }));
+  if (active && payload && payload.length > 0 && label != null) {
+    const dedupeKey = `${metricKey}:${label}`;
+    if (lastKey.current !== dedupeKey) {
+      lastKey.current = dedupeKey;
+      const entries: HoverEntry[] = payload
+        .filter((p) => p.value != null)
+        .map((p) => ({
+          name: p.dataKey as string,
+          shortName: p.dataKey as string,
+          value: p.value as number,
+          color: p.color as string,
+        }))
+        .sort((a, b) => b.value - a.value);
+
+      queueMicrotask(() => onHover({ metricKey, metricLabel, concurrency: label, entries }));
+    }
+  } else {
+    lastKey.current = '';
   }
   return null;
 }
@@ -242,15 +250,16 @@ export function LatencyChart({ seriesData }: LatencyChartProps) {
   }, [pinned]);
 
   const handleChartClick = useCallback(() => {
-    if (pinned) {
-      // Unpin
-      setPinned(null);
-      setHover(null);
-    } else if (hover) {
+    setPinned((prev) => {
+      if (prev) {
+        // Unpin — clear both states
+        setHover(null);
+        return null;
+      }
       // Pin current hover
-      setPinned(hover);
-    }
-  }, [pinned, hover]);
+      return hover;
+    });
+  }, [hover]);
 
   if (seriesData.size === 0) {
     return (
