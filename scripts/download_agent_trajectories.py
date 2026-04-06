@@ -80,7 +80,8 @@ def extract_turns_from_trajectory(trajectory: dict) -> list[dict]:
     Builds growing message history from steps:
     - source=system → system message
     - source=user → user message
-    - source=agent → assistant message (may include tool calls)
+    - source=agent → assistant message using raw_arguments (the actual model output),
+      followed by observation.results as user message (tool result)
 
     Returns list of turn dicts with growing messages + osl estimate.
     """
@@ -88,32 +89,52 @@ def extract_turns_from_trajectory(trajectory: dict) -> list[dict]:
     if not steps:
         return []
 
-    # Build the full conversation as a flat message list
     messages: list[dict] = []
     turns: list[dict] = []
 
     for step in steps:
         source = step.get("source", "")
-        content = step.get("message", "")
-
-        if not content:
-            continue
 
         if source == "system":
-            messages.append({"role": "system", "content": content})
+            content = step.get("message", "")
+            if content:
+                messages.append({"role": "system", "content": content})
+
         elif source == "user":
-            messages.append({"role": "user", "content": content})
-            # Each user message after the first is a new "turn" boundary
-            # (tool results come back as user messages in ATIF format)
+            content = step.get("message", "")
+            if content:
+                messages.append({"role": "user", "content": content})
+
         elif source == "agent":
-            # Agent response — this completes a turn
-            osl_est = estimate_tokens(content)
+            # Use raw_arguments as the actual model output (not the stub message)
+            raw_args = step.get("extra", {}).get("raw_arguments", "")
+            if not raw_args:
+                raw_args = step.get("message", "")
+            if not raw_args:
+                continue
+
+            osl_est = estimate_tokens(raw_args)
+
+            # Snapshot messages before adding assistant response = the input context
             turns.append({
                 "turn_idx": len(turns),
-                "messages": list(messages),  # snapshot of context so far
+                "messages": list(messages),
                 "osl_tokens": osl_est,
             })
-            messages.append({"role": "assistant", "content": content})
+
+            # Add assistant response to history
+            messages.append({"role": "assistant", "content": raw_args})
+
+            # Add tool observation as user message (tool result for next turn's context)
+            obs = step.get("observation", {}).get("results", "")
+            if isinstance(obs, list) and obs:
+                obs_content = obs[0].get("content", "") if isinstance(obs[0], dict) else str(obs[0])
+            elif isinstance(obs, str):
+                obs_content = obs
+            else:
+                obs_content = ""
+            if obs_content:
+                messages.append({"role": "user", "content": obs_content})
 
     return turns
 
