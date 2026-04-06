@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import {
   LineChart,
   Line,
@@ -59,11 +60,22 @@ const METRICS: LatencyMetric[] = [
   },
 ];
 
+interface HoverEntry {
+  name: string;
+  shortName: string;
+  value: number;
+  color: string;
+}
+
+interface HoverState {
+  concurrency: number;
+  entries: HoverEntry[];
+}
+
 function buildChartData(
   seriesData: Map<string, BenchmarkResult[]>,
   medianField: keyof BenchmarkResult['summary']
 ) {
-  // Collect all concurrency levels
   const concSet = new Set<number>();
   const seriesNames = Array.from(seriesData.keys());
 
@@ -75,7 +87,6 @@ function buildChartData(
 
   const concLevels = Array.from(concSet).sort((a, b) => a - b);
 
-  // Build lookup: seriesKey -> concurrency -> value
   const lookup = new Map<string, Map<number, number>>();
   for (const [key, results] of seriesData) {
     const concMap = new Map<number, number>();
@@ -101,14 +112,12 @@ function shortenSeriesKey(key: string, allKeys: string[]): string {
   const parts = key.split(' / ');
   if (parts.length < 4) return key;
 
-  // Collect unique values per part across all visible series
   const partSets = [new Set<string>(), new Set<string>(), new Set<string>(), new Set<string>()];
   for (const k of allKeys) {
     const p = k.split(' / ');
     p.forEach((v, i) => partSets[i]?.add(v));
   }
 
-  // Only include parts that vary across series
   const labels: string[] = [];
   const partNames = parts.map((p, i) => {
     if (i === 1) return p.replace('Llama-3.1-', '');
@@ -132,6 +141,162 @@ function getUniqueProfiles(seriesData: Map<string, BenchmarkResult[]>): string[]
   return Array.from(profiles);
 }
 
+function SidePanel({ hover }: { hover: HoverState | null }) {
+  if (!hover) {
+    return (
+      <div className="flex h-full items-center justify-center text-[11px] text-[#484f58]">
+        Hover chart to see values
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-full flex-col overflow-hidden">
+      <div className="mb-1.5 flex-shrink-0 border-b border-[#21262d] pb-1.5 text-[11px] font-medium text-[#8b949e]">
+        Concurrency: {hover.concurrency}
+      </div>
+      <div className="flex-1 overflow-y-auto pr-1" style={{ scrollbarWidth: 'thin', scrollbarColor: '#30363d #0d1117' }}>
+        {hover.entries.map((entry) => (
+          <div
+            key={entry.name}
+            className="flex items-center gap-1.5 border-b border-[#161b22] py-[3px]"
+          >
+            <span
+              className="inline-block h-2 w-2 flex-shrink-0 rounded-full"
+              style={{ backgroundColor: entry.color }}
+            />
+            <span className="min-w-0 flex-1 truncate text-[10px] text-[#c9d1d9]" title={entry.name}>
+              {entry.shortName}
+            </span>
+            <span className="flex-shrink-0 text-[10px] font-mono text-[#e6edf3]">
+              {entry.value.toFixed(2)}
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function LatencyChartCard({
+  metric,
+  seriesData,
+  seriesNames,
+  singleMeta,
+}: {
+  metric: LatencyMetric;
+  seriesData: Map<string, BenchmarkResult[]>;
+  seriesNames: string[];
+  singleMeta: (typeof PROFILE_META)[string] | null;
+}) {
+  const [hover, setHover] = useState<HoverState | null>(null);
+  const chartData = buildChartData(seriesData, metric.medianField);
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const handleMouseMove = useCallback((state: any) => {
+    if (!state?.activePayload?.length) return;
+    const payload = state.activePayload;
+    const conc = state.activeLabel as number;
+    const entries: HoverEntry[] = payload
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .filter((p: any) => p.value != null)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .map((p: any) => ({
+        name: p.dataKey as string,
+        shortName: shortenSeriesKey(p.dataKey as string, seriesNames),
+        value: p.value as number,
+        color: p.color as string,
+      }))
+      .sort((a: HoverEntry, b: HoverEntry) => b.value - a.value);
+    setHover({ concurrency: conc, entries });
+  }, [seriesNames]);
+
+  const handleMouseLeave = useCallback(() => {
+    setHover(null);
+  }, []);
+
+  return (
+    <div className="rounded-lg border border-[#21262d] bg-[#161b22] p-4">
+      <div className="mb-3 flex flex-wrap items-center gap-2">
+        <h3 className="text-sm font-semibold text-[#e6edf3]">
+          {metric.label}
+        </h3>
+        <span className="rounded bg-[#21262d] px-1.5 py-0.5 text-[10px] font-medium text-[#8b949e]">median · ms</span>
+        {singleMeta && (
+          <>
+            <span
+              className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
+              style={{
+                backgroundColor: (AGENT_TYPE_COLORS[singleMeta.agentType] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).bg,
+                color: (AGENT_TYPE_COLORS[singleMeta.agentType] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).text,
+                borderColor: (AGENT_TYPE_COLORS[singleMeta.agentType] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).border,
+              }}
+            >
+              {singleMeta.agentType}
+            </span>
+            <span
+              className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
+              style={{
+                backgroundColor: (DATA_SOURCE_COLORS[singleMeta.dataSource] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).bg,
+                color: (DATA_SOURCE_COLORS[singleMeta.dataSource] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).text,
+                borderColor: (DATA_SOURCE_COLORS[singleMeta.dataSource] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).border,
+              }}
+            >
+              {singleMeta.dataSource}
+            </span>
+          </>
+        )}
+      </div>
+      <div className="flex gap-3">
+        <div className="min-w-0 flex-1">
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart
+              data={chartData}
+              margin={{ top: 5, right: 10, bottom: 5, left: 10 }}
+              onMouseMove={handleMouseMove}
+              onMouseLeave={handleMouseLeave}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
+              <XAxis
+                dataKey="concurrency"
+                scale="log"
+                domain={['dataMin', 'dataMax']}
+                type="number"
+                tick={{ fill: '#8b949e', fontSize: 11 }}
+                axisLine={{ stroke: '#21262d' }}
+                tickLine={{ stroke: '#21262d' }}
+                label={{ value: 'Concurrency', position: 'insideBottom', offset: -2, fill: '#8b949e', fontSize: 11 }}
+              />
+              <YAxis
+                tick={{ fill: '#8b949e', fontSize: 11 }}
+                axisLine={{ stroke: '#21262d' }}
+                tickLine={{ stroke: '#21262d' }}
+                label={{ value: 'ms', angle: -90, position: 'insideLeft', fill: '#8b949e', fontSize: 11 }}
+              />
+              <Tooltip content={() => null} cursor={{ stroke: '#30363d', strokeWidth: 1 }} />
+              {seriesNames.map((name, i) => (
+                <Line
+                  key={name}
+                  type="monotone"
+                  dataKey={name}
+                  stroke={COLORS[i % COLORS.length]}
+                  strokeWidth={2}
+                  dot={{ r: 3, fill: COLORS[i % COLORS.length] }}
+                  activeDot={{ r: 5 }}
+                  connectNulls
+                />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="w-52 flex-shrink-0 rounded border border-[#21262d] bg-[#0d1117] p-2" style={{ height: 300 }}>
+          <SidePanel hover={hover} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function LatencyChart({ seriesData }: LatencyChartProps) {
   if (seriesData.size === 0) {
     return (
@@ -148,100 +313,15 @@ export function LatencyChart({ seriesData }: LatencyChartProps) {
 
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      {METRICS.map((metric) => {
-        const chartData = buildChartData(seriesData, metric.medianField);
-        // With 4 metrics in a 2-col grid, no orphans
-        const isOrphan = false;
-
-        return (
-          <div
-            key={metric.key}
-            className={`rounded-lg border border-[#21262d] bg-[#161b22] p-4 ${isOrphan ? 'xl:col-span-2' : ''}`}
-          >
-            <div className="mb-3 flex flex-wrap items-center gap-2">
-              <h3 className="text-sm font-semibold text-[#e6edf3]">
-                {metric.label}
-              </h3>
-              <span className="rounded bg-[#21262d] px-1.5 py-0.5 text-[10px] font-medium text-[#8b949e]">median · ms</span>
-              {singleMeta && (
-                <>
-                  <span
-                    className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
-                    style={{
-                      backgroundColor: (AGENT_TYPE_COLORS[singleMeta.agentType] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).bg,
-                      color: (AGENT_TYPE_COLORS[singleMeta.agentType] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).text,
-                      borderColor: (AGENT_TYPE_COLORS[singleMeta.agentType] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).border,
-                    }}
-                  >
-                    {singleMeta.agentType}
-                  </span>
-                  <span
-                    className="inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium"
-                    style={{
-                      backgroundColor: (DATA_SOURCE_COLORS[singleMeta.dataSource] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).bg,
-                      color: (DATA_SOURCE_COLORS[singleMeta.dataSource] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).text,
-                      borderColor: (DATA_SOURCE_COLORS[singleMeta.dataSource] ?? { bg: 'rgba(139,148,158,0.12)', text: '#8b949e', border: 'rgba(139,148,158,0.3)' }).border,
-                    }}
-                  >
-                    {singleMeta.dataSource}
-                  </span>
-                </>
-              )}
-            </div>
-            <ResponsiveContainer width="100%" height={isOrphan ? 320 : 300}>
-              <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 10 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#21262d" />
-                <XAxis
-                  dataKey="concurrency"
-                  scale="log"
-                  domain={['dataMin', 'dataMax']}
-                  type="number"
-                  tick={{ fill: '#8b949e', fontSize: 11 }}
-                  axisLine={{ stroke: '#21262d' }}
-                  tickLine={{ stroke: '#21262d' }}
-                  label={{ value: 'Concurrency', position: 'insideBottom', offset: -2, fill: '#8b949e', fontSize: 11 }}
-                />
-                <YAxis
-                  tick={{ fill: '#8b949e', fontSize: 11 }}
-                  axisLine={{ stroke: '#21262d' }}
-                  tickLine={{ stroke: '#21262d' }}
-                  label={{ value: 'ms', angle: -90, position: 'insideLeft', fill: '#8b949e', fontSize: 11 }}
-                />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: '#161b22',
-                    border: '1px solid #30363d',
-                    borderRadius: '8px',
-                    fontSize: '12px',
-                    color: '#e6edf3',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.5)',
-                  }}
-                  labelFormatter={(v) => `Concurrency: ${v}`}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  itemSorter={(item: any) => -(Number(item.value) || 0)}
-                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                  formatter={(value: any, name: any) => [
-                    `${Number(value).toFixed(2)} ms`,
-                    shortenSeriesKey(String(name), seriesNames),
-                  ]}
-                />
-                {seriesNames.map((name, i) => (
-                  <Line
-                    key={name}
-                    type="monotone"
-                    dataKey={name}
-                    stroke={COLORS[i % COLORS.length]}
-                    strokeWidth={2}
-                    dot={{ r: 3, fill: COLORS[i % COLORS.length] }}
-                    activeDot={{ r: 5 }}
-                    connectNulls
-                  />
-                ))}
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        );
-      })}
+      {METRICS.map((metric) => (
+        <LatencyChartCard
+          key={metric.key}
+          metric={metric}
+          seriesData={seriesData}
+          seriesNames={seriesNames}
+          singleMeta={singleMeta}
+        />
+      ))}
     </div>
   );
 }
