@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, useCallback } from 'react';
 import type { BenchmarkResult, FilterState, FilterOptions } from '../types';
 import { PROFILE_META } from '../profileMeta';
 
+declare const __BUILD_HASH__: string;
+
 export function useData() {
   const [allData, setAllData] = useState<BenchmarkResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -17,7 +19,8 @@ export function useData() {
   });
 
   useEffect(() => {
-    fetch(import.meta.env.BASE_URL + 'data.json')
+    // Cache-bust with build-time hash so deploys always serve fresh data
+    fetch(import.meta.env.BASE_URL + `data.json?v=${__BUILD_HASH__}`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return res.json();

@@ -6,4 +6,7 @@ import tailwindcss from '@tailwindcss/vite'
 export default defineConfig({
   plugins: [react(), tailwindcss()],
   base: '/inference-benchmark/',
+  define: {
+    __BUILD_HASH__: JSON.stringify(Date.now().toString(36)),
+  },
 })
