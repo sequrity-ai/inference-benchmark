@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import {
   LineChart,
   Line,
@@ -148,8 +148,8 @@ function getUniqueProfiles(seriesData: Map<string, BenchmarkResult[]>): string[]
   return Array.from(profiles);
 }
 
-// Custom tooltip that captures payload and calls onHover, renders nothing visible.
-// Uses a ref to deduplicate and avoid infinite render loops.
+// Custom tooltip that captures payload via useEffect (not during render).
+// This avoids setState-during-render loops entirely.
 function InvisibleTooltip({ active, payload, label, onHover, metricKey, metricLabel }: {
   active?: boolean;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -159,27 +159,27 @@ function InvisibleTooltip({ active, payload, label, onHover, metricKey, metricLa
   metricKey: string;
   metricLabel: string;
 }) {
-  const lastKey = useRef('');
+  const stablePayload = active && payload && payload.length > 0 && label != null
+    ? JSON.stringify({ metricKey, metricLabel, concurrency: label, count: payload.filter(p => p.value != null).length })
+    : '';
+  const payloadRef = useRef(payload);
+  payloadRef.current = payload;
 
-  if (active && payload && payload.length > 0 && label != null) {
-    const dedupeKey = `${metricKey}:${label}`;
-    if (lastKey.current !== dedupeKey) {
-      lastKey.current = dedupeKey;
-      const entries: HoverEntry[] = payload
-        .filter((p) => p.value != null)
-        .map((p) => ({
-          name: p.dataKey as string,
-          shortName: p.dataKey as string,
-          value: p.value as number,
-          color: p.color as string,
-        }))
-        .sort((a, b) => b.value - a.value);
+  useEffect(() => {
+    if (!stablePayload) return;
+    const parsed = JSON.parse(stablePayload);
+    const entries: HoverEntry[] = (payloadRef.current || [])
+      .filter((p: { value: unknown }) => p.value != null)
+      .map((p: { dataKey: string; value: number; color: string }) => ({
+        name: p.dataKey,
+        shortName: p.dataKey,
+        value: p.value,
+        color: p.color,
+      }))
+      .sort((a: HoverEntry, b: HoverEntry) => b.value - a.value);
+    onHover({ ...parsed, entries });
+  }, [stablePayload, onHover]);
 
-      queueMicrotask(() => onHover({ metricKey, metricLabel, concurrency: label, entries }));
-    }
-  } else {
-    lastKey.current = '';
-  }
   return null;
 }
 
