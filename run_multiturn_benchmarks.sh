@@ -16,12 +16,12 @@ PYTHON="${PYTHON:-$(which python)}"
 API_KEY="test"
 WARMUP=3
 TIMEOUT=300
-CONC_SWEEP="1 5 10 20"
-CONC_SWEEP_LOW="1 5 10"  # For memory-constrained configs
+CONC_SWEEP="5 10 20 40"
+CONC_SWEEP_LOW="5 10 20"  # For memory-constrained configs
 MAX_SERVER_WAIT=1800
 
 # Multi-turn profiles to run
-MT_PROFILES="chat-multiturn-short chat-multiturn-medium swebench-multiturn-short terminalbench-multiturn-short"
+MT_PROFILES="chat-multiturn-short chat-multiturn-medium chat-multiturn-long swebench-multiturn-short swebench-multiturn-medium terminalbench-multiturn-short terminalbench-multiturn-medium"
 
 # Source the GPU scheduler
 source "$REPO_ROOT/scripts/gpu_scheduler.sh"
