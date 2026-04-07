@@ -609,13 +609,13 @@ export function RooflinePage() {
                     dataKey="x"
                     type="number"
                     scale="log"
-                    domain={[0.1, 1000]}
+                    domain={[10, 20000]}
                     allowDataOverflow
                     tick={{ fill: '#8b949e', fontSize: 11 }}
                     axisLine={{ stroke: '#30363d' }}
                     tickLine={{ stroke: '#30363d' }}
                     tickFormatter={logTick}
-                    ticks={[0.1, 0.5, 1, 5, 10, 50, 100, 500]}
+                    ticks={[10, 50, 100, 295, 500, 1000, 5000, 10000]}
                     label={{
                       value: 'Operational Intensity — OI (ops/byte)',
                       position: 'insideBottom',
