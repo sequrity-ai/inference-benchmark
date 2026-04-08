@@ -601,7 +601,10 @@ export function RooflinePage() {
                     }}
                   />
                   <ZAxis dataKey="_size" range={[15, 200]} />
-                  <RechartsTooltip content={() => null} cursor={false} />
+                  <RechartsTooltip
+                    content={() => null}
+                    cursor={{ strokeDasharray: '4 4', stroke: '#e6edf3', strokeOpacity: 0.4 }}
+                  />
 
                   {/* One scatter per model for coloring */}
                   {filterOptions.models
@@ -620,6 +623,24 @@ export function RooflinePage() {
                         onMouseLeave={() => setHoveredPoint(null)}
                       />
                     ))}
+                  {/* Highlight ring for hovered point */}
+                  {hoveredPoint && (
+                    <Scatter
+                      data={[{ x: hoveredPoint.oi, y: hoveredPoint.cf_gb, _size: 1 }]}
+                      shape={(props: { cx?: number; cy?: number }) => {
+                        const { cx = 0, cy = 0 } = props;
+                        if (!Number.isFinite(cx) || !Number.isFinite(cy)) return null;
+                        return (
+                          <g>
+                            <circle cx={cx} cy={cy} r={14} fill="none" stroke="#ffffff" strokeWidth={2.5} strokeOpacity={0.9} />
+                            <circle cx={cx} cy={cy} r={14} fill="none" stroke={modelColor(hoveredPoint.model)} strokeWidth={1.5} strokeOpacity={0.6} />
+                          </g>
+                        );
+                      }}
+                      legendType="none"
+                      isAnimationActive={false}
+                    />
+                  )}
                 </ScatterChart>
               </ResponsiveContainer>
             </ChartErrorBoundary>
