@@ -17,10 +17,10 @@ declare const __BUILD_HASH__: string;
 
 // ── Quadrant colors ─────────────────────────────────────────────────────────
 const QUADRANT = {
-  computeBound:   { bg: 'rgba(0,114,178,0.08)',  label: 'Compute Bound',         color: '#0072B2' },
-  capacityBound:  { bg: 'rgba(255,183,77,0.08)', label: 'Memory Capacity Bound', color: '#ffb74d' },
-  bwBound:        { bg: 'rgba(63,185,80,0.08)',   label: 'Memory BW Bound',       color: '#3fb950' },
-  bothBound:      { bg: 'rgba(139,148,158,0.08)', label: 'Capacity + BW Bound',   color: '#8b949e' },
+  computeBound:   { bg: 'rgba(0,114,178,0.18)',  label: 'Compute Bound',         color: '#0072B2' },
+  capacityBound:  { bg: 'rgba(255,183,77,0.18)', label: 'Memory Capacity Bound', color: '#ffb74d' },
+  bwBound:        { bg: 'rgba(63,185,80,0.18)',   label: 'Memory BW Bound',       color: '#3fb950' },
+  bothBound:      { bg: 'rgba(139,148,158,0.12)', label: 'Capacity + BW Bound',   color: '#8b949e' },
 };
 
 // ── Model colors (colorblind-safe) ──────────────────────────────────────────
@@ -98,7 +98,7 @@ function QuadrantDot({ cx = 0, cy = 0, payload }: DotProps) {
       <rect
         x={cx - s / 2} y={cy - s / 2}
         width={s} height={s}
-        fill={color} fillOpacity={0.7}
+        fill={color} fillOpacity={0.55}
         stroke={color} strokeWidth={1} strokeOpacity={0.3}
         rx={2}
       />
@@ -111,7 +111,7 @@ function QuadrantDot({ cx = 0, cy = 0, payload }: DotProps) {
     return (
       <polygon
         points={points}
-        fill={color} fillOpacity={0.7}
+        fill={color} fillOpacity={0.55}
         stroke={color} strokeWidth={1} strokeOpacity={0.3}
       />
     );
@@ -123,7 +123,7 @@ function QuadrantDot({ cx = 0, cy = 0, payload }: DotProps) {
     return (
       <polygon
         points={points}
-        fill={color} fillOpacity={0.7}
+        fill={color} fillOpacity={0.55}
         stroke={color} strokeWidth={1} strokeOpacity={0.3}
       />
     );
@@ -132,7 +132,7 @@ function QuadrantDot({ cx = 0, cy = 0, payload }: DotProps) {
   return (
     <circle
       cx={cx} cy={cy} r={r}
-      fill={color} fillOpacity={0.7}
+      fill={color} fillOpacity={0.55}
       stroke={color} strokeWidth={1} strokeOpacity={0.3}
     />
   );
@@ -549,7 +549,7 @@ export function RooflinePage() {
                   {/* Top-left: high OI, high CF = Compute Bound */}
                   <ReferenceArea
                     x1={ridgeOI} x2={10000}
-                    y1={hbmGB} y2={100000}
+                    y1={hbmGB} y2={5000}
                     fill={QUADRANT.computeBound.bg}
                     fillOpacity={1}
                     ifOverflow="hidden"
@@ -557,7 +557,7 @@ export function RooflinePage() {
                   {/* Top-right: low OI, high CF = Capacity Bound */}
                   <ReferenceArea
                     x1={0.01} x2={ridgeOI}
-                    y1={hbmGB} y2={100000}
+                    y1={hbmGB} y2={5000}
                     fill={QUADRANT.capacityBound.bg}
                     fillOpacity={1}
                     ifOverflow="hidden"
@@ -583,24 +583,28 @@ export function RooflinePage() {
                   <ReferenceLine
                     x={ridgeOI}
                     stroke="#f97583"
-                    strokeDasharray="6 3"
-                    strokeOpacity={0.5}
+                    strokeDasharray="8 4"
+                    strokeOpacity={0.8}
+                    strokeWidth={2}
                     label={{
-                      value: `Ridge OI ~${ridgeOI.toFixed(0)}`,
+                      value: `Ridge OI = ${ridgeOI.toFixed(0)}`,
                       fill: '#f97583',
-                      fontSize: 10,
+                      fontSize: 12,
+                      fontWeight: 600,
                       position: 'top',
                     }}
                   />
                   <ReferenceLine
                     y={hbmGB}
                     stroke="#ffb74d"
-                    strokeDasharray="6 3"
-                    strokeOpacity={0.5}
+                    strokeDasharray="8 4"
+                    strokeOpacity={0.8}
+                    strokeWidth={2}
                     label={{
-                      value: `HBM ${hbmGB} GB`,
+                      value: `HBM = ${hbmGB} GB`,
                       fill: '#ffb74d',
-                      fontSize: 10,
+                      fontSize: 12,
+                      fontWeight: 600,
                       position: 'right',
                     }}
                   />
@@ -628,13 +632,13 @@ export function RooflinePage() {
                     dataKey="y"
                     type="number"
                     scale="log"
-                    domain={[1, 100000]}
+                    domain={[5, 5000]}
                     allowDataOverflow
                     tick={{ fill: '#8b949e', fontSize: 11 }}
                     axisLine={{ stroke: '#30363d' }}
                     tickLine={{ stroke: '#30363d' }}
                     tickFormatter={logTick}
-                    ticks={[1, 10, 100, 1000, 10000, 100000]}
+                    ticks={[5, 10, 20, 50, 80, 200, 500, 1000, 2000, 5000]}
                     label={{
                       value: 'Capacity Footprint — CF (GB)',
                       angle: -90,
@@ -644,7 +648,7 @@ export function RooflinePage() {
                       fontSize: 12,
                     }}
                   />
-                  <ZAxis dataKey="_size" range={[20, 400]} />
+                  <ZAxis dataKey="_size" range={[15, 200]} />
                   <Tooltip content={<QuadrantTooltip />} />
 
                   {/* One scatter per model for coloring */}
