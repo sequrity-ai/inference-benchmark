@@ -5,7 +5,7 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
+  Tooltip as RechartsTooltip,
   ResponsiveContainer,
   ReferenceArea,
   ReferenceLine,
@@ -138,55 +138,7 @@ function QuadrantDot({ cx = 0, cy = 0, payload }: DotProps) {
   );
 }
 
-// ── Tooltip ─────────────────────────────────────────────────────────────────
-interface ScatterTooltipProps {
-  active?: boolean;
-  payload?: Array<{ payload: QuadrantPoint }>;
-}
-
-function QuadrantTooltip({ active, payload }: ScatterTooltipProps) {
-  if (!active || !payload?.length) return null;
-  const p = payload[0]?.payload;
-  if (!p) return null;
-  return (
-    <div
-      style={{
-        backgroundColor: '#161b22',
-        border: '1px solid #30363d',
-        borderRadius: '8px',
-        padding: '10px 14px',
-        fontSize: '12px',
-        color: '#e6edf3',
-        boxShadow: '0 4px 16px rgba(0,0,0,0.6)',
-        maxWidth: '280px',
-      }}
-    >
-      <div style={{ fontWeight: 600, color: modelColor(p.model), marginBottom: 6 }}>
-        {p.model}
-      </div>
-      <table style={{ borderCollapse: 'collapse', width: '100%' }}>
-        <tbody>
-          {([
-            ['Profile', p.profile],
-            ['Concurrency', String(p.concurrency)],
-            ['Engine', p.engine],
-            ['Hardware', p.hardware],
-            ['OI', `${p.oi.toFixed(2)} ops/byte`],
-            ['CF', `${p.cf_gb.toFixed(1)} GB`],
-            ['Output tok/s', p.output_tput.toFixed(1)],
-            ['TPOT', `${p.tpot_ms.toFixed(2)} ms`],
-            ['TTFT', `${p.ttft_ms.toFixed(1)} ms`],
-          ] as [string, string][]).map(([label, value]) => (
-            <tr key={label}>
-              <td style={{ color: '#8b949e', paddingRight: 12, paddingBottom: 2 }}>{label}</td>
-              <td style={{ fontFamily: 'monospace', color: '#e6edf3', paddingBottom: 2 }}>{value}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
+// Tooltip removed — side panel provides point details on hover
 
 // ── Log tick formatter ──────────────────────────────────────────────────────
 function logTick(value: number): string {
@@ -649,7 +601,7 @@ export function RooflinePage() {
                     }}
                   />
                   <ZAxis dataKey="_size" range={[15, 200]} />
-                  <Tooltip content={<QuadrantTooltip />} />
+                  <RechartsTooltip content={() => null} cursor={false} />
 
                   {/* One scatter per model for coloring */}
                   {filterOptions.models
