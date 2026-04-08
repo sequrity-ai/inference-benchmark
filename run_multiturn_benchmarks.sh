@@ -16,12 +16,12 @@ PYTHON="${PYTHON:-$(which python)}"
 API_KEY="test"
 WARMUP=3
 TIMEOUT=300
-CONC_SWEEP="5 10 20 40"
-CONC_SWEEP_LOW="5 10 20"  # For memory-constrained configs
+CONC_SWEEP="5 10 20 40 80 120 160"
+CONC_SWEEP_LOW="5 10 20 40 80"  # For memory-constrained configs (70B+)
 MAX_SERVER_WAIT=1800
 
-# Multi-turn profiles to run
-MT_PROFILES="chat-multiturn-short chat-multiturn-medium chat-multiturn-long swebench-multiturn-short swebench-multiturn-medium terminalbench-multiturn-short terminalbench-multiturn-medium"
+# Multi-turn profiles to run (skip saturated: swebench-short/medium, terminalbench-medium)
+MT_PROFILES="chat-multiturn-short chat-multiturn-medium chat-multiturn-long terminalbench-multiturn-short"
 
 # Source the GPU scheduler
 source "$REPO_ROOT/scripts/gpu_scheduler.sh"
@@ -34,10 +34,17 @@ warn() { echo -e "\033[1;33m[WARN]\033[0m $1"; }
 # Model registry (models that work with prefix caching for multi-turn)
 # =============================================================================
 declare -a MODELS=(
-    "Llama-3.1-8B|/workspace/models/Llama-3.1-8B-Instruct|1||--enable-chunked-prefill|32768|0.80"
-    "Qwen3.5-9B|/workspace/models/Qwen3.5-9B|1|--trust-remote-code --disable-overlap-schedule|--enable-chunked-prefill --trust-remote-code --gdn-prefill-backend triton|32768|0.80"
+    # TP=1 (extend to conc 160, resume skips existing 5-40)
+    "Llama-3.1-8B|/workspace/models/Llama-3.1-8B-Instruct|1,4||--enable-chunked-prefill|32768|0.80"
+    "Qwen3.5-9B|/workspace/models/Qwen3.5-9B|1,4|--trust-remote-code --disable-overlap-schedule|--enable-chunked-prefill --trust-remote-code --gdn-prefill-backend triton|32768|0.80"
+    # TP=2 (extend to conc 160)
     "Qwen3.5-27B|/workspace/models/Qwen3.5-27B|2|--trust-remote-code --disable-overlap-schedule|--enable-chunked-prefill --trust-remote-code --gdn-prefill-backend triton|16384|0.92"
     "Llama-3.1-70B|/workspace/models/Llama-3.1-70B-Instruct|2|--disable-piecewise-cuda-graph|--enable-chunked-prefill|4096|0.90"
+    # TP=4 only (separate entries — different max_len/gpu_mem than TP=2)
+    "Qwen3.5-27B|/workspace/models/Qwen3.5-27B|4|--trust-remote-code --disable-overlap-schedule|--enable-chunked-prefill --trust-remote-code --gdn-prefill-backend triton|32768|0.90"
+    "Llama-3.1-70B|/workspace/models/Llama-3.1-70B-Instruct|4|--disable-piecewise-cuda-graph|--enable-chunked-prefill|16384|0.90"
+    "Qwen2.5-72B|/workspace/models/Qwen2.5-72B-Instruct|4|--trust-remote-code --disable-piecewise-cuda-graph|--enable-chunked-prefill --trust-remote-code|4096|0.90"
+    "Llama-3.3-70B|/workspace/models/Llama-3.3-70B-Instruct|4|--disable-piecewise-cuda-graph|--enable-chunked-prefill|4096|0.90"
 )
 
 model_exists() {
@@ -143,12 +150,36 @@ run_engine() {
 
     log "Job counts: TP=1: ${#tp1_jobs[@]}, TP=2: ${#tp2_jobs[@]}, TP=4: ${#tp4_jobs[@]}"
 
+    # Run TP=1 and TP=2 CONCURRENTLY on separate GPUs:
+    #   TP=1 → GPUs 0,1 (2 slots)
+    #   TP=2 → GPUs 2,3 (1 slot, jobs run sequentially within)
+    # This keeps all 4 GPUs busy instead of idling 2,3 during TP=1 batch.
+    local tp1_pid=0 tp2_pid=0
+
     if [[ ${#tp1_jobs[@]} -gt 0 ]]; then
-        run_parallel_batch 1 "$engine" "mt_bench_callback" "${tp1_jobs[@]}"
+        (
+            # Override TP=1 slots to only GPUs 0,1 (leave 2,3 for TP=2)
+            SLOTS_TP1=("0|9000" "1|9001")
+            run_parallel_batch 1 "$engine" "mt_bench_callback" "${tp1_jobs[@]}"
+        ) &
+        tp1_pid=$!
+        log "TP=1 batch launched in background (PID $tp1_pid) on GPUs 0,1"
     fi
+
     if [[ ${#tp2_jobs[@]} -gt 0 ]]; then
-        run_parallel_batch 2 "$engine" "mt_bench_callback" "${tp2_jobs[@]}"
+        (
+            # Override TP=2 slots to only GPUs 2,3 (GPUs 0,1 used by TP=1)
+            SLOTS_TP2=("2,3|9002")
+            run_parallel_batch 2 "$engine" "mt_bench_callback" "${tp2_jobs[@]}"
+        ) &
+        tp2_pid=$!
+        log "TP=2 batch launched in background (PID $tp2_pid) on GPUs 2,3"
     fi
+
+    # Wait for both TP=1 and TP=2 to finish before starting TP=4
+    [[ $tp1_pid -gt 0 ]] && { wait $tp1_pid; log "TP=1 batch finished"; }
+    [[ $tp2_pid -gt 0 ]] && { wait $tp2_pid; log "TP=2 batch finished"; }
+
     if [[ ${#tp4_jobs[@]} -gt 0 ]]; then
         run_parallel_batch 4 "$engine" "mt_bench_callback" "${tp4_jobs[@]}"
     fi
