@@ -78,6 +78,10 @@ function detectHardware(filename: string, dirPath: string): string {
   if (/_tp4_/.test(dir)) return 'H100x4';
   if (/_tp2_/.test(fp) || /_tp2_/.test(dir)) return 'H100x2';
   if (/_tp1_/.test(fp) || /_tp1_/.test(dir)) return 'H100';
+  // Match _tp2 at end of dir name (e.g. tpot_validation_Qwen3.5-27B_tp2)
+  if (/_tp2$/.test(dir)) return 'H100x2';
+  if (/_tp4$/.test(dir)) return 'H100x4';
+  if (/_tp1$/.test(dir)) return 'H100';
   if (fp.includes('h100') || dir.includes('h100')) return 'H100';
 
   return 'Unknown';
