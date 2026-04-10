@@ -219,6 +219,14 @@ function main() {
         continue;
       }
 
+      // Skip underloaded single-turn results (nreq < concurrency)
+      // Multi-turn uses num_requests=num_sessions which is intentionally < concurrency
+      const mode = raw.config.mode || (relDir.includes('multiturn') ? 'multi-turn' : 'single-turn');
+      if (mode !== 'multi-turn' && concurrency > 1 && raw.config.num_requests && raw.config.num_requests < concurrency) {
+        skipped++;
+        continue;
+      }
+
       const seriesKey = `${hardware} / ${modelShort} ${quant} / ${backend} / ${profile}`;
 
       // Extract scatter data from per_request (multi-turn results with turn_index)
