@@ -9,7 +9,7 @@ cd "$REPO_ROOT"
 PYTHON="${PYTHON:-/root/miniconda3/bin/python}"
 MODEL="/workspace/models/Qwen3.5-27B"
 API_KEY="test"
-PROFILE="chat-short"
+PROFILES="chat-short prefill-heavy"
 NREQ=200
 WARMUP=5
 TIMEOUT=300
@@ -75,6 +75,7 @@ run_sweep() {
 
     local url="http://localhost:${port}/v1/chat/completions"
 
+    for PROFILE in $PROFILES; do
     for CONC in "${concs[@]}"; do
         local out="${RESULTS_DIR}/${PROFILE}_conc${CONC}.json"
 
@@ -82,16 +83,17 @@ run_sweep() {
         if [[ -f "$out" ]] && [[ -s "$out" ]]; then
             completed=$("$PYTHON" -c "import json; d=json.load(open('$out')); s=d.get('summary',{}); print(s.get('successful_requests',0))" 2>/dev/null || echo "0")
             if [[ "$completed" -gt 0 ]]; then
-                log "[SLOT$slot] SKIP conc=$CONC (exists, $completed reqs)"
+                log "[SLOT$slot] SKIP $PROFILE conc=$CONC (exists, $completed reqs)"
                 continue
             fi
         fi
 
-        local nreq=$NREQ
+        # nreq must always exceed concurrency to ensure full load pressure
+        local nreq=$(( CONC * 2 ))
+        [[ "$nreq" -lt 200 ]] && nreq=200
         [[ "$CONC" -eq 1 ]] && nreq=50
-        [[ "$CONC" -ge 200 ]] && nreq=150
 
-        log "[SLOT$slot] Running conc=$CONC nreq=$nreq"
+        log "[SLOT$slot] Running $PROFILE conc=$CONC nreq=$nreq"
         OPENAI_API_KEY="$API_KEY" "$PYTHON" -m src.benchmark.runner \
             --url "$url" \
             --model "$MODEL" \
@@ -103,7 +105,8 @@ run_sweep() {
             --timeout "$TIMEOUT" \
             --api-key "$API_KEY" \
             --output "$out" \
-            2>&1 || log "[SLOT$slot] FAILED conc=$CONC"
+            2>&1 || log "[SLOT$slot] FAILED $PROFILE conc=$CONC"
+    done
     done
     log "[SLOT$slot] Sweep complete"
 }
@@ -146,7 +149,10 @@ log "╔════════════════════════
 log "║  RESULTS SUMMARY                                        ║"
 log "╚══════════════════════════════════════════════════════════╝"
 
-# Print TPOT table
+# Print TPOT table per profile
+for PROFILE in $PROFILES; do
+log ""
+log "=== $PROFILE ==="
 log "Conc | TPOT p50 (ms) | Output tok/s | Requests OK"
 log "-----|---------------|-------------|------------"
 for CONC in "${ALL_CONCS[@]}"; do
@@ -159,6 +165,7 @@ s = d.get('summary', {})
 print(f'{$CONC:>4} | {s.get(\"median_tpot_ms\",0):>13.2f} | {s.get(\"output_token_throughput\",0):>11.0f} | {s.get(\"successful_requests\",0)}')
 " 2>/dev/null || echo "  $CONC | ERROR"
     fi
+done
 done
 
 log "Done. Results in $RESULTS_DIR/"
