@@ -1,11 +1,10 @@
 """
 Workload profile definitions.
 
-Profiles are organized into tiers:
-  Tier 1: Real agent data (SWEBench PLLM, SWEBench trajectories, TerminalBench trajectories)
-  Tier 2: Chat (ShareGPT with honest shape-based labels)
-  Tier 3: Synthetic stress tests (random tokens, file-based)
-  Tier 4: Multi-turn chat (ShareGPT multi-turn conversations)
+Profiles are organized into groups:
+  Group 1: Real agent data (SWEBench PLLM, SWEBench trajectories, TerminalBench trajectories)
+  Group 2: Chat — single-turn and multi-turn (ShareGPT)
+  Group 3: Synthetic stress tests (random tokens, file-based)
 
 Each profile defines the data source, ISL/OSL bounds, and metadata tags.
 """
@@ -15,10 +14,10 @@ from typing import Optional
 
 
 # Valid tag values
-AGENT_TYPES = ["chat", "coding", "terminal"]
+AGENT_TYPES = ["chat", "coding", "terminal", "computer-use"]
 TURN_STYLES = ["single-turn", "multi-turn"]
 SERVING_STYLES = ["disaggregated", "not-disaggregated"]
-DATA_SOURCES = ["sharegpt", "swebench", "terminalbench", "file", "random", "test"]
+DATA_SOURCES = ["sharegpt", "swebench", "terminalbench", "osworld", "file", "random", "test"]
 
 
 @dataclass
@@ -50,7 +49,7 @@ class WorkloadProfile:
 PROFILES: dict[str, WorkloadProfile] = {
 
     # ===================================================================
-    # Tier 1: Real Agent Data
+    # Group 1: Real Agent Data
     # ===================================================================
 
     # Single-turn PLLM planning call — real SWEBench prompts (~6K ISL)
@@ -235,9 +234,73 @@ PROFILES: dict[str, WorkloadProfile] = {
         data_source="terminalbench",
     ),
 
+    # Multi-turn OSWorld computer-use agent — real WebArena trajectories
+    # Note: "turns" here are agent steps (browser actions).
+    # OSWorld sessions have min=1, median=8, max=30 steps.
+    # ISL/OSL ratio ~120:1 (massive DOM context, tiny action output).
+    "osworld-multiturn-short": WorkloadProfile(
+        name="osworld-multiturn-short",
+        isl_tokens=32768,
+        osl_tokens=500,
+        isl_stddev=0.0,
+        description="Real OSWorld computer-use agent: 2-10 step sessions (short browsing tasks)",
+        dataset="osworld-multi-turn",
+        file_path="data/osworld_trajectories.jsonl",
+        system_prompt="",
+        mode="multi-turn",
+        prefix_caching_required=True,
+        min_turns=2,
+        max_turns=10,
+        num_sessions=50,
+        agent_type="computer-use",
+        turn_style="multi-turn",
+        serving_style="not-disaggregated",
+        data_source="osworld",
+    ),
+    "osworld-multiturn-medium": WorkloadProfile(
+        name="osworld-multiturn-medium",
+        isl_tokens=65536,
+        osl_tokens=500,
+        isl_stddev=0.0,
+        description="Real OSWorld computer-use agent: 10-20 step sessions",
+        dataset="osworld-multi-turn",
+        file_path="data/osworld_trajectories.jsonl",
+        system_prompt="",
+        mode="multi-turn",
+        prefix_caching_required=True,
+        min_turns=10,
+        max_turns=20,
+        num_sessions=30,
+        agent_type="computer-use",
+        turn_style="multi-turn",
+        serving_style="not-disaggregated",
+        data_source="osworld",
+    ),
+    "osworld-multiturn-long": WorkloadProfile(
+        name="osworld-multiturn-long",
+        isl_tokens=131072,
+        osl_tokens=500,
+        isl_stddev=0.0,
+        description="Real OSWorld computer-use agent: 20-30 step sessions (longest available)",
+        dataset="osworld-multi-turn",
+        file_path="data/osworld_trajectories.jsonl",
+        system_prompt="",
+        mode="multi-turn",
+        prefix_caching_required=True,
+        min_turns=20,
+        max_turns=30,
+        num_sessions=20,
+        agent_type="computer-use",
+        turn_style="multi-turn",
+        serving_style="not-disaggregated",
+        data_source="osworld",
+    ),
+
     # ===================================================================
-    # Tier 2: Chat — ShareGPT with honest shape-based labels
+    # Group 2: Chat — ShareGPT (single-turn and multi-turn)
     # ===================================================================
+
+    # --- Single-turn ---
 
     "chat-short": WorkloadProfile(
         name="chat-short",
@@ -282,59 +345,7 @@ PROFILES: dict[str, WorkloadProfile] = {
         data_source="sharegpt",
     ),
 
-    # ===================================================================
-    # Tier 3: Synthetic Stress Tests
-    # ===================================================================
-
-    "prefill-heavy": WorkloadProfile(
-        name="prefill-heavy",
-        isl_tokens=8192,
-        osl_tokens=256,
-        isl_stddev=0.0,
-        description="Synthetic prefill stress: long input, short output (ISL=8192, OSL=256)",
-        dataset="random",
-        tokenizer_name="meta-llama/Llama-3.1-8B-Instruct",
-        mode="stress-test",
-        prefix_caching_required=False,
-        agent_type="chat",
-        turn_style="single-turn",
-        serving_style="not-disaggregated",
-        data_source="random",
-    ),
-    "decode-heavy": WorkloadProfile(
-        name="decode-heavy",
-        isl_tokens=256,
-        osl_tokens=4096,
-        isl_stddev=0.0,
-        description="Synthetic decode stress: short input, long output (ISL=256, OSL=4096)",
-        dataset="random",
-        tokenizer_name="meta-llama/Llama-3.1-8B-Instruct",
-        mode="stress-test",
-        prefix_caching_required=False,
-        agent_type="chat",
-        turn_style="single-turn",
-        serving_style="not-disaggregated",
-        data_source="random",
-    ),
-    "random-1k": WorkloadProfile(
-        name="random-1k",
-        isl_tokens=1024,
-        osl_tokens=1024,
-        isl_stddev=0.0,
-        description="InferenceX cross-validation: random tokens ISL=1024 OSL=1024",
-        dataset="random",
-        tokenizer_name="meta-llama/Llama-3.1-8B-Instruct",
-        mode="stress-test",
-        prefix_caching_required=False,
-        agent_type="chat",
-        turn_style="single-turn",
-        serving_style="not-disaggregated",
-        data_source="random",
-    ),
-
-    # ===================================================================
-    # Tier 4: Multi-turn Chat (ShareGPT)
-    # ===================================================================
+    # --- Multi-turn ---
 
     "chat-multiturn-short": WorkloadProfile(
         name="chat-multiturn-short",
@@ -406,7 +417,57 @@ PROFILES: dict[str, WorkloadProfile] = {
     ),
 
     # ===================================================================
-    # Utility
+    # Group 3: Synthetic Stress Tests
+    # ===================================================================
+
+    "prefill-heavy": WorkloadProfile(
+        name="prefill-heavy",
+        isl_tokens=8192,
+        osl_tokens=256,
+        isl_stddev=0.0,
+        description="Synthetic prefill stress: long input, short output (ISL=8192, OSL=256)",
+        dataset="random",
+        tokenizer_name="meta-llama/Llama-3.1-8B-Instruct",
+        mode="stress-test",
+        prefix_caching_required=False,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="random",
+    ),
+    "decode-heavy": WorkloadProfile(
+        name="decode-heavy",
+        isl_tokens=256,
+        osl_tokens=4096,
+        isl_stddev=0.0,
+        description="Synthetic decode stress: short input, long output (ISL=256, OSL=4096)",
+        dataset="random",
+        tokenizer_name="meta-llama/Llama-3.1-8B-Instruct",
+        mode="stress-test",
+        prefix_caching_required=False,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="random",
+    ),
+    "random-1k": WorkloadProfile(
+        name="random-1k",
+        isl_tokens=1024,
+        osl_tokens=1024,
+        isl_stddev=0.0,
+        description="InferenceX cross-validation: random tokens ISL=1024 OSL=1024",
+        dataset="random",
+        tokenizer_name="meta-llama/Llama-3.1-8B-Instruct",
+        mode="stress-test",
+        prefix_caching_required=False,
+        agent_type="chat",
+        turn_style="single-turn",
+        serving_style="not-disaggregated",
+        data_source="random",
+    ),
+
+    # ===================================================================
+    # Group 4: Utility
     # ===================================================================
 
     "test": WorkloadProfile(

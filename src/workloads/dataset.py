@@ -754,7 +754,7 @@ def make_dataset(profile) -> BaseDataset:
             max_isl_tokens=profile.isl_tokens,
             max_osl_tokens=profile.osl_tokens,
         )
-    elif profile.dataset in ("swebench-multi-turn", "terminalbench-multi-turn"):
+    elif profile.dataset in ("swebench-multi-turn", "terminalbench-multi-turn", "osworld-multi-turn"):
         return TrajectoryMultiTurnDataset(
             filepath=profile.file_path,
             min_turns=profile.min_turns,
