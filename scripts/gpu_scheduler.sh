@@ -19,6 +19,7 @@ SLOTS_TP2=("0,1|9000" "2,3|9001")
 SLOTS_TP4=("0,1,2,3|9000")
 
 SCHED_MAX_SERVER_WAIT="${MAX_SERVER_WAIT:-1800}"
+SERVER_PYTHON="${SERVER_PYTHON:-$PYTHON}"
 
 slog() { echo -e "\033[0;36m[SCHED]\033[0m $1"; }
 slot_log() { echo -e "\033[0;35m[SLOT$1]\033[0m $2"; }
@@ -80,7 +81,7 @@ start_vllm_on_slot() {
 start_sglang_on_slot() {
     local model_path="$1" tp="$2" extra_flags="$3" max_len="$4" gpu_mem="$5" tag="$6" cuda_devs="$7" port="$8"
 
-    local cmd="CUDA_VISIBLE_DEVICES=$cuda_devs $PYTHON -m sglang.launch_server \
+    local cmd="CUDA_VISIBLE_DEVICES=$cuda_devs $SERVER_PYTHON -m sglang.launch_server \
         --model-path $model_path \
         --tp $tp \
         --port $port \

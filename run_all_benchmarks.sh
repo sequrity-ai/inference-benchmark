@@ -75,27 +75,43 @@ bench_callback() {
                 slot_log "$slot_idx" "Low concurrency sweep for $name TP=$tp (tight VRAM)"
             fi
             ;;
+        Qwen3.5-27B)
+            if [[ "$tp" -le 2 ]]; then
+                conc_list="$CONC_SWEEP_LOW"
+                slot_log "$slot_idx" "Low concurrency sweep for $name TP=$tp (gpu_mem=0.92, memory leak risk)"
+            fi
+            ;;
+        gpt-oss-120b)
+            conc_list="$CONC_SWEEP_LOW"
+            slot_log "$slot_idx" "Low concurrency sweep for $name (large MoE, memory leak risk)"
+            ;;
     esac
 
     for PROFILE in $PROFILES; do
         slot_log "$slot_idx" "━━━ $name TP=$tp: $PROFILE ━━━"
         for CONC in $conc_list; do
-            NREQ=200
+            # nreq must always exceed concurrency to ensure full load pressure
+            NREQ=$(( CONC * 2 ))
+            [[ "$NREQ" -lt 200 ]] && NREQ=200
             [[ "$CONC" -eq 1 ]] && NREQ=50
-            [[ "$CONC" -ge 200 ]] && NREQ=150
 
             local out="${results_dir}/${PROFILE}_conc${CONC}.json"
 
-            # Resume support: skip valid existing results
-            if [[ -f "$out" ]] && [[ -s "$out" ]]; then
-                completed=$("$PYTHON" -c "import json; d=json.load(open('$out')); print(d.get('num_requests_completed', d.get('completed_requests',0)))" 2>/dev/null || echo "0")
-                if [[ "$completed" -gt 0 ]]; then
-                    slot_log "$slot_idx" "  SKIP conc=$CONC (exists, $completed reqs)"
-                    continue
-                else
-                    slot_log "$slot_idx" "  Removing bad: $out"
-                    rm -f "$out"
+            # Resume support: skip valid existing results (check ALL date folders)
+            local skip_run=false
+            for existing_dir in results/${tag}/*/; do
+                local existing_file="${existing_dir}${PROFILE}_conc${CONC}.json"
+                if [[ -f "$existing_file" ]] && [[ -s "$existing_file" ]]; then
+                    completed=$("$PYTHON" -c "import json; d=json.load(open('$existing_file')); s=d.get('summary',{}); print(s.get('successful_requests', d.get('num_requests_completed', d.get('completed_requests',0))))" 2>/dev/null || echo "0")
+                    if [[ "$completed" -gt 0 ]]; then
+                        slot_log "$slot_idx" "  SKIP conc=$CONC (exists in $(basename "$existing_dir"), $completed reqs)"
+                        skip_run=true
+                        break
+                    fi
                 fi
+            done
+            if [[ "$skip_run" == "true" ]]; then
+                continue
             fi
 
             slot_log "$slot_idx" "  $PROFILE conc=$CONC nreq=$NREQ"

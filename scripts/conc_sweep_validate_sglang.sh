@@ -87,9 +87,10 @@ run_sweep() {
             fi
         fi
 
-        local nreq=$NREQ
+        # nreq must always exceed concurrency to ensure full load pressure
+        local nreq=$(( CONC * 2 ))
+        [[ "$nreq" -lt 200 ]] && nreq=200
         [[ "$CONC" -eq 1 ]] && nreq=50
-        [[ "$CONC" -ge 200 ]] && nreq=150
 
         log "[SLOT$slot] Running $PROFILE conc=$CONC nreq=$nreq"
         OPENAI_API_KEY="$API_KEY" "$PYTHON" -m src.benchmark.runner \
