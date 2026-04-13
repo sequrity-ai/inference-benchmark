@@ -27,10 +27,18 @@ class RequestResult:
 
     @property
     def tpot(self) -> Optional[float]:
-        """Time per output token (mean ITL), excluding first token."""
-        if not self.itl:
-            return None
-        return sum(self.itl) / len(self.itl)
+        """Time per output token (mean ITL), excluding first token.
+
+        Falls back to (e2el - ttft) / output_tokens when ITL data is
+        missing (e.g. models that don't stream token-by-token).
+        """
+        if self.itl:
+            return sum(self.itl) / len(self.itl)
+        # Fallback: compute from e2el and ttft
+        if self.e2el is not None and self.ttft is not None and self.output_tokens > 1:
+            decode_time = self.e2el - self.ttft
+            return decode_time / (self.output_tokens - 1)
+        return None
 
 
 @dataclass
